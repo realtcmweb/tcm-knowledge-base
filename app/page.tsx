@@ -1,18 +1,273 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useCallback } from 'react'
+import Head from 'next/head'
 
+// ============================================
+// 問卷題目（10題核心版）
+// ============================================
+const QUESTIONS = [
+  {
+    id: 'S1',
+    text: '您今天最困擾的問題是什麼？',
+    type: 'single',
+    required: true,
+    options: [
+      { value: '失眠', label: '失眠 / 睡不好' },
+      { value: '疲倦', label: '疲倦 / 沒精神' },
+      { value: '消化', label: '腹瀉 / 便祕 / 胃脹' },
+      { value: '冰冷', label: '手腳冰冷' },
+      { value: '頭痛', label: '頭痛 / 頭暈' },
+      { value: '咳嗽', label: '咳嗽 / 喉嚨問題' },
+      { value: '皮膚', label: '皮膚 / 過敏' },
+      { value: '疼痛', label: '腰酸 / 關節痛' },
+      { value: '情緒', label: '情緒 / 壓力問題' },
+      { value: '其他', label: '其他' },
+    ]
+  },
+  {
+    id: 'S2',
+    text: '這個問題持續多久了？',
+    type: 'single',
+    required: true,
+    options: [
+      { value: 'days', label: '几天内' },
+      { value: 'weeks', label: '几週' },
+      { value: 'months', label: '几个月' },
+      { value: 'years', label: '一年以上' },
+    ]
+  },
+  {
+    id: 'S3',
+    text: '您整體比較怕冷還是怕熱？',
+    type: 'single',
+    required: true,
+    options: [
+      { value: 'fear_cold', label: '很怕冷（冬天離不開被子）' },
+      { value: 'fear_heat', label: '很怕熱（夏天離不開冷氣）' },
+      { value: 'both', label: '既怕冷又怕熱' },
+      { value: 'neutral', label: '沒有特別' },
+    ]
+  },
+  {
+    id: 'S4',
+    text: '您是否容易出汗？',
+    type: 'single',
+    required: true,
+    options: [
+      { value: 'little', label: '很少出汗' },
+      { value: 'normal', label: '正常活動時才出' },
+      { value: 'easy', label: '稍微動一下就滿頭大汗' },
+      { value: 'night_sweat', label: '睡覺時盜汗' },
+      { value: 'spontaneous', label: '不動也出汗' },
+    ]
+  },
+  {
+    id: 'S5',
+    text: '大便形態？',
+    type: 'single',
+    required: true,
+    options: [
+      { value: 'normal', label: '成形正常' },
+      { value: '硬', label: '大便偏硬' },
+      { value: '稀', label: '大便偏稀' },
+      { value: '黏', label: '大便黏膩' },
+      { value: '先硬後稀', label: '先硬後稀' },
+    ]
+  },
+  {
+    id: 'S6',
+    text: '小便情況？',
+    type: 'single',
+    required: true,
+    options: [
+      { value: '正常', label: '正常' },
+      { value: '清長', label: '尿清長（量多色淡）' },
+      { value: '短赤', label: '尿短赤（量少色深）' },
+      { value: '頻數', label: '尿頻' },
+      { value: '夜尿', label: '夜尿多' },
+    ]
+  },
+  {
+    id: 'S7',
+    text: '胃口情況？',
+    type: 'single',
+    required: true,
+    options: [
+      { value: '正常', label: '正常' },
+      { value: '不振', label: '食慾不振' },
+      { value: '亢進', label: '食慾亢進' },
+      { value: '胃脹', label: '吃一點就飽' },
+      { value: '飢餓感', label: '容易飢餓' },
+    ]
+  },
+  {
+    id: 'S8',
+    text: '睡眠情況？',
+    type: 'single',
+    required: true,
+    options: [
+      { value: '正常', label: '正常' },
+      { value: '失眠', label: '失眠難入睡' },
+      { value: '早醒', label: '早醒' },
+      { value: '多夢', label: '多夢' },
+      { value: '嗜睡', label: '白天嗜睡' },
+    ]
+  },
+  {
+    id: 'S9',
+    text: '情緒/壓力狀態？',
+    type: 'single',
+    required: true,
+    options: [
+      { value: '平穩', label: '平穩' },
+      { value: '焦慮', label: '焦慮 / 緊張' },
+      { value: '抑鬱', label: '抑鬱 / 低落' },
+      { value: '易怒', label: '易怒 / 脾氣大' },
+      { value: '壓力', label: '壓力大' },
+    ]
+  },
+  {
+    id: 'S10',
+    text: '舌苔外觀（若知道）？',
+    type: 'single',
+    required: false,
+    options: [
+      { value: '不知道', label: '不知道' },
+      { value: '薄白', label: '薄白苔' },
+      { value: '白苔', label: '白厚苔' },
+      { value: '黃苔', label: '黃苔' },
+      { value: '少苔', label: '少苔 / 無苔' },
+      { value: '其他', label: '其他' },
+    ]
+  },
+]
+
+// ============================================
+// 體質分析函式（前端規則引擎）
+// ============================================
+function analyzeConstitution(answers: Record<string, string>) {
+  const { S1, S3, S4, S5, S6, S7, S8, S9 } = answers
+
+  // 陰虛
+  if (S3 === 'fear_heat' && (S4 === 'night_sweat' || S4 === 'spontaneous') && S8 === '失眠') {
+    return {
+      type: '陰虛體質',
+      sub: '心腎陰虛',
+      description: '您屬於陰虛體質，虛火內擾，夜間盜汗，睡眠不安。調理应以滋陰清熱、養心安神為主。',
+      suggestions: ['少吃燒烤油炸辛辣', '多吃百合、銀耳、麥冬', '避免熬夜', '練習太極拳或冥想'],
+      avoid: ['咖啡因', '酒精', '辛辣刺激']
+    }
+  }
+
+  // 陽虛
+  if (S3 === 'fear_cold' && S6 === '清長' && S7 === '不振') {
+    return {
+      type: '陽虛體質',
+      sub: '脾腎陽虛',
+      description: '您屬於陽虛體質，火力不足，畏寒怕冷，容易疲倦。調理应以溫補脾腎、助陽驅寒為主。',
+      suggestions: ['多吃溫熱食物（羊肉、龍眼、紅棗）', '忌生冷冰品', '每天熱水泡腳', '適度運動提升陽氣'],
+      avoid: ['冰品', '生菜水果', '冷飲']
+    }
+  }
+
+  // 氣虛
+  if (S4 === 'easy' || S4 === 'spontaneous' && S7 === '不振' && S8 === '嗜睡') {
+    return {
+      type: '氣虛體質',
+      sub: '脾肺氣虛',
+      description: '您屬於氣虛體質，元氣不足，容易疲勞，說話無力。調理应以補氣健脾、益肺固表為主。',
+      suggestions: ['多吃山藥、黃耆、黨參', '適度運動（散步、太極）', '保證充足睡眠', '少吃耗氣食物（白蘿蔔、茶葉）'],
+      avoid: ['過度勞累', '熬夜', '劇烈運動']
+    }
+  }
+
+  // 痰濕
+  if (S5 === '黏' && S7 === '胃脹' && S1 === '疲倦') {
+    return {
+      type: '痰濕體質',
+      sub: '痰濕困脾',
+      description: '您屬於痰濕體質，濕濁內蘊，身體沉重，易長痘。調理应以燥濕化痰、健脾利濕為主。',
+      suggestions: ['少吃甜食油膩', '多吃薏仁、赤小豆、冬瓜', '保持環境乾燥', '規律運動排汗'],
+      avoid: ['甜食', '油炸', '糯米', '奶製品']
+    }
+  }
+
+  // 肝氣鬱結
+  if (S9 === '焦慮' || S9 === '易怒' && S8 === '失眠' && S1 === '情緒') {
+    return {
+      type: '氣鬱體質',
+      sub: '肝氣鬱結',
+      description: '您屬於氣鬱體質，肝氣不舒，情緒波動大，胸脅脹悶。調理应以疏肝理氣、解鬱安神為主。',
+      suggestions: ['多喝花茶（玫瑰花、菊花）', '規律作息', '找人傾訴', '按摩太衝穴'],
+      avoid: ['過度壓抑情緒', '酒精', '熬夜']
+    }
+  }
+
+  // 脾胃虛弱
+  if (S5 === '稀' || S5 === '先硬後稀' && S7 === '不振') {
+    return {
+      type: '脾虛體質',
+      sub: '脾胃虛弱',
+      description: '您屬於脾虛體質，運化失常，大便異常，食慾不振。調理应以健脾和胃、補中益氣為主。',
+      suggestions: ['定時定量用餐', '多吃山藥、茯苓、蓮子', '飯後散步', '少吃生冷油膩'],
+      avoid: ['冰品', '空腹吃水果', '暴飲暴食']
+    }
+  }
+
+  // 默認平和
+  return {
+    type: '偏頗體質',
+    sub: '需進一步調理',
+    description: '根據您的回答，屬於輕度偏頗體質，建議規律作息、均衡飲食、適度運動以維持健康。',
+    suggestions: ['保持規律作息', '均衡飲食', '每週運動3次', '保持心情愉快'],
+    avoid: ['過度疲勞', '情緒大波動']
+  }
+}
+
+// ============================================
+// 類型定義
+// ============================================
+type Step = 'welcome' | 'questionnaire' | 'tongue' | 'result'
+
+interface AnalysisResult {
+  constitution: { type: string; sub: string; description: string; suggestions: string[]; avoid: string[] }
+  tongue?: { tongue_color: string; coating_color: string; teeth_mark: number; cracks: number; confidence: number }
+  rag_results?: any[]
+  questionnaire_answers: Record<string, string>
+}
+
+// ============================================
+// 主元件
+// ============================================
 export default function Home() {
-  const [tab, setTab] = useState<'tongue' | 'chat' | 'search'>('tongue')
+  const [step, setStep] = useState<Step>('welcome')
+  const [qIndex, setQIndex] = useState(0)
+  const [answers, setAnswers] = useState<Record<string, string>>({})
   const [tongueFile, setTongueFile] = useState<File | null>(null)
   const [tonguePreview, setTonguePreview] = useState<string | null>(null)
-  const [chatMessage, setChatMessage] = useState('')
-  const [searchQuery, setSearchQuery] = useState('')
   const [loading, setLoading] = useState(false)
-  const [result, setResult] = useState<any>(null)
-  const [chatHistory, setChatHistory] = useState<{role: 'user'|'ai', text: string}[]>([])
+  const [result, setResult] = useState<AnalysisResult | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
 
+  // 選擇問卷選項 → 自動跳下一題
+  const handleAnswer = useCallback((value: string) => {
+    const q = QUESTIONS[qIndex]
+    const newAnswers = { ...answers, [q.id]: value }
+    setAnswers(newAnswers)
+
+    // 選完後自動跳下一題，延遲 400ms 讓用戶看到選中效果
+    setTimeout(() => {
+      if (qIndex < QUESTIONS.length - 1) {
+        setQIndex(qIndex + 1)
+      } else {
+        // 問卷完成 → 舌苔步驟
+        setStep('tongue')
+      }
+    }, 400)
+  }, [answers, qIndex])
+
+  // 舌苔上傳
   const handleTongueUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
@@ -21,243 +276,368 @@ export default function Home() {
     reader.onload = (ev) => setTonguePreview(ev.target?.result as string)
   }
 
-  const handleTongueSubmit = async () => {
-    if (!tongueFile) return
+  // 提交分析
+  const handleSubmit = async () => {
     setLoading(true)
-    setResult(null)
-    await new Promise(r => setTimeout(r, 1500))
-    setResult({
-      type: 'tongue',
-      result: '舌苔偏淡，略有齒痕。提示：脾胃功能偏弱，建議清淡飲食，適量運動。',
-      suggestions: ['少吃生冷油膩', '多吃山藥、茯苓', '保持規律作息']
-    })
-    setLoading(false)
-  }
-
-  const handleChatSubmit = async () => {
-    if (!chatMessage.trim()) return
-    const userMsg = chatMessage
-    setChatMessage('')
-    setChatHistory(h => [...h, { role: 'user', text: userMsg }])
-    setLoading(true)
-    await new Promise(r => setTimeout(r, 1200))
-    setChatHistory(h => [...h, { role: 'ai', text: '根據您的描述，建議進一步觀察症狀持續時間。若有不適，請諮詢中醫師獲取個人化調理方案。' }])
-    setLoading(false)
-  }
-
-  const handleSearch = async (q: string) => {
-    if (!q.trim()) return
-    setLoading(true)
-    setResult(null)
     try {
-      const res = await fetch(`/api/search?q=${encodeURIComponent(q)}&k=3`)
-      const data = await res.json()
-      setResult({ type: 'search', query: q, results: data.results || [] })
-    } catch {
-      setResult({ type: 'error', message: '搜尋服務暫時無法使用' })
+      const constitution = analyzeConstitution(answers)
+
+      let tongueInfo: AnalysisResult['tongue'] = undefined
+      let rag_results: any[] = []
+
+      // 如果有上傳舌苔圖片，分析它
+      if (tongueFile) {
+        const formData = new FormData()
+        formData.append('image', tongueFile)
+
+        const res = await fetch('/api/tongue', {
+          method: 'POST',
+          body: formData,
+        })
+        if (res.ok) {
+          const data = await res.json()
+          tongueInfo = data
+        }
+      }
+
+      // RAG 搜尋相關中醫知識
+      try {
+        const chiefComplaint = answers['S1'] || '一般養生'
+        const searchRes = await fetch(`/api/search?q=${encodeURIComponent(chiefComplaint)}&k=3`)
+        if (searchRes.ok) {
+          const searchData = await searchRes.json()
+          rag_results = searchData.results || []
+        }
+      } catch { /* RAG 失敗不影響 */ }
+
+      setResult({ constitution, tongue: tongueInfo, rag_results, questionnaire_answers: answers })
+      setStep('result')
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
   }
+
+  const currentQ = QUESTIONS[qIndex]
+  const progress = ((qIndex + 1) / QUESTIONS.length) * 100
 
   return (
-    <div className="min-h-screen bg-stone-50 text-stone-800" style={{ fontFamily: "'PingFang TC', 'Microsoft JhengHei', serif" }}>
+    <div className="min-h-screen bg-stone-50 text-stone-800" style={{ fontFamily: "'Noto Serif TC', serif" }}>
+      <Head><title>中醫智能問診 | TCM AI</title></Head>
 
-      {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b border-stone-200 sticky top-0 z-50">
-        <div className="max-w-lg mx-auto px-4 py-4 flex items-center justify-between">
+      {/* ── Header ── */}
+      <header className="bg-white/90 backdrop-blur-sm border-b border-stone-200 sticky top-0 z-50">
+        <div className="max-w-lg mx-auto px-4 py-3 flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-light tracking-wide text-stone-700">中醫智能問診</h1>
+            <h1 className="text-lg font-light tracking-wide text-stone-700">中醫智能問診</h1>
             <p className="text-xs text-stone-400 tracking-widest">AI 輔助養生參考</p>
           </div>
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white text-sm">
+          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white text-sm font-medium">
             診
           </div>
         </div>
+        {/* Progress bar for questionnaire */}
+        {step === 'questionnaire' && (
+          <div className="h-0.5 bg-stone-100">
+            <div className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-500" style={{ width: `${progress}%` }} />
+          </div>
+        )}
       </header>
 
-      {/* Tab Navigation */}
-      <nav className="max-w-lg mx-auto px-4 py-3 flex gap-1 bg-white/60 backdrop-blur-sm">
-        {[
-          { id: 'tongue', label: '舌苔拍照', icon: '👅' },
-          { id: 'chat',   label: '智能問診', icon: '💬' },
-          { id: 'search', label: '知識庫',   icon: '📖' },
-        ].map(t => (
-          <button
-            key={t.id}
-            onClick={() => { setTab(t.id as any); setResult(null); setTongueFile(null); setTonguePreview(null) }}
-            className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all flex items-center justify-center gap-1.5
-              ${tab === t.id ? 'bg-stone-800 text-white shadow-sm' : 'text-stone-500 hover:bg-stone-100'}`}
-          >
-            <span>{t.icon}</span>
-            <span>{t.label}</span>
-          </button>
-        ))}
-      </nav>
+      {/* ── Welcome ── */}
+      {step === 'welcome' && (
+        <main className="max-w-lg mx-auto px-4 py-12 flex flex-col items-center justify-center min-h-[70vh] text-center">
+          <div className="text-6xl mb-6">🌿</div>
+          <h2 className="text-2xl font-light text-stone-700 mb-3 tracking-wide">中醫智能問診</h2>
+          <p className="text-sm text-stone-500 leading-relaxed mb-10 max-w-xs">
+            填寫問卷 + 拍攝舌苔<br />AI 為您分析體質與調養建議
+          </p>
 
-      {/* Main Content */}
-      <main className="max-w-lg mx-auto px-4 py-6">
-
-        {/* ── 舌苔拍照 ── */}
-        {tab === 'tongue' && (
-          <div className="space-y-5">
-            <div className="text-center">
-              <p className="text-sm text-stone-500 leading-relaxed">
-                拍攝舌苔照片，AI 將根據圖像提供養生參考建議。
-                <br /><span className="text-xs text-stone-400">本系統僅供養生參考，不作為醫療診斷依據。</span>
-              </p>
-            </div>
-
-            {/* Upload Area */}
-            <div
-              onClick={() => fileRef.current?.click()}
-              className="relative border-2 border-dashed border-stone-300 rounded-2xl overflow-hidden cursor-pointer hover:border-emerald-400 transition-colors aspect-[4/3] flex items-center justify-center bg-white"
+          <div className="w-full space-y-3">
+            <button
+              onClick={() => setStep('questionnaire')}
+              className="w-full py-4 bg-gradient-to-r from-emerald-600 to-teal-500 text-white rounded-2xl font-medium shadow-lg shadow-emerald-200 hover:shadow-xl transition-all text-base"
             >
-              {tonguePreview ? (
-                <img src={tonguePreview} alt="舌苔預覽" className="w-full h-full object-cover" />
-              ) : (
-                <div className="text-center text-stone-400">
-                  <div className="text-5xl mb-3">👅</div>
-                  <p className="text-sm font-medium">點擊上傳舌苔照片</p>
-                  <p className="text-xs mt-1">建議在自然光下拍攝</p>
-                </div>
-              )}
-              <input ref={fileRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={handleTongueUpload} />
-            </div>
+              開始問診
+            </button>
+            <p className="text-xs text-stone-400 mt-3">
+              約需 2 分鐘 · 僅供養生參考，不作為醫療診斷
+            </p>
+          </div>
 
-            {tonguePreview && (
+          <div className="mt-16 grid grid-cols-3 gap-6 text-center">
+            {[
+              { icon: '📋', label: '10 題精選問卷' },
+              { icon: '👅', label: '舌苔 AI 分析' },
+              { icon: '📚', label: '51 本中醫典籍' },
+            ].map(f => (
+              <div key={f.label} className="text-xs text-stone-500">
+                <div className="text-2xl mb-1">{f.icon}</div>
+                <div>{f.label}</div>
+              </div>
+            ))}
+          </div>
+        </main>
+      )}
+
+      {/* ── 問卷（每次一題，彈出式） ── */}
+      {step === 'questionnaire' && (
+        <main className="max-w-lg mx-auto px-4 py-8 min-h-[70vh] flex flex-col justify-center">
+          <div className="text-center mb-6">
+            <p className="text-xs text-stone-400 tracking-widest mb-1">第 {qIndex + 1} / {QUESTIONS.length} 題</p>
+            <h2 className="text-xl font-light text-stone-700 leading-relaxed">{currentQ.text}</h2>
+          </div>
+
+          {/* 選項卡片 */}
+          <div className="space-y-2.5">
+            {currentQ.options.map((opt) => (
               <button
-                onClick={handleTongueSubmit}
-                disabled={loading}
-                className="w-full py-4 bg-gradient-to-r from-emerald-600 to-teal-500 text-white rounded-2xl font-medium shadow-lg shadow-emerald-200 disabled:opacity-60 transition"
+                key={opt.value}
+                onClick={() => handleAnswer(opt.value)}
+                className={`w-full px-5 py-4 rounded-xl text-sm text-left transition-all border-2
+                  ${answers[currentQ.id] === opt.value
+                    ? 'border-emerald-500 bg-emerald-50 text-emerald-800 font-medium shadow-sm'
+                    : 'border-stone-200 bg-white text-stone-700 hover:border-emerald-300 hover:bg-emerald-50/50'
+                  }`}
               >
-                {loading ? '分析中...' : '✨ 開始分析'}
+                {opt.label}
               </button>
-            )}
+            ))}
+          </div>
 
-            {/* Result */}
-            {result?.type === 'tongue' && (
-              <div className="bg-white rounded-2xl p-5 shadow-sm border border-stone-100 animate-fade-in">
-                <h3 className="text-sm font-semibold text-emerald-700 mb-3 flex items-center gap-2">
-                  <span>✨</span> AI 分析結果
-                </h3>
-                <p className="text-stone-700 leading-relaxed mb-4">{result.result}</p>
-                <div className="space-y-2">
-                  <p className="text-xs font-medium text-stone-500">📋 養生建議</p>
-                  {result.suggestions.map((s: string, i: number) => (
-                    <div key={i} className="flex items-center gap-2 text-sm text-stone-600">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 flex-shrink-0" />
-                      {s}
-                    </div>
-                  ))}
-                </div>
+          {/* 跳過按鈕 */}
+          {qIndex < QUESTIONS.length - 1 && (
+            <button
+              onClick={() => {
+                const newAnswers = { ...answers }
+                delete newAnswers[currentQ.id]
+                setAnswers(newAnswers)
+                setQIndex(qIndex + 1)
+              }}
+              className="mt-4 text-xs text-stone-400 hover:text-stone-600 transition"
+            >
+              跳過 →
+            </button>
+          )}
+
+          {/* 上一題 */}
+          {qIndex > 0 && (
+            <button
+              onClick={() => setQIndex(qIndex - 1)}
+              className="mt-3 text-xs text-stone-400 hover:text-stone-600 transition"
+            >
+              ← 上一題
+            </button>
+          )}
+        </main>
+      )}
+
+      {/* ── 舌苔拍照 ── */}
+      {step === 'tongue' && (
+        <main className="max-w-lg mx-auto px-4 py-8 min-h-[70vh] flex flex-col justify-center">
+          <div className="text-center mb-6">
+            <p className="text-xs text-emerald-600 tracking-widest mb-2 font-medium">步驟 2 / 2</p>
+            <h2 className="text-xl font-light text-stone-700">拍攝舌苔</h2>
+            <p className="text-xs text-stone-500 mt-2">協助 AI 更準確判斷體質</p>
+          </div>
+
+          {/* 拍攝引導 */}
+          <div className="bg-white rounded-2xl border-2 border-dashed border-stone-300 overflow-hidden mb-4">
+            {tonguePreview ? (
+              <div className="relative">
+                <img src={tonguePreview} alt="舌苔預覽" className="w-full object-cover aspect-[4/3]" />
+                <button
+                  onClick={() => { setTonguePreview(null); setTongueFile(null) }}
+                  className="absolute top-3 right-3 w-8 h-8 bg-black/50 rounded-full text-white text-xs flex items-center justify-center"
+                >
+                  ✕
+                </button>
+              </div>
+            ) : (
+              <div
+                onClick={() => fileRef.current?.click()}
+                className="aspect-[4/3] flex flex-col items-center justify-center text-stone-400 cursor-pointer hover:bg-stone-50 transition"
+              >
+                <div className="text-5xl mb-3">👅</div>
+                <p className="text-sm font-medium">點擊拍攝舌苔</p>
+                <p className="text-xs mt-1 text-stone-400">或從相簿選擇</p>
+                <p className="text-xs mt-3 text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-full">
+                  💡 建議：自然光、張嘴伸舌、舌頭放鬆
+                </p>
               </div>
             )}
+            <input ref={fileRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={handleTongueUpload} />
           </div>
-        )}
 
-        {/* ── 智能問診 ── */}
-        {tab === 'chat' && (
-          <div className="space-y-4">
-            {/* Chat history */}
-            <div className="space-y-3 min-h-[40vh]">
-              {chatHistory.length === 0 && (
-                <div className="text-center py-12 text-stone-400">
-                  <div className="text-4xl mb-3">💬</div>
-                  <p className="text-sm">描述您的症狀，AI 將提供養生參考</p>
-                </div>
+          {/* 提示 */}
+          <div className="bg-stone-100 rounded-xl p-4 mb-4">
+            <p className="text-xs text-stone-500 leading-relaxed">
+              <span className="font-medium text-stone-700">拍攝技巧：</span><br />
+              ① 自然光或室內光，避免閃光燈<br />
+              ② 張嘴伸舌，舌頭自然下垂<br />
+              ③ 舌頭自然放鬆，不要用力<br />
+              ④ 確保舌頭佔據畫面主要區域
+            </p>
+          </div>
+
+          {/* 按鈕 */}
+          <div className="space-y-2">
+            <button
+              onClick={handleSubmit}
+              disabled={loading}
+              className="w-full py-4 bg-gradient-to-r from-emerald-600 to-teal-500 text-white rounded-2xl font-medium shadow-lg shadow-emerald-200 disabled:opacity-60 transition text-base"
+            >
+              {loading ? (
+                <span>分析中...</span>
+              ) : (
+                <span>✨ {tongueFile ? '開始分析舌苔' : '略過舌苔，直接分析'}</span>
               )}
-              {chatHistory.map((msg, i) => (
-                <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-[80%] px-4 py-3 rounded-2xl text-sm leading-relaxed
-                    ${msg.role === 'user'
-                      ? 'bg-stone-800 text-white rounded-br-sm'
-                      : 'bg-white text-stone-700 border border-stone-200 rounded-bl-sm shadow-sm'}`}>
-                    {msg.text}
-                  </div>
+            </button>
+            {!tongueFile && (
+              <button
+                onClick={() => {
+                  setResult({
+                    constitution: analyzeConstitution(answers),
+                    questionnaire_answers: answers,
+                    rag_results: []
+                  })
+                  setStep('result')
+                }}
+                className="w-full py-3 text-sm text-stone-500 hover:text-stone-700 transition"
+              >
+                跳過舌苔分析
+              </button>
+            )}
+          </div>
+        </main>
+      )}
+
+      {/* ── 結果 ── */}
+      {step === 'result' && result && (
+        <main className="max-w-lg mx-auto px-4 py-8">
+          {/* 體質判定 */}
+          <div className="text-center mb-6">
+            <div className="text-4xl mb-3">🎉</div>
+            <p className="text-xs text-emerald-600 tracking-widest mb-1">體質分析結果</p>
+            <h2 className="text-2xl font-light text-stone-700">{result.constitution.type}</h2>
+            <p className="text-sm text-emerald-600 mt-1">{result.constitution.sub}</p>
+          </div>
+
+          {/* 體質描述 */}
+          <div className="bg-white rounded-2xl p-5 shadow-sm border border-stone-100 mb-4">
+            <p className="text-sm text-stone-700 leading-relaxed">{result.constitution.description}</p>
+          </div>
+
+          {/* 舌苔分析結果（如果有） */}
+          {result.tongue && (
+            <div className="bg-white rounded-2xl p-5 shadow-sm border border-stone-100 mb-4">
+              <h3 className="text-sm font-semibold text-emerald-700 mb-3 flex items-center gap-2">
+                <span>👅</span> 舌苔特徵
+              </h3>
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                <div className="bg-stone-50 rounded-xl p-3">
+                  <p className="text-xs text-stone-400 mb-1">舌色</p>
+                  <p className="text-stone-700 font-medium">{result.tongue.tongue_color || '未檢測'}</p>
+                </div>
+                <div className="bg-stone-50 rounded-xl p-3">
+                  <p className="text-xs text-stone-400 mb-1">苔色</p>
+                  <p className="text-stone-700 font-medium">{result.tongue.coating_color || '未檢測'}</p>
+                </div>
+                <div className="bg-stone-50 rounded-xl p-3">
+                  <p className="text-xs text-stone-400 mb-1">齒痕</p>
+                  <p className="text-stone-700 font-medium">
+                    {result.tongue.teeth_mark === 0 ? '無' : result.tongue.teeth_mark === 1 ? '輕微' : '明顯'}
+                  </p>
+                </div>
+                <div className="bg-stone-50 rounded-xl p-3">
+                  <p className="text-xs text-stone-400 mb-1">裂紋</p>
+                  <p className="text-stone-700 font-medium">
+                    {result.tongue.cracks === 0 ? '無' : result.tongue.cracks === 1 ? '輕微' : '明顯'}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* 調養建議 */}
+          <div className="bg-white rounded-2xl p-5 shadow-sm border border-stone-100 mb-4">
+            <h3 className="text-sm font-semibold text-emerald-700 mb-3 flex items-center gap-2">
+              <span>✅</span> 調養建議
+            </h3>
+            <div className="space-y-2">
+              {result.constitution.suggestions.map((s, i) => (
+                <div key={i} className="flex items-start gap-2.5 text-sm text-stone-700">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 flex-shrink-0 mt-2" />
+                  {s}
                 </div>
               ))}
             </div>
-
-            {/* Input */}
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={chatMessage}
-                onChange={e => setChatMessage(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && handleChatSubmit()}
-                placeholder="描述您的症狀，如：失眠、胃口不好..."
-                className="flex-1 px-4 py-3 bg-white border border-stone-200 rounded-xl text-sm outline-none focus:border-emerald-400 transition"
-              />
-              <button
-                onClick={handleChatSubmit}
-                disabled={loading || !chatMessage.trim()}
-                className="px-5 py-3 bg-stone-800 text-white rounded-xl disabled:opacity-50 transition"
-              >
-                送出
-              </button>
-            </div>
           </div>
-        )}
 
-        {/* ── 知識庫搜尋 ── */}
-        {tab === 'search' && (
-          <div className="space-y-4">
-            <div className="relative">
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && handleSearch(searchQuery)}
-                placeholder="搜尋中醫藥知識，如：桂枝湯功效"
-                className="w-full px-4 py-3.5 pr-12 bg-white border border-stone-200 rounded-2xl text-sm outline-none focus:border-emerald-400 transition"
-              />
-              <button
-                onClick={() => handleSearch(searchQuery)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-emerald-600 transition"
-              >
-                🔍
-              </button>
-            </div>
-
-            {/* Quick suggestions */}
-            <div className="flex flex-wrap gap-2">
-              {['桂枝湯', '針灸失眠', '溫病學', '中藥配伍', '脾胃調理'].map(s => (
-                <button
-                  key={s}
-                  onClick={() => { setSearchQuery(s); handleSearch(s) }}
-                  className="text-xs px-3 py-1.5 bg-white border border-stone-200 rounded-full text-stone-500 hover:border-emerald-400 hover:text-emerald-600 transition"
-                >
-                  {s}
-                </button>
+          {/* 禁忌 */}
+          <div className="bg-red-50 rounded-2xl p-5 border border-red-100 mb-4">
+            <h3 className="text-sm font-semibold text-red-600 mb-3 flex items-center gap-2">
+              <span>⚠️</span> 應避免
+            </h3>
+            <div className="space-y-2">
+              {result.constitution.avoid.map((a, i) => (
+                <div key={i} className="flex items-start gap-2.5 text-sm text-stone-700">
+                  <span className="text-red-400 flex-shrink-0">✕</span>
+                  {a}
+                </div>
               ))}
             </div>
+          </div>
 
-            {/* Results */}
-            {result?.type === 'search' && (
+          {/* 中醫典籍參考（如果有） */}
+          {result.rag_results && result.rag_results.length > 0 && (
+            <div className="bg-white rounded-2xl p-5 shadow-sm border border-stone-100 mb-4">
+              <h3 className="text-sm font-semibold text-stone-600 mb-3 flex items-center gap-2">
+                <span>📖</span> 中醫典籍參考
+              </h3>
               <div className="space-y-3">
-                <p className="text-xs text-stone-400">{result.results.length} 個結果</p>
-                {result.results.map((r: any, i: number) => (
-                  <div key={i} className="bg-white rounded-xl p-4 shadow-sm border border-stone-100">
-                    <div className="text-xs text-emerald-600 font-medium mb-1">
-                      {r.book_title} · {r.chapter}
-                    </div>
-                    <p className="text-sm text-stone-700 leading-relaxed">{r.content?.slice(0, 120)}...</p>
+                {result.rag_results.slice(0, 2).map((r: any, i: number) => (
+                  <div key={i} className="border-l-2 border-emerald-300 pl-3">
+                    <p className="text-xs text-emerald-600 font-medium mb-0.5">{r.book_title}</p>
+                    <p className="text-xs text-stone-500">{r.chapter}</p>
+                    <p className="text-sm text-stone-700 mt-1 leading-relaxed">{r.content?.slice(0, 100)}...</p>
                   </div>
                 ))}
               </div>
-            )}
+            </div>
+          )}
 
-            {result?.type === 'error' && (
-              <div className="text-center py-8 text-stone-400 text-sm">{result.message}</div>
-            )}
+          {/* 免責聲明 */}
+          <div className="text-center py-4">
+            <p className="text-xs text-stone-400 leading-relaxed">
+              本系統基於中醫理論與古籍文獻分析<br />
+              僅供養生參考，不作為醫療診斷依據<br />
+              如有不適請諮詢中醫師
+            </p>
           </div>
-        )}
-      </main>
+
+          {/* 重新開始 */}
+          <button
+            onClick={() => {
+              setStep('welcome')
+              setQIndex(0)
+              setAnswers({})
+              setTongueFile(null)
+              setTonguePreview(null)
+              setResult(null)
+            }}
+            className="w-full py-3 border-2 border-stone-200 rounded-xl text-sm text-stone-500 hover:border-emerald-400 hover:text-emerald-600 transition"
+          >
+            重新問診
+          </button>
+        </main>
+      )}
 
       {/* Footer */}
-      <footer className="text-center py-6 text-xs text-stone-400 border-t border-stone-200 mt-8">
+      <footer className="text-center py-6 text-xs text-stone-400 border-t border-stone-200 mt-4">
         <p>本系統僅供養生參考，不作為醫療診斷依據</p>
-        <p className="mt-1">中醫藥知識庫 © 2026</p>
+        <p className="mt-1">中醫藥知識庫 © 2026 · 51 本中醫藥教材</p>
       </footer>
     </div>
   )
