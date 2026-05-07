@@ -5,11 +5,10 @@ export async function POST(req: NextRequest) {
     const formData = await req.formData()
     const image = formData.get('image')
 
-    if (!image) {
+    if (!image || typeof image === 'string') {
       return NextResponse.json({ error: 'No image provided' }, { status: 400 })
     }
 
-    // Forward to Flask backend
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://152.53.240.253:8000'
     const backendFormData = new FormData()
     backendFormData.append('image', image)
