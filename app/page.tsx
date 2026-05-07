@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import SearchBox from '@/components/SearchBox'
 import SubjectGrid from '@/components/SubjectGrid'
-import RecentSearches from '@/components/RecentSearches'
 
 export default function Home() {
   const [query, setQuery] = useState('')
