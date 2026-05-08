@@ -629,6 +629,113 @@ function getPatternKeys(type: string): string[] {
 // ============================================
 // 分析引擎
 // ============================================
+// ============================================
+// 智能問診：症狀分類（全開式多選）
+// ============================================
+const SMART_SECTIONS = [
+  {
+    id: 'general', title: '全身症狀', icon: '🌡️',
+    symptoms: [
+      { value: '疲倦', label: '疲倦乏力' },
+      { value: '怕冷', label: '怕冷' },
+      { value: '怕熱', label: '怕熱' },
+      { value: '盜汗', label: '盜汗/自汗' },
+      { value: '發燒', label: '發燒/發熱' },
+      { value: '浮腫', label: '身體浮腫' },
+      { value: '消瘦', label: '體重減輕' },
+      { value: '沉重', label: '身體沉重' },
+    ]
+  },
+  {
+    id: 'head', title: '頭面部', icon: '🧠',
+    symptoms: [
+      { value: '頭暈', label: '頭暈' },
+      { value: '頭痛', label: '頭痛' },
+      { value: '耳鳴', label: '耳鳴' },
+      { value: '眼花', label: '眼睛乾澀/眼花' },
+      { value: '口乾', label: '口乾' },
+      { value: '口苦', label: '口苦' },
+      { value: '口臭', label: '口臭' },
+      { value: '咽乾', label: '咽喉乾癢' },
+    ]
+  },
+  {
+    id: 'digestive', title: '消化系統', icon: '🫃',
+    symptoms: [
+      { value: '食欲不振', label: '食欲不振' },
+      { value: '胃脹', label: '胃脹/腹脹' },
+      { value: '胃痛', label: '胃痛' },
+      { value: '反酸', label: '反酸/燒心' },
+      { value: '噁心', label: '噁心嘔吐' },
+      { value: '腹瀉', label: '腹瀉/稀軟' },
+      { value: '便祕', label: '便祕/乾硬' },
+      { value: '黏便', label: '大便黏膩' },
+    ]
+  },
+  {
+    id: 'sleep', title: '睡眠情緒', icon: '😴',
+    symptoms: [
+      { value: '失眠', label: '失眠/難入睡' },
+      { value: '多夢', label: '多夢' },
+      { value: '易醒', label: '容易醒' },
+      { value: '嗜睡', label: '嗜睡/昏沉' },
+      { value: '焦慮', label: '焦慮/緊張' },
+      { value: '易怒', label: '易怒/脾氣大' },
+      { value: '低落', label: '情緒低落' },
+      { value: '壓力', label: '壓力大' },
+    ]
+  },
+  {
+    id: 'respiratory', title: '呼吸系統', icon: '🫁',
+    symptoms: [
+      { value: '咳嗽', label: '咳嗽' },
+      { value: '鼻塞', label: '鼻塞' },
+      { value: '流鼻涕', label: '流鼻涕/鼻水' },
+      { value: '打噴嚏', label: '打噴嚏' },
+      { value: '氣喘', label: '氣喘/呼吸困難' },
+      { value: '痰多', label: '痰多' },
+    ]
+  },
+  {
+    id: 'skin', title: '皮膚問題', icon: '🔴',
+    symptoms: [
+      { value: '皮膚癢', label: '皮膚癢' },
+      { value: '濕疹', label: '濕疹' },
+      { value: '蕁麻疹', label: '蕁麻疹' },
+      { value: '痘痘', label: '痘痘/瘡' },
+      { value: '脫皮', label: '脫皮/乾燥' },
+    ]
+  },
+  {
+    id: 'pain', title: '疼痛問題', icon: '💢',
+    symptoms: [
+      { value: '腰痛', label: '腰痛' },
+      { value: '關節痛', label: '關節疼痛' },
+      { value: '肌肉酸', label: '肌肉酸痛' },
+      { value: '神經痛', label: '神經痛/刺痛' },
+      { value: '冷痛', label: '冷痛（遇冷加劇）' },
+    ]
+  },
+  {
+    id: 'urinary', title: '泌尿/生殖', icon: '💧',
+    symptoms: [
+      { value: '尿頻', label: '尿頻/夜尿多' },
+      { value: '尿少', label: '尿少/尿黃' },
+      { value: '尿痛', label: '尿痛' },
+      { value: '性功能', label: '性功能問題' },
+    ]
+  },
+  {
+    id: 'cold', title: '寒熱表現', icon: '❄️',
+    symptoms: [
+      { value: '手腳冷', label: '手腳冰冷' },
+      { value: '上熱下寒', label: '上熱下寒' },
+      { value: '冷底', label: '冷底體質' },
+      { value: '燥熱', label: '燥熱/虛火' },
+    ]
+  },
+]
+
 function analyzeCondition(answers: Record<string, string>): {
   type: string; sub: string; pattern: string; description: string
   suggestions: string[]; avoid: string[]; herbs: string[]; acupoints: string[]; diet: string[]
@@ -662,8 +769,8 @@ function analyzeCondition(answers: Record<string, string>): {
 // ============================================
 // 類型
 // ============================================
-type Step = 'mode' | 'basic' | 'chief' | 'questionnaire' | 'tongue' | 'result'
-type Mode = 'fast' | 'detailed'
+type Step = 'mode' | 'basic' | 'chief' | 'smart' | 'questionnaire' | 'tongue' | 'result'
+type Mode = 'fast' | 'detailed' | 'smart'
 
 interface ResultData {
   constitution: ReturnType<typeof analyzeCondition>
@@ -684,6 +791,7 @@ export default function Home() {
   const [qIndex, setQIndex] = useState(0)
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [customInput, setCustomInput] = useState('')
+  const [smartAnswers, setSmartAnswers] = useState<Record<string, string[]>>({})
   const [tongueFile, setTongueFile] = useState<File | null>(null)
   const [tonguePreview, setTonguePreview] = useState<string | null>(null)
   const [faceFile, setFaceFile] = useState<File | null>(null)
@@ -699,10 +807,18 @@ export default function Home() {
   // 當前問卷題目列表
   const chief = answers.chief || '其他'
   const chiefQuestions: Question[] = FAST_QUESTIONS[chief] || FAST_QUESTIONS['其他'] || []
-  // 月經題目：性別為男或年齡<10或年齡>65時排除
   const ageNum = parseInt(answers.age || '')
-  const excludeMenses = answers.gender === '男' || (!isNaN(ageNum) && (ageNum < 10 || ageNum > 65))
-  const filteredChiefQ = excludeMenses && chief === '月經' ? [] : chiefQuestions
+  const isMale = answers.gender === '男'
+  const isFemale = answers.gender === '女'
+  const excludeMenses = isMale || (!isNaN(ageNum) && (ageNum < 10 || ageNum > 65))
+  // 動態過濾性別不合的題目
+  const genderFilteredChiefQ = chiefQuestions.filter(q => {
+    if (isMale && q.id === 'f_b3') return false // 月經相關，備孕章節中
+    if (isMale && q.id === 'f_h3') return false // 頭痛-月經相關問題
+    if (excludeMenses && q.id.startsWith('f_m')) return false // 月經章節題目
+    return true
+  })
+  const filteredChiefQ = excludeMenses && chief === '月經' ? [] : genderFilteredChiefQ
   const allDetailedQuestions: Question[] = [...filteredChiefQ, ...DETAILED_EXTRA]
   const currentQuestions: Question[] = mode === 'detailed' ? allDetailedQuestions : filteredChiefQ
 
@@ -856,7 +972,7 @@ export default function Home() {
               🔒 {t('home.privacy')}
             </p>
           </div>
-          <div className="space-y-3 mb-8">
+          <div className="space-y-3 mb-6">
             <button onClick={() => { setMode('fast'); setStep('basic') }}
               className="w-full py-5 px-5 bg-white border-2 border-stone-200 rounded-2xl text-left hover:border-emerald-400 transition group">
               <div className="flex items-center justify-between">
@@ -877,6 +993,16 @@ export default function Home() {
                 <span className="text-stone-300 group-hover:text-emerald-400">→</span>
               </div>
             </button>
+            <button onClick={() => { setMode('smart'); setStep('basic') }}
+              className="w-full py-5 px-5 bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-200 rounded-2xl text-left hover:border-amber-400 transition group">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-medium text-amber-700 group-hover:text-amber-800">🧠 智能問診</p>
+                  <p className="text-xs text-amber-500 mt-1">勾選所有症狀，AI一次性分析（實驗功能）</p>
+                </div>
+                <span className="text-amber-300 group-hover:text-amber-500">→</span>
+              </div>
+            </button>
           </div>
           <div className="bg-stone-100 rounded-xl p-4 text-center">
             <p className="text-xs text-stone-500 leading-relaxed">
@@ -892,7 +1018,9 @@ export default function Home() {
         <main className="max-w-lg mx-auto px-4 py-8 min-h-[70vh] flex flex-col justify-center">
           <div className="text-center mb-6">
             <p className="text-xs text-stone-400 tracking-widest mb-1">基本資料</p>
-            <p className="text-xs text-emerald-600">{mode === 'fast' ? t('mode.fast') : t('mode.detailed')} · 協助精準判斷</p>
+            <p className="text-xs text-emerald-600">
+              {mode === 'fast' ? t('mode.fast') : mode === 'detailed' ? t('mode.detailed') : '🧠 智能問診'} · 協助精準判斷
+            </p>
           </div>
           {(() => {
             const q = BASIC_QUESTIONS[qIndex]
@@ -910,11 +1038,11 @@ export default function Home() {
                   </div>
                   <button onClick={() => {
                     if (qIndex < BASIC_QUESTIONS.length - 1) setQIndex(qIndex + 1)
-                    else setStep('chief')
+                    else (mode === 'smart' ? setStep('smart') : setStep('chief'))
                   }} className="w-full py-4 bg-gradient-to-r from-emerald-600 to-teal-500 text-white rounded-xl font-medium">確定 →</button>
                   <button onClick={() => {
                     if (qIndex < BASIC_QUESTIONS.length - 1) setQIndex(qIndex + 1)
-                    else setStep('chief')
+                    else (mode === 'smart' ? setStep('smart') : setStep('chief'))
                   }} className="w-full py-3 text-sm text-stone-400 hover:text-stone-600">跳過（選填）→</button>
                   {qIndex > 0 && <button onClick={() => setQIndex(qIndex - 1)} className="text-xs text-stone-400 hover:text-stone-600">← 上一題</button>}
                 </div>
@@ -931,7 +1059,7 @@ export default function Home() {
                     setAnswers(newA)
                     setTimeout(() => {
                       if (qIndex < BASIC_QUESTIONS.length - 1) setQIndex(qIndex + 1)
-                      else setStep('chief')
+                      else (mode === 'smart' ? setStep('smart') : setStep('chief'))
                     }, 350)
                   }} className={`w-full px-5 py-4 rounded-xl text-left text-sm transition-all border-2 ${answers[q.id] === opt.value ? 'border-emerald-500 bg-emerald-50 font-medium text-emerald-800' : 'border-stone-200 bg-white text-stone-700 hover:border-emerald-300'}`}>
                     {opt.label}
@@ -951,7 +1079,7 @@ export default function Home() {
                     </div>
                     <button onClick={() => {
                       if (qIndex < BASIC_QUESTIONS.length - 1) setQIndex(qIndex + 1)
-                      else setStep('chief')
+                      else (mode === 'smart' ? setStep('smart') : setStep('chief'))
                     }} className="w-full py-3 bg-stone-100 text-stone-600 rounded-xl text-sm mt-2 hover:bg-stone-200 transition">確定 →</button>
                   </div>
                 )}
@@ -1022,6 +1150,89 @@ export default function Home() {
             className="w-full py-3.5 text-sm text-stone-500 border-2 border-dashed border-stone-300 rounded-xl hover:border-stone-400 hover:text-stone-600 transition bg-white">
             + 其他健康問題
           </button>
+        </main>
+      )}
+
+      {/* ── 智能問診（實驗） ── */}
+      {step === 'smart' && (
+        <main className="max-w-lg mx-auto px-4 py-8 min-h-[70vh]">
+          <div className="text-center mb-5">
+            <div className="inline-flex items-center gap-1.5 bg-amber-100 text-amber-700 text-xs px-3 py-1 rounded-full mb-3">
+              <span>🧠</span> 實驗功能
+            </div>
+            <h2 className="text-xl font-medium text-stone-700">勾選您有的所有症狀</h2>
+            <p className="text-xs text-stone-400 mt-1">可多選，越完整分析越準確</p>
+          </div>
+
+          <div className="space-y-4 mb-24">
+            {SMART_SECTIONS.map(section => {
+              const selected = smartAnswers[section.id] || []
+              return (
+                <div key={section.id} className="bg-white rounded-2xl border border-stone-200 p-4">
+                  <h3 className="text-sm font-semibold text-stone-600 mb-3 flex items-center gap-2">
+                    <span>{section.icon}</span> {section.title}
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    {section.symptoms.map(symptom => {
+                      const isSelected = selected.includes(symptom.value)
+                      return (
+                        <button key={symptom.value}
+                          onClick={() => {
+                            const current = smartAnswers[section.id] || []
+                            const next = isSelected
+                              ? current.filter(v => v !== symptom.value)
+                              : [...current, symptom.value]
+                            setSmartAnswers({ ...smartAnswers, [section.id]: next })
+                          }}
+                          className={`px-3 py-2 rounded-full text-xs border-2 transition-all ${
+                            isSelected
+                              ? 'border-emerald-400 bg-emerald-50 text-emerald-700 font-medium'
+                              : 'border-stone-200 bg-stone-50 text-stone-600 hover:border-emerald-300'
+                          }`}>
+                          {symptom.label}
+                        </button>
+                      )
+                    })}
+                  </div>
+                  {selected.length > 0 && (
+                    <p className="text-xs text-emerald-600 mt-2">已選：{selected.length} 項</p>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+
+          {/* 底部固定提交欄 */}
+          <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-stone-200 p-4 max-w-lg mx-auto">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs text-stone-400">
+                已選擇 {Object.values(smartAnswers).flat().length} 項症狀
+              </span>
+              {Object.values(smartAnswers).flat().length > 0 && (
+                <button onClick={() => setSmartAnswers({})}
+                  className="text-xs text-stone-400 hover:text-stone-600">清除全部</button>
+              )}
+            </div>
+            <button
+              onClick={() => {
+                // Convert smart answers to regular answers format for analyzeCondition
+                const flatAnswers: Record<string, string> = {}
+                Object.entries(smartAnswers).forEach(([sectionId, values]) => {
+                  values.forEach(v => { flatAnswers[`${sectionId}_${v}`] = v })
+                })
+                flatAnswers.chief = '調養'
+                flatAnswers.gender = answers.gender
+                flatAnswers.age = answers.age
+                setAnswers(flatAnswers)
+                setStep('tongue')
+              }}
+              disabled={Object.values(smartAnswers).flat().length === 0}
+              className="w-full py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-2xl font-medium shadow-lg disabled:opacity-50 transition">
+              {Object.values(smartAnswers).flat().length === 0
+                ? '請先選擇症狀'
+                : `🧠 智能分析（${Object.values(smartAnswers).flat().length}項）→`}
+            </button>
+          </div>
         </main>
       )}
 
@@ -1390,7 +1601,7 @@ export default function Home() {
             </div>
 
             {/* 十二經絡預覽（浮水印疊加） */}
-            <div className="relative overflow-hidden rounded-2xl border border-stone-200 mb-4">
+            <div className="rounded-2xl border border-stone-200 mb-4">
               <div className="bg-white p-5">
                 <h3 className="text-sm font-semibold text-stone-600 mb-4 flex items-center gap-2">
                   <span>🧘</span> 十二經絡能量圖
@@ -1435,15 +1646,10 @@ export default function Home() {
                 </div>
                 <p className="text-xs text-stone-400 text-center mt-4">完整12經絡解讀，含經絡走向、穴位建議、保養時辰，僅限付費會員</p>
               </div>
-              {/* 浮水印 */}
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <div className="text-4xl font-bold text-violet-100 rotate-[-15deg] select-none">進階版</div>
-              </div>
-              <div className="absolute inset-0 bg-white/40 backdrop-blur-[1px]" />
             </div>
 
             {/* 七大脈輪預覽 */}
-            <div className="relative overflow-hidden rounded-2xl border border-stone-200">
+            <div className="rounded-2xl border border-stone-200">
               <div className="bg-white p-5">
                 <h3 className="text-sm font-semibold text-stone-600 mb-4 flex items-center gap-2">
                   <span>⚡</span> 七大脈輪能量圖
@@ -1512,14 +1718,9 @@ export default function Home() {
                   <p className="text-xs text-stone-400 text-center mt-4">完整脈輪解讀含打開/關閉原因、調理建議，僅限付費會員</p>
                 </div>
               </div>
-              {/* 浮水印 */}
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <div className="text-4xl font-bold text-violet-100 rotate-[-15deg] select-none">進階版</div>
-              </div>
-              <div className="absolute inset-0 bg-white/40 backdrop-blur-[1px]" />
-            </div>
           </div>
 
+          </div>
           {/* 辯證要點 */}
           <div className="bg-emerald-50 rounded-2xl p-5 border border-emerald-100 mb-4">
             <h3 className="text-sm font-semibold text-emerald-700 mb-3 flex items-center gap-2">
