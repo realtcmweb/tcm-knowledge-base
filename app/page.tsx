@@ -34,14 +34,22 @@ const CHIEF_COMPLAINTS = [
   { value: '其他', label: '其他問題', icon: '📋' },
 ]
 
+// 年齡子選項（18歲以下）
+const AGE_MINOR_OPTIONS = [
+  { value: 'preschool', label: '🧒 幼兒（0-6歲）' },
+  { value: 'school', label: '🎒 學齡（7-11歲）' },
+  { value: 'adolescent', label: '🧑 青少年（12-17歲）' },
+]
+
+// 年齡子選項（60歲以上，WHO標準）
+const AGE_ELDER_OPTIONS = [
+  { value: 'young_old', label: '👴 老年人（60-74歲）' },
+  { value: 'old', label: '🧓 高齡老人（75-89歲）' },
+  { value: 'oldest', label: '🎂 長壽老人（90歲以上）' },
+]
+
 const BASIC_QUESTIONS: Question[] = [
-  { id: 'age', text: '您的年齡是？', options: [
-    { value: '18以下', label: '18 歲以下' },
-    { value: '18-30', label: '18 - 30 歲' },
-    { value: '31-45', label: '31 - 45 歲' },
-    { value: '46-60', label: '46 - 60 歲' },
-    { value: '60以上', label: '60 歲以上' },
-  ]},
+  { id: 'age', text: '您的年齡是？', type: 'input_number', placeholder: '例：35', unit: '歲' },
   { id: 'gender', text: '您的性別是？', options: [
     { value: '男', label: '👨 男性' },
     { value: '女', label: '👩 女性' },
@@ -358,13 +366,18 @@ export default function Home() {
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState<ResultData | null>(null)
   const [imageLoaded, setImageLoaded] = useState(false)
+  const [ageStage, setAgeStage] = useState<'initial' | 'minor' | 'elder' | 'done'>('initial')
   const fileRef = useRef<HTMLInputElement>(null)
 
   // 當前問卷題目列表
   const chief = answers.chief || '其他'
   const chiefQuestions: Question[] = FAST_QUESTIONS[chief] || FAST_QUESTIONS['其他'] || []
-  const allDetailedQuestions: Question[] = [...chiefQuestions, ...DETAILED_EXTRA]
-  const currentQuestions: Question[] = mode === 'detailed' ? allDetailedQuestions : chiefQuestions
+  // 月經題目：性別為男或年齡<10或年齡>65時排除
+  const ageNum = parseInt(answers.age || '')
+  const excludeMenses = answers.gender === '男' || (!isNaN(ageNum) && (ageNum < 10 || ageNum > 65))
+  const filteredChiefQ = excludeMenses && chief === '月經' ? [] : chiefQuestions
+  const allDetailedQuestions: Question[] = [...filteredChiefQ, ...DETAILED_EXTRA]
+  const currentQuestions: Question[] = mode === 'detailed' ? allDetailedQuestions : filteredChiefQ
 
   const currentQ = currentQuestions[qIndex] as Question | undefined
   const totalQ = currentQuestions.length
@@ -523,26 +536,75 @@ export default function Home() {
           {(() => {
             const q = BASIC_QUESTIONS[qIndex]
             if (q.type === 'input_number') {
+              const ageNum = parseInt(answers[q.id] || '')
+              const showMinor = ageStage === 'minor'
+              const showElder = ageStage === 'elder'
+
               return (
                 <div className="space-y-3">
-                  <h2 className="text-xl font-light text-stone-700 mb-6 text-center">{q.text}</h2>
-                  <div className="flex items-center gap-3 bg-white border-2 border-stone-200 rounded-xl px-4 py-3 focus-within:border-emerald-400 transition">
-                    <input type="number" placeholder={q.placeholder} value={answers[q.id] || ''}
-                      onChange={e => setAnswers({ ...answers, [q.id]: e.target.value })}
-                      className="flex-1 outline-none text-stone-800" />
-                    <span className="text-stone-400 text-sm">{q.unit}</span>
-                  </div>
-                  <button onClick={() => {
-                    if (answers[q.id]) {
-                      if (qIndex < BASIC_QUESTIONS.length - 1) setQIndex(qIndex + 1)
-                      else setStep('chief')
-                    }
-                  }} className="w-full py-4 bg-gradient-to-r from-emerald-600 to-teal-500 text-white rounded-xl font-medium">確定 →</button>
-                  <button onClick={() => {
-                    if (qIndex < BASIC_QUESTIONS.length - 1) setQIndex(qIndex + 1)
-                    else setStep('chief')
-                  }} className="w-full py-3 text-sm text-stone-400 hover:text-stone-600">跳過（選填）→</button>
-                  {qIndex > 0 && <button onClick={() => setQIndex(qIndex - 1)} className="text-xs text-stone-400 hover:text-stone-600">← 上一題</button>}
+                  <h2 className="text-xl font-light text-stone-700 mb-6 text-center">
+                    {showMinor ? '請選擇您的年齡區間' : showElder ? '請選擇您的年齡區間' : q.text}
+                  </h2>
+
+                  {/* 年齡輸入框（年齡區間選擇之前） */}
+                  {!showMinor && !showElder && (
+                    <>
+                      <div className="flex items-center gap-3 bg-white border-2 border-stone-200 rounded-xl px-4 py-3 focus-within:border-emerald-400 transition">
+                        <input type="number" placeholder={q.placeholder} value={answers[q.id] || ''}
+                          onChange={e => { setAnswers({ ...answers, [q.id]: e.target.value }); setAgeStage('initial') }}
+                          className="flex-1 outline-none text-stone-800" />
+                        <span className="text-stone-400 text-sm">{q.unit}</span>
+                      </div>
+                      <button onClick={() => {
+                        const n = parseInt(answers[q.id] || '')
+                        if (!n || n <= 0 || n > 120) return
+                        if (n < 18) { setAgeStage('minor') }
+                        else if (n >= 18 && n <= 60) {
+                          if (qIndex < BASIC_QUESTIONS.length - 1) { setQIndex(qIndex + 1); setAgeStage('done') }
+                          else { setStep('chief'); setAgeStage('done') }
+                        } else { setAgeStage('elder') }
+                      }} className="w-full py-4 bg-gradient-to-r from-emerald-600 to-teal-500 text-white rounded-xl font-medium">確定 →</button>
+                      <button onClick={() => {
+                        if (qIndex < BASIC_QUESTIONS.length - 1) { setQIndex(qIndex + 1); setAgeStage('done') }
+                        else { setStep('chief'); setAgeStage('done') }
+                      }} className="w-full py-3 text-sm text-stone-400 hover:text-stone-600">跳過（選填）→</button>
+                      {qIndex > 0 && <button onClick={() => { setQIndex(qIndex - 1); setAgeStage('initial') }} className="text-xs text-stone-400 hover:text-stone-600">← 上一題</button>}
+                    </>
+                  )}
+
+                  {/* 18歲以下：子年齡選項 */}
+                  {showMinor && (
+                    <>
+                      {AGE_MINOR_OPTIONS.map(opt => (
+                        <button key={opt.value} onClick={() => {
+                          setAnswers({ ...answers, ageGroup: opt.value })
+                          setAgeStage('done')
+                          if (qIndex < BASIC_QUESTIONS.length - 1) setQIndex(qIndex + 1)
+                          else setStep('chief')
+                        }} className={`w-full px-5 py-4 rounded-xl text-left text-sm transition-all border-2 ${answers.ageGroup === opt.value ? 'border-emerald-500 bg-emerald-50 font-medium text-emerald-800' : 'border-stone-200 bg-white text-stone-700 hover:border-emerald-300'}`}>
+                          {opt.label}
+                        </button>
+                      ))}
+                      <button onClick={() => setAgeStage('initial')} className="text-xs text-stone-400 hover:text-stone-600 mt-1">← 修正年齡</button>
+                    </>
+                  )}
+
+                  {/* 60歲以上：子年齡選項 */}
+                  {showElder && (
+                    <>
+                      {AGE_ELDER_OPTIONS.map(opt => (
+                        <button key={opt.value} onClick={() => {
+                          setAnswers({ ...answers, ageGroup: opt.value })
+                          setAgeStage('done')
+                          if (qIndex < BASIC_QUESTIONS.length - 1) setQIndex(qIndex + 1)
+                          else setStep('chief')
+                        }} className={`w-full px-5 py-4 rounded-xl text-left text-sm transition-all border-2 ${answers.ageGroup === opt.value ? 'border-emerald-500 bg-emerald-50 font-medium text-emerald-800' : 'border-stone-200 bg-white text-stone-700 hover:border-emerald-300'}`}>
+                          {opt.label}
+                        </button>
+                      ))}
+                      <button onClick={() => setAgeStage('initial')} className="text-xs text-stone-400 hover:text-stone-600 mt-1">← 修正年齡</button>
+                    </>
+                  )}
                 </div>
               )
             }
@@ -577,7 +639,11 @@ export default function Home() {
             <p className="text-xs text-stone-400 mt-1">選一項主要困擾，系統會為您精準問診</p>
           </div>
           <div className="grid grid-cols-2 gap-2.5 mb-4">
-            {CHIEF_COMPLAINTS.map(c => (
+            {CHIEF_COMPLAINTS.filter(c => {
+              if (c.value !== '月經') return true
+              const ageNum = parseInt(answers.age || '')
+              return !(answers.gender === '男' || (!isNaN(ageNum) && (ageNum < 10 || ageNum > 65)))
+            }).map(c => (
               <button key={c.value} onClick={() => { setAnswers({ ...answers, chief: c.value }); setStep('questionnaire'); setQIndex(0) }}
                 className="py-4 px-3 bg-white border-2 border-stone-200 rounded-xl text-center hover:border-emerald-400 transition active:scale-95">
                 <div className="text-2xl mb-1">{c.icon}</div>
