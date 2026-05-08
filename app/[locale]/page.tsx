@@ -4,7 +4,7 @@ import { useState, useRef, useCallback, useEffect } from 'react'
 import { useTranslations, useLocale } from 'next-intl'
 import Head from 'next/head'
 import LanguageSelector from '../../components/LanguageSelector'
-import { HerbRecommendation, getHerbTiming, SYNDROME_DATABASE } from '../../lib/tcm_knowledge'
+import { HerbRecommendation, getHerbTiming, SYNDROME_DATABASE, MERIDIAN_CLOCK } from '../../lib/tcm_knowledge'
 
 // ============================================
 // 題目類型
@@ -770,7 +770,7 @@ function analyzeCondition(answers: Record<string, string>): {
 // ============================================
 // 類型
 // ============================================
-type Step = 'mode' | 'basic' | 'chief' | 'smart' | 'questionnaire' | 'tongue' | 'result'
+type Step = 'mode' | 'basic' | 'chief' | 'smart' | 'questionnaire' | 'tongue_guide' | 'tongue' | 'result'
 type Mode = 'fast' | 'detailed' | 'smart'
 
 interface ResultData {
@@ -779,6 +779,7 @@ interface ResultData {
   face?: Record<string, unknown>
   questionnaire_answers: Record<string, string>
   savedAt?: string // ISO date string for comparison
+  tongueGuide?: { tongueColor?: string; coatingColor?: string; coatingTexture?: string; marks?: string[] }
 }
 
 // ============================================
@@ -793,6 +794,37 @@ export default function Home() {
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [customInput, setCustomInput] = useState('')
   const [smartAnswers, setSmartAnswers] = useState<Record<string, string[]>>({})
+const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, string>>({})
+
+  const TONGUE_COLOR_OPTIONS = [
+    { value: '淡紅', label: '淡紅舌（健康/輕微氣虛）' },
+    { value: '紅', label: '紅舌（實熱或陰虛火旺）' },
+    { value: '深紅', label: '深紅舌（熱證嚴重）' },
+    { value: '淡白', label: '淡白舌（氣虛/血虛）' },
+    { value: '紫暗', label: '紫暗舌（血瘀或寒證）' },
+    { value: '瘀斑', label: '有瘀斑/瘀點（血瘀）' },
+  ]
+  const COATING_COLOR_OPTIONS = [
+    { value: '薄白苔', label: '薄白苔（健康或輕微寒證）' },
+    { value: '白厚苔', label: '白厚苔（痰濕或寒濕）' },
+    { value: '黃苔', label: '黃苔（熱證）' },
+    { value: '黃厚苔', label: '黃厚苔（濕熱或實熱）' },
+    { value: '灰黑苔', label: '灰黑苔（寒濕或熱極）' },
+    { value: '少苔/剝苔', label: '少苔或剝苔（陰虛）' },
+  ]
+  const COATING_TEXTURE_OPTIONS = [
+    { value: '濕潤', label: '濕潤（正常或痰濕）' },
+    { value: '乾燥', label: '乾燥（熱證或陰虛）' },
+    { value: '滑苔', label: '滑苔（水滑感，寒濕）' },
+    { value: '糙苔', label: '糙苔（熱盛傷津）' },
+  ]
+  const TONGUE_MARKS_OPTIONS = [
+    { value: '齒痕', label: '齒痕（脾虛濕盛）' },
+    { value: '裂紋', label: '裂紋（陰虛或血虛）' },
+    { value: '瘀點', label: '瘀點/瘀斑（血瘀）' },
+    { value: '潰瘍', label: '潰瘍（熱證）' },
+    { value: '無', label: '無特殊標記' },
+  ]
   const [tongueFile, setTongueFile] = useState<File | null>(null)
   const [tonguePreview, setTonguePreview] = useState<string | null>(null)
   const [faceFile, setFaceFile] = useState<File | null>(null)
@@ -836,7 +868,7 @@ export default function Home() {
       if (qIndex < totalQ - 1) {
         setQIndex(qIndex + 1)
       } else {
-        setStep('tongue')
+        setStep('tongue_guide')
       }
     }, 350)
   }, [answers, qIndex, currentQ, totalQ])
@@ -850,7 +882,7 @@ export default function Home() {
       if (qIndex < totalQ - 1) {
         setQIndex(qIndex + 1)
       } else {
-        setStep('tongue')
+        setStep('tongue_guide')
       }
     }, 350)
   }, [answers, qIndex, customInput, currentQ, totalQ])
@@ -859,10 +891,9 @@ export default function Home() {
     const file = e.target.files?.[0]
     if (!file) return
     setTongueFile(file)
-    setImageLoaded(false)
-    const reader = new FileReader()
-    reader.onload = (ev) => setTonguePreview(ev.target?.result as string)
-    reader.onloadend = () => setImageLoaded(true)
+    setImageLoaded(true) // createObjectURL is synchronous, preview always works
+    const preview = URL.createObjectURL(file)
+    setTonguePreview(preview)
   }
 
   const handleFaceUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -878,7 +909,7 @@ export default function Home() {
     try {
       const constitution = analyzeCondition(answers)
       let tongueInfo: Record<string, unknown> | undefined
-      if (tongueFile && imageLoaded) {
+      if (tongueFile) {
         const formData = new FormData()
         formData.append('image', tongueFile)
         try {
@@ -895,7 +926,7 @@ export default function Home() {
           if (res.ok) faceResult = await res.json()
         } catch { /* silent */ }
       }
-      setResult({ constitution, tongue: tongueInfo, face: faceResult, questionnaire_answers: answers, savedAt: new Date().toISOString() })
+      setResult({ constitution, tongue: tongueInfo, face: faceResult, questionnaire_answers: answers, savedAt: new Date().toISOString(), tongueGuide: tongueGuideAnswers })
       setStep('result')
     } catch (err) {
       console.error(err)
@@ -1225,7 +1256,7 @@ export default function Home() {
                 flatAnswers.gender = answers.gender
                 flatAnswers.age = answers.age
                 setAnswers(flatAnswers)
-                setStep('tongue')
+                setStep('tongue_guide')
               }}
               disabled={Object.values(smartAnswers).flat().length === 0}
               className="w-full py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-2xl font-medium shadow-lg disabled:opacity-50 transition">
@@ -1310,6 +1341,112 @@ export default function Home() {
         </main>
       )}
 
+      {/* ── 舌象引導（選填） ── */}
+      {step === 'tongue_guide' && (
+        <main className="max-w-lg mx-auto px-4 py-8 min-h-[70vh] flex flex-col">
+          <div className="text-center mb-5">
+            <p className="text-xs text-amber-600 tracking-widest mb-1 font-medium">選填 · 可跳過</p>
+            <h2 className="text-xl font-light text-stone-700">觀察舌象</h2>
+            <p className="text-xs text-stone-500 mt-1">協助AI更精準判斷體質，拍照前可先自我觀察</p>
+          </div>
+
+          <div className="space-y-5">
+            {/* 舌色 */}
+            <div>
+              <p className="text-sm font-medium text-stone-700 mb-2">1️⃣ 您的舌頭顏色？</p>
+              <div className="grid grid-cols-2 gap-2">
+                {TONGUE_COLOR_OPTIONS.map(opt => (
+                  <button key={opt.value}
+                    onClick={() => setTongueGuideAnswers(prev => ({ ...prev, tongueColor: opt.value }))}
+                    className={`px-3 py-2.5 rounded-xl text-xs text-left transition-all border-2 ${
+                      tongueGuideAnswers.tongueColor === opt.value
+                        ? 'border-amber-400 bg-amber-50 font-medium text-amber-800'
+                        : 'border-stone-200 bg-white text-stone-600 hover:border-amber-300'
+                    }`}>
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 苔色 */}
+            <div>
+              <p className="text-sm font-medium text-stone-700 mb-2">2️⃣ 舌苔顏色？</p>
+              <div className="grid grid-cols-2 gap-2">
+                {COATING_COLOR_OPTIONS.map(opt => (
+                  <button key={opt.value}
+                    onClick={() => setTongueGuideAnswers(prev => ({ ...prev, coatingColor: opt.value }))}
+                    className={`px-3 py-2.5 rounded-xl text-xs text-left transition-all border-2 ${
+                      tongueGuideAnswers.coatingColor === opt.value
+                        ? 'border-amber-400 bg-amber-50 font-medium text-amber-800'
+                        : 'border-stone-200 bg-white text-stone-600 hover:border-amber-300'
+                    }`}>
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 苔質 */}
+            <div>
+              <p className="text-sm font-medium text-stone-700 mb-2">3️⃣ 舌苔質地？</p>
+              <div className="grid grid-cols-2 gap-2">
+                {COATING_TEXTURE_OPTIONS.map(opt => (
+                  <button key={opt.value}
+                    onClick={() => setTongueGuideAnswers(prev => ({ ...prev, coatingTexture: opt.value }))}
+                    className={`px-3 py-2.5 rounded-xl text-xs text-left transition-all border-2 ${
+                      tongueGuideAnswers.coatingTexture === opt.value
+                        ? 'border-amber-400 bg-amber-50 font-medium text-amber-800'
+                        : 'border-stone-200 bg-white text-stone-600 hover:border-amber-300'
+                    }`}>
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 特殊標記 */}
+            <div>
+              <p className="text-sm font-medium text-stone-700 mb-2">4️⃣ 舌頭有特殊標記嗎？</p>
+              <div className="grid grid-cols-2 gap-2">
+                {TONGUE_MARKS_OPTIONS.map(opt => (
+                  <button key={opt.value}
+                    onClick={() => setTongueGuideAnswers(prev => ({ ...prev, marks: opt.value }))}
+                    className={`px-3 py-2.5 rounded-xl text-xs text-left transition-all border-2 ${
+                      tongueGuideAnswers.marks === opt.value
+                        ? 'border-amber-400 bg-amber-50 font-medium text-amber-800'
+                        : 'border-stone-200 bg-white text-stone-600 hover:border-amber-300'
+                    }`}>
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* 跳過 / 下一步按鈕 */}
+          <div className="mt-6 space-y-3">
+            <button onClick={() => setStep('tongue')}
+              className="w-full py-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-2xl font-medium shadow-lg">
+              {Object.keys(tongueGuideAnswers).length > 0
+                ? `✓ 已記錄，繼續拍攝舌苔 →`
+                : '直接拍攝舌苔 →'}
+            </button>
+            <button onClick={() => {
+              const hasAnswers = Object.keys(tongueGuideAnswers).length > 0
+              if (hasAnswers) {
+                // Save tongue guide to result later via state
+                setStep('tongue')
+              } else {
+                setStep('tongue')
+              }
+            }} className="w-full py-3 text-stone-400 text-sm hover:text-stone-600 transition">
+              跳過，稍後再觀察
+            </button>
+          </div>
+        </main>
+      )}
+
       {/* ── 舌苔拍攝 ── */}
       {step === 'tongue' && (
         <main className="max-w-lg mx-auto px-4 py-8 min-h-[70vh] flex flex-col justify-center">
@@ -1329,7 +1466,7 @@ export default function Home() {
                   <span className="text-sm">✓</span>
                 </div>
                 {/* 刪除按鈕 */}
-                <button onClick={() => { setTonguePreview(null); setTongueFile(null); setImageLoaded(false) }}
+                <button onClick={() => { setTonguePreview(null); setTongueFile(null) }}
                   className="absolute top-3 right-3 w-8 h-8 bg-black/50 hover:bg-black/70 rounded-full text-white text-xs flex items-center justify-center transition">
                   ✕
                 </button>
@@ -1540,6 +1677,36 @@ export default function Home() {
                 </div>
               </div>
             </div>
+          </div>
+
+          {/* ── 經脈運行參考圖 ── */}
+          <div className="bg-gradient-to-br from-slate-50 to-blue-50 rounded-2xl p-4 border border-slate-200 mb-5">
+            <h3 className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
+              <span>🕐</span> 十二經脈運行時間
+            </h3>
+            <div className="grid grid-cols-3 gap-1.5 text-xs">
+              {Object.entries(MERIDIAN_CLOCK).map(([key, m]) => {
+                const hour = parseInt(key.split('-')[0])
+                const isStrong = result.constitution.type.includes('氣虛') && ['07-09','09-11'].includes(key)
+                  || result.constitution.type.includes('陰虛') && ['17-19','11-13'].includes(key)
+                  || result.constitution.type.includes('陽虛') && ['07-09','23-01'].includes(key)
+                  || result.constitution.type.includes('氣鬱') && ['01-03','09-11'].includes(key)
+                  || result.constitution.type.includes('痰濕') && ['09-11','15-17'].includes(key)
+                  || result.constitution.type.includes('濕熱') && ['15-17','01-03'].includes(key)
+                return (
+                  <div key={key} className={`rounded-lg p-2 text-center transition-all ${
+                    isStrong
+                      ? 'bg-emerald-100 border border-emerald-300 text-emerald-800'
+                      : 'bg-white border border-stone-100 text-stone-600'
+                  }`}>
+                    <div className="font-medium text-stone-800">{m.name}</div>
+                    <div className="text-stone-400 text-xs">{m.time.split('-')[0]}</div>
+                    {isStrong && <div className="text-emerald-500 text-xs mt-0.5">★ 最佳</div>}
+                  </div>
+                )
+              })}
+            </div>
+            <p className="text-xs text-stone-400 mt-2 text-center">★ 標記為您的體質最旺盛時段，此時調理效果最佳</p>
           </div>
 
           {/* ── 生活方式雷達圖（用長條圖替代） ── */}
@@ -1823,25 +1990,35 @@ export default function Home() {
                       <div className="flex items-start justify-between gap-2 mb-1">
                         <div className="flex items-start gap-2">
                           <span className="text-amber-400 flex-shrink-0 mt-0.5">◆</span>
-                          <span className="font-medium text-stone-800">{h}</span>
+                          <div>
+                            <span className="font-medium text-stone-800">{h}</span>
+                            {timing && (
+                              <span className="ml-2 text-xs bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full border border-amber-200">
+                                {timing.effect}
+                              </span>
+                            )}
+                          </div>
                         </div>
                         {timing && (
-                          <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full whitespace-nowrap">
+                          <span className="text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full whitespace-nowrap">
                             {timing.beforeOrAfterMeal}
                           </span>
                         )}
                       </div>
                       {timing ? (
                         <div className="ml-6 space-y-0.5">
-                          <p className="text-xs text-emerald-600 flex items-center gap-1">
-                            <span>🕐</span> {timing.timing}
+                          <p className="text-xs text-stone-600 flex items-center gap-1">
+                            <span className="bg-emerald-50 text-emerald-600 px-1.5 py-0.5 rounded mr-1">🕐</span>
+                            <strong>建議：</strong>{timing.timing}
                           </p>
                           <p className="text-xs text-stone-500 flex items-center gap-1">
-                            <span>📍</span> {timing.meridianNote}
+                            <span className="bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded mr-1">📍</span>
+                            {timing.meridianNote}
                           </p>
                           {timing.note && (
-                            <p className="text-xs text-amber-600 flex items-start gap-1">
-                              <span>💡</span> {timing.note}
+                            <p className="text-xs text-amber-600 flex items-center gap-1">
+                              <span className="bg-amber-50 text-amber-600 px-1.5 py-0.5 rounded mr-1">💡</span>
+                              {timing.note}
                             </p>
                           )}
                         </div>
