@@ -855,6 +855,7 @@ export default function Home() {
   const t = useTranslations()
   const locale = useLocale()
   const [mode, setMode] = useState<Mode | null>(null)
+  const [fontScale, setFontScale] = useState(100) // 100/115/130
   const [step, setStep] = useState<Step>('mode')
   const [qIndex, setQIndex] = useState(0)
   const [answers, setAnswers] = useState<Record<string, string>>({})
@@ -1036,7 +1037,7 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
   }
 
   return (
-    <div className="min-h-screen bg-stone-50 text-stone-800" style={{ fontFamily: "'Noto Serif TC', serif" }}>
+    <div className="min-h-screen bg-stone-50 text-stone-800" style={{ fontFamily: "'Noto Serif TC', serif", fontSize: fontScale === 100 ? '17px' : fontScale === 115 ? '19px' : '21px' }}>
       <Head><title>{t('header.title')} | TCM AI</title></Head>
 
       {/* Header */}
@@ -1046,15 +1047,18 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
             <h1 className="text-lg font-light tracking-wide text-stone-700">{t('header.title')}</h1>
             <p className="text-xs text-stone-400 tracking-widest">{t('header.subtitle')}</p>
           </div>
-          <div className="flex items-center gap-3">
-            <LanguageSelector currentLocale={locale} />
+          <div className="flex items-center gap-2">
+            {/* 字體縮放 */}
+            <div className="flex items-center bg-stone-100 rounded-full px-1 py-0.5 gap-0.5">
+              <button onClick={() => setFontScale(100)} className={`w-7 h-7 rounded-full text-xs font-bold transition ${fontScale === 100 ? 'bg-emerald-500 text-white' : 'text-stone-400 hover:text-stone-600'}`}>A</button>
+              <button onClick={() => setFontScale(115)} className={`w-7 h-7 rounded-full text-sm font-bold transition ${fontScale === 115 ? 'bg-emerald-500 text-white' : 'text-stone-400 hover:text-stone-600'}`}>A</button>
+              <button onClick={() => setFontScale(130)} className={`w-7 h-7 rounded-full text-base font-bold transition ${fontScale === 130 ? 'bg-emerald-500 text-white' : 'text-stone-400 hover:text-stone-600'}`}>A</button>
+            </div>
             <Link href="/login"
               className="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white text-xs rounded-full transition">
               登入
             </Link>
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white text-sm font-medium">
-              診
-            </div>
+            <LanguageSelector currentLocale={locale} />
           </div>
         </div>
         {(step === 'questionnaire') && (
@@ -1708,6 +1712,22 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
             )
           })()}
 
+          {result.constitution.suggestions.length > 0 && (
+            <div className="bg-white rounded-2xl p-5 shadow-sm border border-stone-100 mb-5">
+              <h3 className="text-sm font-semibold text-emerald-700 mb-3 flex items-center gap-2">
+                <span>✅</span> {t('result.suggestions')}
+              </h3>
+              <div className="space-y-2">
+                {result.constitution.suggestions.map((s, i) => (
+                  <div key={i} className="flex items-start gap-2.5 text-sm text-stone-700">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 flex-shrink-0 mt-2" />
+                    {s}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* ── 能量分析儀表板 ── */}
           <div className="bg-gradient-to-br from-stone-50 to-stone-100 rounded-2xl p-5 border border-stone-200 mb-5">
             <h3 className="text-sm font-semibold text-stone-600 mb-4 flex items-center gap-2">
@@ -2110,21 +2130,7 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
             </div>
           )}
 
-          {result.constitution.suggestions.length > 0 && (
-            <div className="bg-white rounded-2xl p-5 shadow-sm border border-stone-100 mb-4">
-              <h3 className="text-sm font-semibold text-emerald-700 mb-3 flex items-center gap-2">
-                <span>✅</span> {t('result.suggestions')}
-              </h3>
-              <div className="space-y-2">
-                {result.constitution.suggestions.map((s, i) => (
-                  <div key={i} className="flex items-start gap-2.5 text-sm text-stone-700">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 flex-shrink-0 mt-2" />
-                    {s}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+
 
           {result.constitution.herbs.length > 0 && (
             <div className="bg-amber-50 rounded-2xl p-5 border border-amber-100 mb-4">
