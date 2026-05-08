@@ -799,15 +799,27 @@ export default function Home() {
   // 選項按鈕渲染
   const renderOptions = (q: Question) => {
     if (!q.options) return null
-    return q.options.map(opt => (
-      <button
-        key={opt.value}
-        onClick={() => handleAnswer(opt.value)}
-        className={`w-full px-5 py-4 rounded-xl text-left text-sm transition-all border-2 ${answers[q.id] === opt.value ? 'border-emerald-500 bg-emerald-50 font-medium text-emerald-800' : 'border-stone-200 bg-white text-stone-700 hover:border-emerald-300'}`}
-      >
-        {opt.label}
-      </button>
-    ))
+    return q.options.map(opt => {
+      const isSelected = answers[q.id] === opt.value
+      return (
+        <button
+          key={opt.value}
+          onClick={() => handleAnswer(opt.value)}
+          className={`w-full px-5 py-4 rounded-2xl text-left text-sm transition-all border-2 flex items-center gap-3 ${
+            isSelected
+              ? 'border-emerald-500 bg-emerald-50 font-medium text-emerald-800 shadow-sm'
+              : 'border-stone-200 bg-white text-stone-600 hover:border-emerald-300 active:bg-stone-50'
+          }`}
+        >
+          <span className={`w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-all ${
+            isSelected ? 'border-emerald-500 bg-emerald-500' : 'border-stone-300'
+          }`}>
+            {isSelected && <span className="w-2 h-2 bg-white rounded-full" />}
+          </span>
+          <span className="flex-1">{opt.label}</span>
+        </button>
+      )
+    })
   }
 
   return (
@@ -959,45 +971,78 @@ export default function Home() {
       {/* ── 主訴選擇 ── */}
       {step === 'chief' && (
         <main className="max-w-lg mx-auto px-4 py-8 min-h-[70vh] flex flex-col">
-          <div className="text-center mb-6">
-            <p className="text-xs text-stone-400 tracking-widest mb-1">第 1 步</p>
-            <h2 className="text-xl font-light text-stone-700">您今天最困擾的問題是什麼？</h2>
-            <p className="text-xs text-stone-400 mt-1">選一項主要困擾，系統會為您精準問診</p>
+          <div className="text-center mb-7">
+            <p className="text-xs text-emerald-500 font-medium tracking-widest mb-2">第 1 步</p>
+            <h2 className="text-xl font-medium text-stone-700 mb-1">您今天想改善什麼？</h2>
+            <p className="text-xs text-stone-400">選一項，AI為您量身問診</p>
           </div>
-          <div className="grid grid-cols-2 gap-2.5 mb-4">
-            {CHIEF_COMPLAINTS.filter(c => {
-              if (c.value !== '月經') return true
-              const ageNum = parseInt(answers.age || '')
-              return !(answers.gender === '男' || (!isNaN(ageNum) && (ageNum < 10 || ageNum > 65)))
-            }).map(c => (
-              <button key={c.value} onClick={() => { setAnswers({ ...answers, chief: c.value }); setStep('questionnaire'); setQIndex(0) }}
-                className="py-4 px-3 bg-white border-2 border-stone-200 rounded-xl text-center hover:border-emerald-400 transition active:scale-95">
-                <div className="text-2xl mb-1">{c.icon}</div>
-                <p className="text-xs text-stone-700">{c.label}</p>
-              </button>
-            ))}
+          <div className="grid grid-cols-2 gap-3 mb-4">
+            {[
+              {
+                value: '調養', label: '調養身體', desc: '健康檢查、保養', icon: '🌱', color: 'from-emerald-50 to-teal-50', border: 'hover:border-emerald-300', active: 'border-emerald-400 bg-gradient-to-br from-emerald-50 to-teal-50'
+              },
+              {
+                value: '減肥', label: '減肥控重', desc: '體重管理、雕塑', icon: '⚖️', color: 'from-amber-50 to-orange-50', border: 'hover:border-amber-300', active: 'border-amber-400 bg-gradient-to-br from-amber-50 to-orange-50'
+              },
+              {
+                value: '備孕', label: '備孕調理', desc: '不孕調理、孕前準備', icon: '🤰', color: 'from-pink-50 to-rose-50', border: 'hover:border-pink-300', active: 'border-pink-400 bg-gradient-to-br from-pink-50 to-rose-50'
+              },
+              {
+                value: '過敏', label: '過敏/鼻炎', desc: '鼻過敏、皮膚過敏、氣喘', icon: '🤧', color: 'from-blue-50 to-cyan-50', border: 'hover:border-blue-300', active: 'border-blue-400 bg-gradient-to-br from-blue-50 to-cyan-50'
+              },
+            ].map(c => {
+              const isActive = answers.chief === c.value
+              return (
+                <button key={c.value}
+                  onClick={() => { setAnswers({ ...answers, chief: c.value }); setStep('questionnaire'); setQIndex(0) }}
+                  className={`py-5 px-3 bg-white border-2 rounded-2xl text-center transition-all active:scale-95 ${isActive ? c.active : 'border-stone-200 ' + c.border}`}>
+                  <div className="text-3xl mb-2">{c.icon}</div>
+                  <p className={`text-sm font-medium ${isActive ? 'text-stone-800' : 'text-stone-700'}`}>{c.label}</p>
+                  <p className="text-xs text-stone-400 mt-0.5">{c.desc}</p>
+                </button>
+              )
+            })}
+          </div>
+          <div className="grid grid-cols-2 gap-3 mb-4">
+            {[
+              { value: '皮膚', label: '皮膚/過敏', desc: '濕疹、蕁麻疹、痘痘', icon: '🔴' },
+              { value: '月經', label: '月經/婦科', desc: '經期問題、子宮調理', icon: '🌸' },
+            ].map(c => {
+              if (c.value === '月經') {
+                const ageNum = parseInt(answers.age || '')
+                if (answers.gender === '男' || (!isNaN(ageNum) && (ageNum < 10 || ageNum > 65))) return null
+              }
+              return (
+                <button key={c.value}
+                  onClick={() => { setAnswers({ ...answers, chief: c.value }); setStep('questionnaire'); setQIndex(0) }}
+                  className="py-5 px-3 bg-white border-2 border-stone-200 rounded-2xl text-center hover:border-stone-300 transition active:scale-95">
+                  <div className="text-3xl mb-2">{c.icon}</div>
+                  <p className="text-sm font-medium text-stone-700">{c.label}</p>
+                  <p className="text-xs text-stone-400 mt-0.5">{c.desc}</p>
+                </button>
+              )
+            })}
           </div>
           <button onClick={() => { setAnswers({ ...answers, chief: '其他' }); setStep('questionnaire'); setQIndex(0) }}
-            className="w-full py-3 text-sm text-stone-500 border-2 border-stone-200 rounded-xl hover:border-emerald-300 transition">其他問題</button>
+            className="w-full py-3.5 text-sm text-stone-500 border-2 border-dashed border-stone-300 rounded-xl hover:border-stone-400 hover:text-stone-600 transition bg-white">
+            + 其他健康問題
+          </button>
         </main>
       )}
 
       {/* ── 動態問卷 ── */}
       {step === 'questionnaire' && currentQ && (
         <main className="max-w-lg mx-auto px-4 py-8 min-h-[70vh] flex flex-col justify-center">
-          <div className="text-center mb-6">
-            <p className="text-xs text-stone-400 tracking-widest mb-1">
-              {mode === 'detailed' ? t('mode.detailed') : t('mode.fast')} · {t('questionnaire.step', { current: qIndex + 1 })} / {totalQ}
-            </p>
-            {mode === 'detailed' && (
-              <span className="inline-block mt-1 text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">
-                十問歌全面問診
+          <div className="text-center mb-5">
+            <p className="text-xs text-stone-400 tracking-widest mb-2">
+              <span className="inline-block px-2 py-0.5 bg-stone-100 rounded-full">
+                {mode === 'detailed' ? '🔍 詳細問診' : '⚡ 快速問診'} · {qIndex + 1} / {totalQ}
               </span>
-            )}
-            <h2 className="text-xl font-light text-stone-700 leading-relaxed mt-2">{currentQ.text}</h2>
+            </p>
+            <h2 className="text-xl font-medium text-stone-700 leading-relaxed mt-3 px-2">{currentQ.text}</h2>
             {/* 答題導航指示器 */}
-            <div className="flex justify-center gap-1.5 mt-3">
-              {currentQuestions.slice(0, 12).map((_, i) => (
+            <div className="flex justify-center gap-1.5 mt-4">
+              {currentQuestions.slice(0, 16).map((_, i) => (
                 <button key={i} onClick={() => setQIndex(i)}
                   className={`w-2 h-2 rounded-full transition-all ${
                     i === qIndex
@@ -1026,20 +1071,39 @@ export default function Home() {
               {renderOptions(currentQ)}
               {/* 其他選項 */}
               <button onClick={() => handleAnswer('其他')}
-                className={`w-full px-5 py-4 rounded-xl text-left text-sm transition-all border-2 ${answers[currentQ.id] === '其他' ? 'border-emerald-500 bg-emerald-50 font-medium' : 'border-stone-200 bg-white text-stone-500 hover:border-emerald-300'}`}>
-                其他（自行描述）→
+                className={`w-full px-5 py-4 rounded-2xl text-left text-sm transition-all border-2 flex items-center gap-3 ${
+                  answers[currentQ.id] === '其他'
+                    ? 'border-emerald-500 bg-emerald-50 font-medium text-emerald-800 shadow-sm'
+                    : 'border-stone-200 bg-white text-stone-500 hover:border-emerald-300'
+                }`}>
+                <span className={`w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-all ${
+                  answers[currentQ.id] === '其他' ? 'border-emerald-500 bg-emerald-500' : 'border-stone-300'
+                }`}>
+                  {answers[currentQ.id] === '其他' && <span className="w-2 h-2 bg-white rounded-full" />}
+                </span>
+                <span className="flex-1">其他（自行描述）</span>
+                <span className="text-stone-400">→</span>
               </button>
             </div>
           )}
 
-          <div className="mt-4 flex justify-between">
+          <div className="mt-5 flex items-center justify-between px-1">
             {qIndex > 0 ? (
-              <button onClick={() => setQIndex(qIndex - 1)} className="text-xs text-stone-400 hover:text-stone-600">← 上一題</button>
+              <button onClick={() => setQIndex(qIndex - 1)}
+                className="flex items-center gap-1 text-sm text-stone-400 hover:text-stone-600 transition px-3 py-2 rounded-lg hover:bg-stone-100">
+                ← 上一題
+              </button>
             ) : (
-              <button onClick={() => { setStep('chief'); setQIndex(0) }} className="text-xs text-stone-400 hover:text-stone-600">← 重選主訴</button>
+              <button onClick={() => { setStep('chief'); setQIndex(0) }}
+                className="flex items-center gap-1 text-sm text-stone-400 hover:text-stone-600 transition px-3 py-2 rounded-lg hover:bg-stone-100">
+                ← 重選主訴
+              </button>
             )}
             {isLastQ && (
-              <button onClick={() => setStep('tongue')} className="text-xs text-emerald-600 hover:text-emerald-700">跳到舌苔 →</button>
+              <button onClick={() => setStep('tongue')}
+                className="flex items-center gap-1 text-sm text-emerald-600 hover:text-emerald-700 font-medium transition px-3 py-2 rounded-lg hover:bg-emerald-50">
+                跳過 →
+              </button>
             )}
           </div>
         </main>

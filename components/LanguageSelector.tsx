@@ -4,14 +4,30 @@ import { useState, useRef, useEffect } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 
 const languages = [
-  { code: 'zh-TW', label: '繁體中文', flag: '🇹🇼' },
-  { code: 'zh-CN', label: '简体中文', flag: '🇨🇳' },
-  { code: 'en', label: 'English', flag: '🇬🇧' },
-  { code: 'ja', label: '日本語', flag: '🇯🇵' },
-  { code: 'ko', label: '한국어', flag: '🇰🇷' },
-  { code: 'pt', label: 'Português', flag: '🇧🇷' },
-  { code: 'es', label: 'Español', flag: '🇪🇸' },
+  { code: 'zh-TW', label: '繁體中文' },
+  { code: 'zh-CN', label: '簡體中文' },
+  { code: 'en', label: 'English' },
+  { code: 'ja', label: '日本語' },
+  { code: 'ko', label: '한국어' },
+  { code: 'pt', label: 'Português' },
+  { code: 'es', label: 'Español' },
 ]
+
+// Detect browser language, return best match
+function detectBrowserLanguage(): string {
+  if (typeof navigator === 'undefined') return 'zh-TW'
+  const nav = navigator.language || ''
+  const lang = nav.toLowerCase()
+
+  if (lang.startsWith('zh-tw') || lang.startsWith('zh-hk')) return 'zh-TW'
+  if (lang.startsWith('zh')) return 'zh-CN'
+  if (lang.startsWith('en')) return 'en'
+  if (lang.startsWith('ja')) return 'ja'
+  if (lang.startsWith('ko')) return 'ko'
+  if (lang.startsWith('pt')) return 'pt'
+  if (lang.startsWith('es')) return 'es'
+  return 'zh-TW'
+}
 
 interface LanguageSelectorProps {
   currentLocale: string
@@ -26,6 +42,18 @@ export default function LanguageSelector({ currentLocale }: LanguageSelectorProp
   const currentLang = languages.find(l => l.code === currentLocale) || languages[0]
 
   useEffect(() => {
+    // Auto-detect browser language on first visit (only for root path)
+    const stored = localStorage.getItem('locale_auto_detected')
+    if (!stored && pathname === '/') {
+      const detected = detectBrowserLanguage()
+      if (detected !== currentLocale) {
+        localStorage.setItem('locale_auto_detected', 'true')
+        router.replace(`/${detected}`)
+      }
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (ref.current && !ref.current.contains(e.target as Node)) {
         setOpen(false)
@@ -37,7 +65,7 @@ export default function LanguageSelector({ currentLocale }: LanguageSelectorProp
 
   function switchLocale(newLocale: string) {
     setOpen(false)
-    // Replace the locale segment in the pathname
+    localStorage.setItem('locale_auto_detected', 'true')
     const newPathname = pathname.replace(`/${currentLocale}`, `/${newLocale}`)
     router.push(newPathname)
   }
@@ -48,7 +76,7 @@ export default function LanguageSelector({ currentLocale }: LanguageSelectorProp
         onClick={() => setOpen(!open)}
         className="flex items-center gap-2 px-3 py-2 text-sm text-stone-600 hover:text-emerald-600 transition-colors border border-stone-200 rounded-lg hover:border-emerald-300"
       >
-        <span>{currentLang.flag}</span>
+        <span className="text-stone-500">🌐</span>
         <span>{currentLang.label}</span>
         <span className={`text-xs transition-transform ${open ? 'rotate-180' : ''}`}>▼</span>
       </button>
@@ -63,8 +91,9 @@ export default function LanguageSelector({ currentLocale }: LanguageSelectorProp
                 lang.code === currentLocale ? 'text-emerald-600 font-medium bg-emerald-50' : 'text-stone-600'
               }`}
             >
-              <span>{lang.flag}</span>
+              <span className="w-6 text-center text-stone-400">○</span>
               <span>{lang.label}</span>
+              {lang.code === currentLocale && <span className="ml-auto text-emerald-500">✓</span>}
             </button>
           ))}
         </div>
