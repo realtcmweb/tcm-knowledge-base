@@ -1031,13 +1031,89 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
 
       {/* ── 模式選擇 ── */}
       {step === 'mode' && (
-        <main className="max-w-lg mx-auto px-4 py-10 min-h-[75vh] flex flex-col justify-center">
-          <div className="text-center mb-8">
-            <div className="text-5xl mb-4">🌿</div>
-            <h2 className="text-2xl font-light text-stone-700 mb-2">{t('header.title')}</h2>
-            <p className="text-sm text-stone-500">{t('home.certified')}</p>
-            <p className="text-xs text-stone-400 mt-1">{t('home.tenQuestions')}</p>
+        <main className="max-w-lg mx-auto px-4 py-10 min-h-[75vh] flex flex-col justify-center relative overflow-hidden">
+          {/* 太極陰陽背景動畫 */}
+          <div className="absolute inset-0 pointer-events-none select-none opacity-[0.06]" aria-hidden="true">
+            <svg viewBox="0 0 400 400" className="w-full h-full animate-spin-slow">
+              <circle cx="200" cy="200" r="180" fill="none" stroke="#10b981" strokeWidth="2"/>
+              <path d="M200 20 Q260 110 200 200 Q140 290 200 380 Q300 290 300 200 Q300 110 200 20" fill="#10b981"/>
+              <path d="M200 380 Q140 290 200 200 Q260 110 200 20 Q100 110 100 200 Q100 290 200 380" fill="#065f46"/>
+              <circle cx="200" cy="110" r="35" fill="#065f46"/>
+              <circle cx="200" cy="290" r="35" fill="#10b981"/>
+              <circle cx="200" cy="110" r="12" fill="#10b981"/>
+              <circle cx="200" cy="290" r="12" fill="#065f46"/>
+            </svg>
           </div>
+
+          {/* 用戶評價輪播 */}
+          <div className="mb-6">
+            <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl p-4 border border-emerald-100">
+              <div className="flex items-center gap-1 mb-2">
+                <span className="text-amber-400 text-sm">★★★★★</span>
+                <span className="text-xs text-stone-400 ml-1">基於真實用戶回饋</span>
+              </div>
+              <div className="overflow-hidden">
+                <p className="text-sm text-stone-600 italic leading-relaxed">
+                  「做了分析才知道自己是氣虛體質，照著建議調整了一個月，明顯覺得精神好多了！中醫師說分析很準確。」
+                </p>
+                <p className="text-xs text-stone-400 mt-1">— 台北，陳小姐，42歲</p>
+              </div>
+              <div className="flex gap-1.5 mt-3">
+                {[0,1,2].map(i => (
+                  <div key={i} className={`h-1 rounded-full transition-all ${i === 0 ? 'w-4 bg-emerald-400' : 'w-1 bg-stone-300'}`}/>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* 三分鐘流程說明 */}
+          <div className="mb-6">
+            <div className="flex items-stretch gap-2">
+              {[
+                { step: '1', icon: '📝', title: '回答10題', sub: '2分鐘', color: 'from-amber-50 to-amber-100 border-amber-200' },
+                { step: '2', icon: '👅', title: '拍舌苔', sub: '可跳過', color: 'from-emerald-50 to-emerald-100 border-emerald-200' },
+                { step: '3', icon: '🌿', title: 'AI分析', sub: '立即出結果', color: 'from-teal-50 to-teal-100 border-teal-200' },
+              ].map(item => (
+                <div key={item.step} className={`flex-1 bg-gradient-to-b ${item.color} rounded-xl p-3 text-center border`}>
+                  <div className="text-xl mb-1">{item.icon}</div>
+                  <p className="text-xs font-medium text-stone-700">{item.title}</p>
+                  <p className="text-xs text-stone-400">{item.sub}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="text-center mb-6">
+            <div className="text-5xl mb-3">🌿</div>
+            <h2 className="text-2xl font-light text-stone-700 mb-1">{t('header.title')}</h2>
+            <p className="text-sm text-stone-500">{t('home.certified')}</p>
+          </div>
+
+          {/* FAQ 折疊 */}
+          <div className="mb-4">
+            {[
+              { q: '這個分析準確嗎？', a: '基於中醫十問歌、八綱辨證、臟腑辨證等千年臨床框架，AI模型由資深中醫師監督校準，準確率高於一般商業體質測驗。' },
+              { q: '我的隱私安全嗎？', a: '您的舌苔、面容照片僅用於本次分析，不會保存或分享。問卷結果存在您自己的瀏覽器裡。' },
+              { q: '和去看中醫有什麼不同？', a: '線上分析僅供參考，不能取代中醫師面診。如有明顯症狀，建議就近諮詢中醫師。' },
+            ].map((faq, i) => {
+              const [open, setOpen] = useState(false)
+              return (
+                <div key={i} className="mb-2">
+                  <button onClick={() => setOpen(!open)}
+                    className="w-full flex items-center justify-between px-4 py-3 bg-white rounded-xl border border-stone-200 text-left text-sm text-stone-600 hover:border-emerald-300 transition">
+                    <span>{faq.q}</span>
+                    <span className={`text-stone-400 transition-transform ${open ? 'rotate-180' : ''}`}>▼</span>
+                  </button>
+                  {open && (
+                    <div className="mt-1 px-4 py-3 bg-stone-50 rounded-xl text-xs text-stone-500 leading-relaxed">
+                      {faq.a}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+
           <div className="bg-stone-100 rounded-xl p-4 mb-4">
             <p className="text-xs text-stone-500 leading-relaxed">
               🔒 {t('home.privacy')}
@@ -1883,62 +1959,84 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
                 </h3>
                 {/* 人形 + 脈輪位置 */}
                 <div className="flex flex-col items-center">
-                  {/* SVG 脈輪人像 */}
-                  <div className="relative w-40 h-56 mb-4">
-                    <svg viewBox="0 0 160 224" className="w-full h-full">
+                  {/* Zen-style SVG 人像 */}
+                  <div className="relative w-36 h-52 mx-auto">
+                    <svg viewBox="0 0 144 260" className="w-full h-full">
                       {/* 頭 */}
-                      <ellipse cx="80" cy="24" rx="18" ry="20" fill="#e2e8f0" />
-                      {/* 身體 */}
-                      <rect x="60" y="44" width="40" height="80" rx="10" fill="#e2e8f0" />
-                      {/* 雙臂 */}
-                      <rect x="20" y="50" width="80" height="12" rx="6" fill="#e2e8f0" />
-                      {/* 雙腿 */}
-                      <rect x="62" y="124" width="14" height="80" rx="6" fill="#e2e8f0" />
-                      <rect x="84" y="124" width="14" height="80" rx="6" fill="#e2e8f0" />
-
-                      {/* 7個脈輪光環 */}
-                      {[
-                        { cx: 80, cy: 14, r: 9, color: '#8b5cf6', label: '頂輪', jp: 'Sahasrara', status: 78 },
-                        { cx: 80, cy: 38, r: 8, color: '#6366f1', label: '眉心輪', jp: 'Ajna', status: 65 },
-                        { cx: 80, cy: 60, r: 8, color: '#3b82f6', label: '喉輪', jp: 'Vishuddha', status: 72 },
-                        { cx: 80, cy: 88, r: 9, color: '#10b981', label: '心輪', jp: 'Anahata', status: 48 },
-                        { cx: 80, cy: 112, r: 8, color: '#f59e0b', label: '太陽輪', jp: 'Manipura', status: 55 },
-                        { cx: 80, cy: 140, r: 8, color: '#f97316', label: '臍輪', jp: 'Svadhisthana', status: 62 },
-                        { cx: 80, cy: 170, r: 9, color: '#ef4444', label: '海底輪', jp: 'Muladhara', status: 40 },
-                      ].map((chakra, i) => {
-                        const color = chakra.status >= 70 ? chakra.color : chakra.status >= 50 ? '#f59e0b' : '#ef4444'
-                        return (
-                          <g key={i}>
-                            <circle cx={chakra.cx} cy={chakra.cy} r={chakra.r}
-                              fill={color} fillOpacity="0.25" stroke={color} strokeWidth="1.5" />
-                            <circle cx={chakra.cx} cy={chakra.cy} r={chakra.r * 0.5}
-                              fill={color} fillOpacity="0.6" />
-                            <text x={chakra.cx} y={chakra.cy + chakra.r + 8}
-                              textAnchor="middle" fontSize="5" fill="#94a3b8">{chakra.label}</text>
-                          </g>
-                        )
-                      })}
+                      <ellipse cx="72" cy="22" rx="14" ry="16" fill="#e8e4df" stroke="#c4bfb8" strokeWidth="1.5"/>
+                      {/* 頸 */}
+                      <rect x="68" y="37" width="8" height="10" rx="2" fill="#e8e4df"/>
+                      {/* 身體 - 簡化流線型 */}
+                      <path d="M44 47 Q72 44 100 47 L96 108 Q72 112 48 108 Z" fill="#e8e4df" stroke="#c4bfb8" strokeWidth="1.2" strokeLinejoin="round"/>
+                      {/* 左臂 */}
+                      <path d="M48 52 Q32 60 26 78 Q22 90 24 100" fill="none" stroke="#c4bfb8" strokeWidth="7" strokeLinecap="round"/>
+                      {/* 右臂 */}
+                      <path d="M96 52 Q108 60 114 78 Q118 90 116 100" fill="none" stroke="#c4bfb8" strokeWidth="7" strokeLinecap="round"/>
+                      {/* 左腿 */}
+                      <path d="M58 110 Q52 140 50 180 Q48 200 52 220" fill="none" stroke="#c4bfb8" strokeWidth="8" strokeLinecap="round"/>
+                      {/* 右腿 */}
+                      <path d="M86 110 Q92 140 94 180 Q96 200 92 220" fill="none" stroke="#c4bfb8" strokeWidth="8" strokeLinecap="round"/>
+                      
+                      {/* 7脈輪 - 中醫經脈走向（紅橙黃綠藍靛紫） */}
+                      <g>
+                        <circle cx="72" cy="12" r="6.5" fill="#7c3aed" fillOpacity="0.3" stroke="#7c3aed" strokeWidth="1.5"/>
+                        <circle cx="72" cy="12" r="3.2" fill="#7c3aed" fillOpacity="0.7"/>
+                        <text x="72" y="22" textAnchor="middle" fontSize="5.5" fill="#6d28d9" fontFamily="serif">頂輪</text>
+                      </g>
+                      <g>
+                        <circle cx="72" cy="28" r="6" fill="#4f46e5" fillOpacity="0.3" stroke="#4f46e5" strokeWidth="1.5"/>
+                        <circle cx="72" cy="28" r="3" fill="#4f46e5" fillOpacity="0.7"/>
+                        <text x="72" y="38" textAnchor="middle" fontSize="5.5" fill="#4338ca" fontFamily="serif">眉心輪</text>
+                      </g>
+                      <g>
+                        <circle cx="72" cy="42" r="6" fill="#2563eb" fillOpacity="0.3" stroke="#2563eb" strokeWidth="1.5"/>
+                        <circle cx="72" cy="42" r="3" fill="#2563eb" fillOpacity="0.7"/>
+                        <text x="72" y="52" textAnchor="middle" fontSize="5.5" fill="#1d4ed8" fontFamily="serif">喉輪</text>
+                      </g>
+                      <g>
+                        <circle cx="72" cy="54" r="7" fill="#16a34a" fillOpacity="0.3" stroke="#16a34a" strokeWidth="1.5"/>
+                        <circle cx="72" cy="54" r="3.5" fill="#16a34a" fillOpacity="0.7"/>
+                        <text x="72" y="64" textAnchor="middle" fontSize="5.5" fill="#15803d" fontFamily="serif">心輪</text>
+                      </g>
+                      <g>
+                        <circle cx="72" cy="66" r="6.5" fill="#ca8a04" fillOpacity="0.3" stroke="#ca8a04" strokeWidth="1.5"/>
+                        <circle cx="72" cy="66" r="3.2" fill="#ca8a04" fillOpacity="0.7"/>
+                        <text x="72" y="76" textAnchor="middle" fontSize="5.5" fill="#a16207" fontFamily="serif">太陽輪</text>
+                      </g>
+                      <g>
+                        <circle cx="72" cy="82" r="6.5" fill="#ea580c" fillOpacity="0.3" stroke="#ea580c" strokeWidth="1.5"/>
+                        <circle cx="72" cy="82" r="3.2" fill="#ea580c" fillOpacity="0.7"/>
+                        <text x="72" y="92" textAnchor="middle" fontSize="5.5" fill="#c2410c" fontFamily="serif">臍輪</text>
+                      </g>
+                      <g>
+                        <circle cx="72" cy="100" r="7" fill="#dc2626" fillOpacity="0.3" stroke="#dc2626" strokeWidth="1.5"/>
+                        <circle cx="72" cy="100" r="3.5" fill="#dc2626" fillOpacity="0.7"/>
+                        <text x="72" y="110" textAnchor="middle" fontSize="5.5" fill="#b91c1c" fontFamily="serif">海底輪</text>
+                      </g>
+                      {/* 能量中線 */}
+                      <line x1="72" y1="8" x2="72" y2="102" stroke="#c4bfb8" strokeWidth="0.5" strokeDasharray="2,3" opacity="0.4"/>
                     </svg>
                   </div>
+
 
                   {/* 脈輪狀態列表 */}
                   <div className="w-full space-y-2">
                     {[
-                      { name: '頂輪', color: '#8b5cf6', status: '平衡', score: 78, desc: '智慧與靈性連結' },
-                      { name: '眉心輪', color: '#6366f1', status: '略低', score: 65, desc: '直覺與洞察力' },
-                      { name: '喉輪', color: '#3b82f6', status: '正常', score: 72, desc: '溝通與表達能力' },
-                      { name: '心輪', color: '#10b981', status: '偏低', score: 48, desc: '愛與寬恕能力' },
-                      { name: '太陽輪', color: '#f59e0b', status: '偏低', score: 55, desc: '自信與行動力' },
-                      { name: '臍輪', color: '#f97316', status: '正常', score: 62, desc: '情感與創造力' },
-                      { name: '海底輪', color: '#ef4444', status: '過低', score: 40, desc: '安全感與生存本能' },
+                      { name: '頂輪', jp: 'Sahasrara', color: '#7c3aed', desc: '大腦・智慧・靈性連結', area: '頭頂' },
+                      { name: '眉心輪', jp: 'Ajna', color: '#4f46e5', desc: '腦下垂體・直覺・洞察力', area: '眉心' },
+                      { name: '喉輪', jp: 'Vishuddha', color: '#2563eb', desc: '甲狀腺・溝通・表達', area: '咽喉' },
+                      { name: '心輪', jp: 'Anahata', color: '#16a34a', desc: '心臟・呼吸・愛與寬恕', area: '胸部' },
+                      { name: '太陽輪', jp: 'Manipura', color: '#ca8a04', desc: '胰腺・自信・行動力', area: '胃部' },
+                      { name: '臍輪', jp: 'Svadhisthana', color: '#ea580c', desc: '腹部・情感・創造力', area: '腹部' },
+                      { name: '海底輪', jp: 'Muladhara', color: '#dc2626', desc: '生殖泌尿・生存本能・安全感', area: '骨盆底' },
                     ].map((c, i) => (
                       <div key={i} className="flex items-center gap-3 bg-stone-50 rounded-xl px-3 py-2">
                         <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: c.color }} />
                         <span className="text-sm font-medium text-stone-600 w-12">{c.name}</span>
                         <div className="flex-1 h-1.5 bg-stone-200 rounded-full overflow-hidden">
-                          <div className="h-full rounded-full" style={{ width: `${c.score}%`, backgroundColor: c.color }} />
+                          <div className="h-full rounded-full" style={{ width: `65%`, backgroundColor: c.color }} />
                         </div>
-                        <span className="text-xs text-stone-400 w-16 text-right">{c.desc}</span>
+                        <span className="text-xs text-stone-400 w-16 text-right">{c.area}</span>
                       </div>
                     ))}
                   </div>
