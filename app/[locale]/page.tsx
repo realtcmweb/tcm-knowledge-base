@@ -813,6 +813,41 @@ interface ResultData {
   tongueGuide?: { tongueColor?: string; coatingColor?: string; coatingTexture?: string; marks?: string[] }
 }
 
+
+// ============================================
+// FAQ折疊元件
+// ============================================
+function FaqAccordion() {
+  const faqs = [
+    { q: '這個分析準確嗎？', a: '基於中醫十問歌、八綱辨證、臟腑辨證等千年臨床框架，AI模型由資深中醫師監督校準，準確率高於一般商業體質測驗。' },
+    { q: '我的隱私安全嗎？', a: '您的舌苔、面容照片僅用於本次分析，不會保存或分享。問卷結果存在您自己的瀏覽器裡。' },
+    { q: '和去看中醫有什麼不同？', a: '線上分析僅供參考，不能取代中醫師面診。如有明顯症狀，建議就近諮詢中醫師。' },
+  ]
+  return (
+    <div className="mb-4">
+      {faqs.map((faq, i) => <FaqItem key={i} faq={faq} />)}
+    </div>
+  )
+}
+
+function FaqItem({ faq }: { faq: { q: string; a: string } }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <div className="mb-2">
+      <button onClick={() => setOpen(!open)}
+        className="w-full flex items-center justify-between px-4 py-3 bg-white rounded-xl border border-stone-200 text-left text-sm text-stone-600 hover:border-emerald-300 transition">
+        <span>{faq.q}</span>
+        <span className={`text-stone-400 transition-transform ${open ? 'rotate-180' : ''}`}>▼</span>
+      </button>
+      {open && (
+        <div className="mt-1 px-4 py-3 bg-stone-50 rounded-xl text-xs text-stone-500 leading-relaxed">
+          {faq.a}
+        </div>
+      )}
+    </div>
+  )
+}
+
 // ============================================
 // 主元件
 // ============================================
@@ -1089,30 +1124,7 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
             <p className="text-sm text-stone-500">{t('home.certified')}</p>
           </div>
 
-          {/* FAQ 折疊 */}
-          <div className="mb-4">
-            {[
-              { q: '這個分析準確嗎？', a: '基於中醫十問歌、八綱辨證、臟腑辨證等千年臨床框架，AI模型由資深中醫師監督校準，準確率高於一般商業體質測驗。' },
-              { q: '我的隱私安全嗎？', a: '您的舌苔、面容照片僅用於本次分析，不會保存或分享。問卷結果存在您自己的瀏覽器裡。' },
-              { q: '和去看中醫有什麼不同？', a: '線上分析僅供參考，不能取代中醫師面診。如有明顯症狀，建議就近諮詢中醫師。' },
-            ].map((faq, i) => {
-              const [open, setOpen] = useState(false)
-              return (
-                <div key={i} className="mb-2">
-                  <button onClick={() => setOpen(!open)}
-                    className="w-full flex items-center justify-between px-4 py-3 bg-white rounded-xl border border-stone-200 text-left text-sm text-stone-600 hover:border-emerald-300 transition">
-                    <span>{faq.q}</span>
-                    <span className={`text-stone-400 transition-transform ${open ? 'rotate-180' : ''}`}>▼</span>
-                  </button>
-                  {open && (
-                    <div className="mt-1 px-4 py-3 bg-stone-50 rounded-xl text-xs text-stone-500 leading-relaxed">
-                      {faq.a}
-                    </div>
-                  )}
-                </div>
-              )
-            })}
-          </div>
+          <FaqAccordion />
 
           <div className="bg-stone-100 rounded-xl p-4 mb-4">
             <p className="text-xs text-stone-500 leading-relaxed">
