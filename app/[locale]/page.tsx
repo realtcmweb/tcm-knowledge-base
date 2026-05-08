@@ -1281,6 +1281,163 @@ export default function Home() {
             <p className="text-xs text-stone-400 mt-4 text-center">依據您的調理進度，各項指標建議逐步提升至綠色區間</p>
           </div>
 
+          {/* ══════════════════════════════════════════
+              付費內容：十二經絡 + 脈輪
+          ══════════════════════════════════════════ */}
+          <div className="mt-5">
+            {/* 付費解鎖提示 */}
+            <div className="bg-gradient-to-r from-violet-50 to-purple-50 rounded-2xl p-4 border border-violet-100 mb-4">
+              <div className="flex items-center gap-3">
+                <div className="text-2xl">🔐</div>
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-violet-700">經絡與脈輪深度分析</p>
+                  <p className="text-xs text-violet-500 mt-0.5">十二經絡能量 • 七大脈輪状态 • 身心連結解讀</p>
+                </div>
+                <div className="bg-violet-600 text-white text-xs px-3 py-1.5 rounded-full font-medium">
+                  進階版專屬
+                </div>
+              </div>
+              <div className="mt-3 flex gap-2">
+                <button className="flex-1 py-2.5 bg-violet-600 text-white text-sm rounded-xl font-medium hover:bg-violet-700 transition">
+                  解鎖完整報告
+                </button>
+                <button className="px-4 py-2.5 border border-violet-200 text-violet-600 text-sm rounded-xl hover:bg-violet-50 transition">
+                  登入會員
+                </button>
+              </div>
+            </div>
+
+            {/* 十二經絡預覽（浮水印疊加） */}
+            <div className="relative overflow-hidden rounded-2xl border border-stone-200 mb-4">
+              <div className="bg-white p-5">
+                <h3 className="text-sm font-semibold text-stone-600 mb-4 flex items-center gap-2">
+                  <span>🧘</span> 十二經絡能量圖
+                </h3>
+                {/* 12經絡能量條 */}
+                <div className="grid grid-cols-2 gap-3">
+                  {[
+                    { name: '肺經', element: '金', time: '3-5', energy: 72, side: 1.1, organ: '呼吸系統', emotion: '悲傷', color: 'bg-blue-400' },
+                    { name: '大腸經', element: '金', time: '5-7', energy: 68, side: 1.15, organ: '消化系統', emotion: '沮喪', color: 'bg-blue-500' },
+                    { name: '胃經', element: '土', time: '7-9', energy: 45, side: 0.88, organ: '消化系統', emotion: '焦慮', color: 'bg-amber-400' },
+                    { name: '脾經', element: '土', time: '9-11', energy: 55, side: 0.92, organ: '免疫系統', emotion: '擔憂', color: 'bg-amber-500' },
+                    { name: '心經', element: '火', time: '11-13', energy: 62, side: 1.05, organ: '心血管', emotion: '喜悅', color: 'bg-red-400' },
+                    { name: '小腸經', element: '火', time: '13-15', energy: 58, side: 1.0, organ: '消化系統', emotion: '純真', color: 'bg-red-500' },
+                    { name: '膀胱經', element: '水', time: '15-17', energy: 50, side: 0.78, organ: '泌尿系統', emotion: '恐懼', color: 'bg-cyan-400' },
+                    { name: '腎經', element: '水', time: '17-19', energy: 48, side: 0.82, organ: '生殖系統', emotion: '匱乏', color: 'bg-cyan-500' },
+                    { name: '心包經', element: '火', time: '19-21', energy: 65, side: 1.08, organ: '免疫系統', emotion: '連結', color: 'bg-rose-400' },
+                    { name: '三焦經', element: '火', time: '21-23', energy: 60, side: 1.02, organ: '淋巴系統', emotion: '循環', color: 'bg-rose-500' },
+                    { name: '膽經', element: '木', time: '23-1', energy: 52, side: 0.95, organ: '解毒系統', emotion: '決斷', color: 'bg-green-400' },
+                    { name: '肝經', element: '木', time: '1-3', energy: 40, side: 0.85, organ: '解毒系統', emotion: '憤怒', color: 'bg-green-500' },
+                  ].map((m, i) => {
+                    const statusColor = m.energy >= 60 ? 'text-emerald-500' : m.energy >= 45 ? 'text-amber-500' : 'text-red-500'
+                    return (
+                      <div key={i} className="bg-stone-50 rounded-xl p-3">
+                        <div className="flex items-center justify-between mb-1.5">
+                          <span className="text-sm font-medium text-stone-700">{m.name}</span>
+                          <span className="text-xs text-stone-400">{m.element} · {m.time}時</span>
+                        </div>
+                        <div className="h-2 bg-stone-200 rounded-full overflow-hidden mb-1">
+                          <div className={`h-full ${m.color} rounded-full`} style={{ width: `${m.energy}%` }} />
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className={`text-xs font-semibold ${statusColor}`}>{m.energy}%</span>
+                          <span className="text-xs text-stone-400">失衡 {Math.round((1 - m.side) * 100)}%</span>
+                        </div>
+                        <div className="mt-1.5 flex items-center gap-1.5">
+                          <span className="text-xs bg-stone-200 text-stone-600 px-1.5 py-0.5 rounded">{m.organ}</span>
+                          <span className="text-xs bg-stone-100 text-stone-500 px-1.5 py-0.5 rounded">{m.emotion}</span>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+                <p className="text-xs text-stone-400 text-center mt-4">完整12經絡解讀，含經絡走向、穴位建議、保養時辰，僅限付費會員</p>
+              </div>
+              {/* 浮水印 */}
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div className="text-4xl font-bold text-violet-100 rotate-[-15deg] select-none">進階版</div>
+              </div>
+              <div className="absolute inset-0 bg-white/40 backdrop-blur-[1px]" />
+            </div>
+
+            {/* 七大脈輪預覽 */}
+            <div className="relative overflow-hidden rounded-2xl border border-stone-200">
+              <div className="bg-white p-5">
+                <h3 className="text-sm font-semibold text-stone-600 mb-4 flex items-center gap-2">
+                  <span>⚡</span> 七大脈輪能量圖
+                </h3>
+                {/* 人形 + 脈輪位置 */}
+                <div className="flex flex-col items-center">
+                  {/* SVG 脈輪人像 */}
+                  <div className="relative w-40 h-56 mb-4">
+                    <svg viewBox="0 0 160 224" className="w-full h-full">
+                      {/* 頭 */}
+                      <ellipse cx="80" cy="24" rx="18" ry="20" fill="#e2e8f0" />
+                      {/* 身體 */}
+                      <rect x="60" y="44" width="40" height="80" rx="10" fill="#e2e8f0" />
+                      {/* 雙臂 */}
+                      <rect x="20" y="50" width="80" height="12" rx="6" fill="#e2e8f0" />
+                      {/* 雙腿 */}
+                      <rect x="62" y="124" width="14" height="80" rx="6" fill="#e2e8f0" />
+                      <rect x="84" y="124" width="14" height="80" rx="6" fill="#e2e8f0" />
+
+                      {/* 7個脈輪光環 */}
+                      {[
+                        { cx: 80, cy: 14, r: 9, color: '#8b5cf6', label: '頂輪', jp: 'Sahasrara', status: 78 },
+                        { cx: 80, cy: 38, r: 8, color: '#6366f1', label: '眉心輪', jp: 'Ajna', status: 65 },
+                        { cx: 80, cy: 60, r: 8, color: '#3b82f6', label: '喉輪', jp: 'Vishuddha', status: 72 },
+                        { cx: 80, cy: 88, r: 9, color: '#10b981', label: '心輪', jp: 'Anahata', status: 48 },
+                        { cx: 80, cy: 112, r: 8, color: '#f59e0b', label: '太陽輪', jp: 'Manipura', status: 55 },
+                        { cx: 80, cy: 140, r: 8, color: '#f97316', label: '臍輪', jp: 'Svadhisthana', status: 62 },
+                        { cx: 80, cy: 170, r: 9, color: '#ef4444', label: '海底輪', jp: 'Muladhara', status: 40 },
+                      ].map((chakra, i) => {
+                        const color = chakra.status >= 70 ? chakra.color : chakra.status >= 50 ? '#f59e0b' : '#ef4444'
+                        return (
+                          <g key={i}>
+                            <circle cx={chakra.cx} cy={chakra.cy} r={chakra.r}
+                              fill={color} fillOpacity="0.25" stroke={color} strokeWidth="1.5" />
+                            <circle cx={chakra.cx} cy={chakra.cy} r={chakra.r * 0.5}
+                              fill={color} fillOpacity="0.6" />
+                            <text x={chakra.cx} y={chakra.cy + chakra.r + 8}
+                              textAnchor="middle" fontSize="5" fill="#94a3b8">{chakra.label}</text>
+                          </g>
+                        )
+                      })}
+                    </svg>
+                  </div>
+
+                  {/* 脈輪狀態列表 */}
+                  <div className="w-full space-y-2">
+                    {[
+                      { name: '頂輪', color: '#8b5cf6', status: '平衡', score: 78, desc: '智慧與靈性連結' },
+                      { name: '眉心輪', color: '#6366f1', status: '略低', score: 65, desc: '直覺與洞察力' },
+                      { name: '喉輪', color: '#3b82f6', status: '正常', score: 72, desc: '溝通與表達能力' },
+                      { name: '心輪', color: '#10b981', status: '偏低', score: 48, desc: '愛與寬恕能力' },
+                      { name: '太陽輪', color: '#f59e0b', status: '偏低', score: 55, desc: '自信與行動力' },
+                      { name: '臍輪', color: '#f97316', status: '正常', score: 62, desc: '情感與創造力' },
+                      { name: '海底輪', color: '#ef4444', status: '過低', score: 40, desc: '安全感與生存本能' },
+                    ].map((c, i) => (
+                      <div key={i} className="flex items-center gap-3 bg-stone-50 rounded-xl px-3 py-2">
+                        <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: c.color }} />
+                        <span className="text-sm font-medium text-stone-600 w-12">{c.name}</span>
+                        <div className="flex-1 h-1.5 bg-stone-200 rounded-full overflow-hidden">
+                          <div className="h-full rounded-full" style={{ width: `${c.score}%`, backgroundColor: c.color }} />
+                        </div>
+                        <span className="text-xs text-stone-400 w-16 text-right">{c.desc}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-xs text-stone-400 text-center mt-4">完整脈輪解讀含打開/關閉原因、調理建議，僅限付費會員</p>
+                </div>
+              </div>
+              {/* 浮水印 */}
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div className="text-4xl font-bold text-violet-100 rotate-[-15deg] select-none">進階版</div>
+              </div>
+              <div className="absolute inset-0 bg-white/40 backdrop-blur-[1px]" />
+            </div>
+          </div>
+
           {/* 辯證要點 */}
           <div className="bg-emerald-50 rounded-2xl p-5 border border-emerald-100 mb-4">
             <h3 className="text-sm font-semibold text-emerald-700 mb-3 flex items-center gap-2">
