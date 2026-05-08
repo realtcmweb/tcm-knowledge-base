@@ -3,8 +3,38 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
 import { useTranslations, useLocale } from 'next-intl'
 import Head from 'next/head'
+import Link from 'next/link'
 import LanguageSelector from '../../components/LanguageSelector'
 import { HerbRecommendation, getHerbTiming, SYNDROME_DATABASE, MERIDIAN_CLOCK } from '../../lib/tcm_knowledge'
+
+// Input with unit toggle (used for height/weight)
+function NumberInputWithUnit({ value, onChange, placeholder, isHeight }: {
+  value: string; onChange: (v: string) => void; placeholder: string; isHeight?: boolean;
+}) {
+  const [localUnit, setLocalUnit] = useState(isHeight ? 'cm' : 'kg')
+  return (
+    <div className="flex items-center gap-2 bg-white border-2 border-stone-200 rounded-xl px-4 py-3 focus-within:border-emerald-400 transition">
+      <input type="text" inputMode="decimal" placeholder={placeholder} value={value}
+        onChange={e => onChange(e.target.value)}
+        className="flex-1 outline-none text-stone-800" />
+      {isHeight ? (
+        <div className="flex gap-1">
+          <button type="button" onClick={() => setLocalUnit('cm')}
+            className={`px-2 py-1 rounded text-xs ${localUnit === 'cm' ? 'bg-emerald-500 text-white' : 'bg-stone-100 text-stone-500'}`}>cm</button>
+          <button type="button" onClick={() => setLocalUnit('inch')}
+            className={`px-2 py-1 rounded text-xs ${localUnit === 'inch' ? 'bg-emerald-500 text-white' : 'bg-stone-100 text-stone-500'}`}>inch</button>
+        </div>
+      ) : (
+        <div className="flex gap-1">
+          <button type="button" onClick={() => setLocalUnit('kg')}
+            className={`px-2 py-1 rounded text-xs ${localUnit === 'kg' ? 'bg-emerald-500 text-white' : 'bg-stone-100 text-stone-500'}`}>kg</button>
+          <button type="button" onClick={() => setLocalUnit('lb')}
+            className={`px-2 py-1 rounded text-xs ${localUnit === 'lb' ? 'bg-emerald-500 text-white' : 'bg-stone-100 text-stone-500'}`}>lb</button>
+        </div>
+      )}
+    </div>
+  )
+}
 
 // ============================================
 // 題目類型
@@ -20,6 +50,7 @@ interface Question {
   placeholder?: string
   unit?: string
   hasCustomAgeInput?: boolean
+  groupLabel?: string
 }
 
 // ============================================
@@ -244,7 +275,7 @@ const BASIC_QUESTIONS: Question[] = [
     { value: '女', label: '👩 女性' },
   ]},
   { id: 'age', text: '您的年齡是？', options: AGE_OPTIONS, hasCustomAgeInput: true },
-  { id: 'height', text: '身高（選填）', type: 'input_number', placeholder: '例：170', unit: 'cm' },
+  { id: 'height', text: '身高（選填）', type: 'input_number', placeholder: '例：170', unit: 'cm', groupLabel: '身體數據' },
   { id: 'weight', text: '體重（選填）', type: 'input_number', placeholder: '例：65', unit: 'kg' },
 ]
 
@@ -795,6 +826,9 @@ export default function Home() {
   const [customInput, setCustomInput] = useState('')
   const [smartAnswers, setSmartAnswers] = useState<Record<string, string[]>>({})
 const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, string>>({})
+  const [reportFile, setReportFile] = useState<File | null>(null)
+  const [reportPreview, setReportPreview] = useState<string | null>(null)
+  const reportFileRef = useRef<HTMLInputElement>(null)
 
   const TONGUE_COLOR_OPTIONS = [
     { value: '淡紅', label: '淡紅舌（健康/輕微氣虛）' },
@@ -940,6 +974,7 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
     setCustomInput(''); setTongueFile(null); setTonguePreview(null)
     setFaceFile(null); setFacePreview(null); setFaceInfo(null); setShowFaceCapture(false)
     setResult(null); setImageLoaded(false)
+    setReportFile(null); setReportPreview(null)
   }
 
   const isLastQ = qIndex === totalQ - 1
@@ -978,6 +1013,10 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
           </div>
           <div className="flex items-center gap-3">
             <LanguageSelector currentLocale={locale} />
+            <Link href="/login"
+              className="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white text-xs rounded-full transition">
+              登入
+            </Link>
             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white text-sm font-medium">
               診
             </div>
@@ -1059,15 +1098,17 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
 
             // input_number 類型（身高、體重）
             if (q.type === 'input_number') {
+              const isHeight = q.id === 'height'
               return (
                 <div className="space-y-3">
+                  {q.groupLabel && <p className="text-xs text-emerald-600 tracking-widest mb-1">{q.groupLabel}</p>}
                   <h2 className="text-xl font-light text-stone-700 mb-6 text-center">{q.text}</h2>
-                  <div className="flex items-center gap-3 bg-white border-2 border-stone-200 rounded-xl px-4 py-3 focus-within:border-emerald-400 transition">
-                    <input type="number" placeholder={q.placeholder} value={answers[q.id] || ''}
-                      onChange={e => setAnswers({ ...answers, [q.id]: e.target.value })}
-                      className="flex-1 outline-none text-stone-800" />
-                    <span className="text-stone-400 text-sm">{q.unit}</span>
-                  </div>
+                  <NumberInputWithUnit
+                    value={answers[q.id] || ''}
+                    onChange={v => setAnswers({ ...answers, [q.id]: v })}
+                    placeholder={q.placeholder || ''}
+                    isHeight={isHeight}
+                  />
                   <button onClick={() => {
                     if (qIndex < BASIC_QUESTIONS.length - 1) setQIndex(qIndex + 1)
                     else (mode === 'smart' ? setStep('smart') : setStep('chief'))
@@ -1343,7 +1384,7 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
 
       {/* ── 舌象引導（選填） ── */}
       {step === 'tongue_guide' && (
-        <main className="max-w-lg mx-auto px-4 py-8 min-h-[70vh] flex flex-col">
+        <main className="max-w-lg mx-auto px-4 py-8 min-h-[70vh] flex flex-col justify-center">
           <div className="text-center mb-5">
             <p className="text-xs text-amber-600 tracking-widest mb-1 font-medium">選填 · 可跳過</p>
             <h2 className="text-xl font-light text-stone-700">觀察舌象</h2>
@@ -1351,96 +1392,53 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
           </div>
 
           <div className="space-y-5">
-            {/* 舌色 */}
+            {/* 舌頭抖動 */}
             <div>
-              <p className="text-sm font-medium text-stone-700 mb-2">1️⃣ 您的舌頭顏色？</p>
+              <p className="text-sm font-medium text-stone-700 mb-2">1️⃣ 舌頭有沒有抖動？</p>
               <div className="grid grid-cols-2 gap-2">
-                {TONGUE_COLOR_OPTIONS.map(opt => (
+                {[{value:'無',label:'正常不抖動'},{value:'輕微',label:'輕微顫動'},{value:'明顯',label:'明顯顫動'},{value:'不確定',label:'不確定'}].map(opt => (
                   <button key={opt.value}
-                    onClick={() => setTongueGuideAnswers(prev => ({ ...prev, tongueColor: opt.value }))}
-                    className={`px-3 py-2.5 rounded-xl text-xs text-left transition-all border-2 ${
-                      tongueGuideAnswers.tongueColor === opt.value
-                        ? 'border-amber-400 bg-amber-50 font-medium text-amber-800'
-                        : 'border-stone-200 bg-white text-stone-600 hover:border-amber-300'
-                    }`}>
+                    onClick={() => setTongueGuideAnswers(prev => ({...prev, tremor: opt.value}))}
+                    className={`px-3 py-2.5 rounded-xl text-xs text-left transition-all border-2 ${tongueGuideAnswers.tremor === opt.value ? 'border-amber-400 bg-amber-50 font-medium text-amber-800' : 'border-stone-200 bg-white text-stone-600 hover:border-amber-300'}`}>
                     {opt.label}
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* 苔色 */}
+            {/* 齒痕情況 */}
             <div>
-              <p className="text-sm font-medium text-stone-700 mb-2">2️⃣ 舌苔顏色？</p>
+              <p className="text-sm font-medium text-stone-700 mb-2">2️⃣ 舌頭邊緣有齒痕嗎？</p>
               <div className="grid grid-cols-2 gap-2">
-                {COATING_COLOR_OPTIONS.map(opt => (
+                {[{value:'無',label:'無齒痕（健康）'},{value:'輕微',label:'輕微齒痕'},{value:'明顯',label:'明顯齒痕'},{value:'不確定',label:'不確定'}].map(opt => (
                   <button key={opt.value}
-                    onClick={() => setTongueGuideAnswers(prev => ({ ...prev, coatingColor: opt.value }))}
-                    className={`px-3 py-2.5 rounded-xl text-xs text-left transition-all border-2 ${
-                      tongueGuideAnswers.coatingColor === opt.value
-                        ? 'border-amber-400 bg-amber-50 font-medium text-amber-800'
-                        : 'border-stone-200 bg-white text-stone-600 hover:border-amber-300'
-                    }`}>
+                    onClick={() => setTongueGuideAnswers(prev => ({...prev, teethMark: opt.value}))}
+                    className={`px-3 py-2.5 rounded-xl text-xs text-left transition-all border-2 ${tongueGuideAnswers.teethMark === opt.value ? 'border-amber-400 bg-amber-50 font-medium text-amber-800' : 'border-stone-200 bg-white text-stone-600 hover:border-amber-300'}`}>
                     {opt.label}
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* 苔質 */}
+            {/* 特殊標記文字輸入 */}
             <div>
-              <p className="text-sm font-medium text-stone-700 mb-2">3️⃣ 舌苔質地？</p>
-              <div className="grid grid-cols-2 gap-2">
-                {COATING_TEXTURE_OPTIONS.map(opt => (
-                  <button key={opt.value}
-                    onClick={() => setTongueGuideAnswers(prev => ({ ...prev, coatingTexture: opt.value }))}
-                    className={`px-3 py-2.5 rounded-xl text-xs text-left transition-all border-2 ${
-                      tongueGuideAnswers.coatingTexture === opt.value
-                        ? 'border-amber-400 bg-amber-50 font-medium text-amber-800'
-                        : 'border-stone-200 bg-white text-stone-600 hover:border-amber-300'
-                    }`}>
-                    {opt.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* 特殊標記 */}
-            <div>
-              <p className="text-sm font-medium text-stone-700 mb-2">4️⃣ 舌頭有特殊標記嗎？</p>
-              <div className="grid grid-cols-2 gap-2">
-                {TONGUE_MARKS_OPTIONS.map(opt => (
-                  <button key={opt.value}
-                    onClick={() => setTongueGuideAnswers(prev => ({ ...prev, marks: opt.value }))}
-                    className={`px-3 py-2.5 rounded-xl text-xs text-left transition-all border-2 ${
-                      tongueGuideAnswers.marks === opt.value
-                        ? 'border-amber-400 bg-amber-50 font-medium text-amber-800'
-                        : 'border-stone-200 bg-white text-stone-600 hover:border-amber-300'
-                    }`}>
-                    {opt.label}
-                  </button>
-                ))}
-              </div>
+              <p className="text-sm font-medium text-stone-700 mb-2">3️⃣ 舌頭外觀有什麼特別之處？（選填）</p>
+              <textarea
+                placeholder="例如：舌頭有裂紋、瘀點、潰瘍、顏色特別深..."
+                value={tongueGuideAnswers.notes || ''}
+                onChange={e => setTongueGuideAnswers(prev => ({...prev, notes: e.target.value}))}
+                className="w-full px-4 py-3 border-2 border-stone-200 rounded-xl text-sm resize-none focus:outline-none focus:border-amber-400 transition"
+                rows={3}
+              />
             </div>
           </div>
 
-          {/* 跳過 / 下一步按鈕 */}
           <div className="mt-6 space-y-3">
             <button onClick={() => setStep('tongue')}
               className="w-full py-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-2xl font-medium shadow-lg">
-              {Object.keys(tongueGuideAnswers).length > 0
-                ? `✓ 已記錄，繼續拍攝舌苔 →`
-                : '直接拍攝舌苔 →'}
+              {Object.keys(tongueGuideAnswers).length > 0 ? '✓ 已記錄，繼續拍攝舌苔 →' : '直接拍攝舌苔 →'}
             </button>
-            <button onClick={() => {
-              const hasAnswers = Object.keys(tongueGuideAnswers).length > 0
-              if (hasAnswers) {
-                // Save tongue guide to result later via state
-                setStep('tongue')
-              } else {
-                setStep('tongue')
-              }
-            }} className="w-full py-3 text-stone-400 text-sm hover:text-stone-600 transition">
+            <button onClick={() => setStep('tongue')} className="w-full py-3 text-stone-400 text-sm hover:text-stone-600 transition">
               跳過，稍後再觀察
             </button>
           </div>
@@ -1553,6 +1551,41 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
             </div>
           )}
 
+          {/* 體檢報告上傳（Beta） */}
+          <div className="mt-4">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-sm font-medium text-stone-600">📄 上傳體檢報告（Beta，選填）</span>
+              <span className="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full">Beta</span>
+            </div>
+            <div
+              onClick={() => reportFileRef.current?.click()}
+              className="border-2 border-dashed border-stone-300 rounded-xl p-4 text-center cursor-pointer hover:border-emerald-300 transition"
+            >
+              <input ref={reportFileRef} type="file" accept="image/*,.pdf" className="hidden"
+                onChange={e => {
+                  const file = e.target.files?.[0]
+                  if (file) {
+                    setReportFile(file)
+                    const reader = new FileReader()
+                    reader.onload = ev => setReportPreview(ev.target?.result as string)
+                    reader.readAsDataURL(file)
+                  }
+                }} />
+              {reportPreview ? (
+                <div className="relative">
+                  <img src={reportPreview} alt="體檢報告預覽" className="w-full object-contain max-h-32 rounded-lg" />
+                  <div className="absolute top-2 left-2 bg-emerald-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs">✓</div>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center text-stone-400">
+                  <div className="text-3xl mb-1">📄</div>
+                  <p className="text-xs">點擊上傳體檢報告圖片或PDF</p>
+                  <p className="text-xs text-stone-300 mt-1">可輔助AI更全面了解您的健康狀況</p>
+                </div>
+              )}
+            </div>
+          </div>
+
           <button onClick={handleSubmit} disabled={loading}
             className="w-full py-4 bg-gradient-to-r from-emerald-600 to-teal-500 text-white rounded-2xl font-medium shadow-lg shadow-emerald-200 disabled:opacity-60 transition">
             {loading ? '分析中...' : tongueFile ? '✨ 分析舌苔 + 送出' : '✨ 略過舌苔，直接分析'}
@@ -1580,6 +1613,32 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
               {t('result.pattern')}：{result.constitution.pattern}
             </span>
           </div>
+
+          {/* 身體狀況摘要 */}
+          {(() => {
+            const s = result.constitution
+            const summaries: Record<string, string> = {
+              '氣虛': `您屬於「氣虛」體質，主要表現為元氣不足、臟腑功能減退。常見症狀包括說話無力、容易疲倦、稍動即喘、免疫力較弱。舌質偏淡，邊緣有齒痕，脈象虛弱。建議以健脾益氣為主，避免過度勞累，保持充足睡眠，適度進行太極拳、八段錦等柔和運動。`,
+              '陰虛': `您屬於「陰虛」體質，特點是陰液不足、虛火內生。常見症狀包括怕熱、手腳心燙、口乾舌燥、盜汗、睡眠不佳。舌色偏紅，少苔或無苔，舌面可見裂紋，脈象細數。建議滋陰清熱為主，少熬夜，多食百合、銀耳、麥冬等滋陰食材。`,
+              '陽虛': `您屬於「陽虛」體質，特點是陽氣不足、虛寒內盛。常見症狀包括怕冷、手腳冰涼、精神倦怠、腰膝酸軟、夜尿頻繁。舌質淡胖，舌苔白滑，脈象遲緩或沉細。建議溫陽補腎為主，忌食生冷冰品，堅持熱水泡腳、曬背等溫陽療法。`,
+              '痰濕': `您屬於「痰濕」體質，特點是濕濁內生、痰濕困脾。常見症狀包括身體沉重、胃口不佳、大便黏膩、口中黏膩、頭髮臉部容易出油。舌苔厚膩，脈象滑緩。建議燥濕化痰為主，晚餐在7點前吃完，避免甜食油炸，配合快走、游泳等運動。`,
+              '氣鬱': `您屬於「氣鬱」體質，特點是肝氣不舒、情緒壓抑。常見症狀包括易怒焦慮、胸悶脅痛、嘆氣多、月經前乳房脹痛、睡眠不佳。舌邊偏紅，脈象弦。建議疏肝解鬱為主，保持情緒平穩，每天快走6000步，按摩太衝穴。`,
+              '濕熱': `您屬於「濕熱」體質，特點是濕熱內蘊、肝膽濕熱。常見症狀包括口苦、口乾、脇痛、小便黃、陰囊潮濕、白帶多。舌苔黃厚膩，脈象滑數。建議清熱利濕為主，忌辛辣油炸，晚上11點前入睡（肝膽排毒時間）。`,
+              '血瘀': `您屬於「血瘀」體質，特點是血液運行不暢、瘀阻脈絡。常見症狀包括身體特定部位刺痛、面色黯沉、唇色暗紫、瘀青不易消散、月經有血塊。舌有瘀點或瘀斑，舌下靜脈曲張，脈象澀。建議活血化瘀為主，多做促進血液循環的運動，避免寒涼。`,
+              '脾虛': `您屬於「脾虛」體質，特點是脾胃運化失常、食慾不佳。常見症狀包括飯後腹脹、吃很少就飽、大便稀軟、疲倦乏力、面色萎黃。舌淡胖有齒痕，脈象緩弱。建議健脾益氣為主，定時定量用餐（每餐7-8分飽），飯後散步30分鐘。`,
+              '胃熱': `您屬於「胃熱」體質，特點是胃火熾盛、腐熟過度。常見症狀包括胃部灼熱感、胃酸過多、口臭、牙齦腫痛、想吃冰、大便乾硬。舌紅苔黃乾，脈象滑數。建議清胃瀉火為主，忌辛辣油炸咖啡，保持大便通暢。`,
+            }
+            const type = s.type || ''
+            const summary = summaries[type] || `您的體質屬於「${type}」範疇，建議结合中醫師建議進行個人化調理，平時注意飲食均衡、情緒穩定、充足睡眠。`
+            return (
+              <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl p-5 border border-emerald-100 mb-5">
+                <h3 className="text-sm font-semibold text-emerald-700 mb-2 flex items-center gap-2">
+                  <span>📋</span> 身體狀況摘要
+                </h3>
+                <p className="text-sm text-stone-600 leading-relaxed">{summary}</p>
+              </div>
+            )
+          })()}
 
           {/* ── 能量分析儀表板 ── */}
           <div className="bg-gradient-to-br from-stone-50 to-stone-100 rounded-2xl p-5 border border-stone-200 mb-5">
