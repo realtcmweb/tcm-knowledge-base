@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import { useTranslations, useLocale } from 'next-intl'
 import Head from 'next/head'
 import LanguageSelector from '../../components/LanguageSelector'
@@ -19,6 +19,188 @@ interface Question {
   placeholder?: string
   unit?: string
   hasCustomAgeInput?: boolean
+}
+
+// ============================================
+// 歷史記錄儲存元件（localStorage）
+// ============================================
+interface SavedResult {
+  type: string
+  sub: string
+  energy: number
+  stress: number
+  resilience: number
+  innerEnergy: number
+  lifestyle: { exercise: number; nutrition: number; environment: number; psychology: number; sleep: number; hormonal: number }
+  savedAt: string
+}
+
+function ResultSaveSection({ result }: { result: ResultData }) {
+  const [history, setHistory] = useState<SavedResult[]>([])
+  const [showHistory, setShowHistory] = useState(false)
+
+  const [saved, setSaved] = useState(false)
+  const [compareMode, setCompareMode] = useState(false)
+  const [selectedOld, setSelectedOld] = useState<SavedResult | null>(null)
+
+  useEffect(() => {
+    const stored = localStorage.getItem('tcm_result_history')
+    if (stored) {
+      try {
+        setHistory(JSON.parse(stored))
+      } catch {}
+    }
+  }, [])
+
+  const saveResult = () => {
+    const entry: SavedResult = {
+      type: result.constitution.type,
+      sub: result.constitution.sub,
+      energy: result.constitution.energy,
+      stress: result.constitution.stress,
+      resilience: result.constitution.resilience,
+      innerEnergy: result.constitution.innerEnergy,
+      lifestyle: result.constitution.lifestyle,
+      savedAt: new Date().toISOString(),
+    }
+    const updated = [entry, ...history].slice(0, 10)
+    localStorage.setItem('tcm_result_history', JSON.stringify(updated))
+    setHistory(updated)
+    setSaved(true)
+    setTimeout(() => setSaved(false), 2000)
+  }
+
+
+  const clearHistory = () => {
+    localStorage.removeItem('tcm_result_history')
+    setHistory([])
+    setShowHistory(false)
+    setCompareMode(false)
+    setSelectedOld(null)
+  }
+
+  const lifestyleDiff = (cur: SavedResult['lifestyle'], old: SavedResult['lifestyle']) => {
+    const keys = ['exercise', 'nutrition', 'environment', 'psychology', 'sleep', 'hormonal'] as const
+    return keys.map(k => ({
+      key: k,
+      diff: cur[k] - old[k],
+      icon: k === 'exercise' ? '🏃' : k === 'nutrition' ? '🥗' : k === 'environment' ? '🌤' : k === 'psychology' ? '🧘' : k === 'sleep' ? '😴' : '⚖️',
+      label: { exercise: '運動', nutrition: '營養', environment: '環境', psychology: '心理', sleep: '睡眠', hormonal: '荷爾蒙' }[k],
+    }))
+  }
+
+  return (
+    <div className="mt-4">
+      {!saved ? (
+        <button onClick={saveResult}
+          className="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl text-sm font-medium hover:from-emerald-600 hover:to-teal-600 transition shadow-md">
+          💾 儲存這次結果
+        </button>
+      ) : (
+        <div className="w-full py-3 bg-emerald-100 text-emerald-700 rounded-xl text-sm text-center font-medium">
+          ✅ 已儲存！
+        </div>
+      )}
+
+      <button onClick={() => setShowHistory(!showHistory)}
+        className="w-full py-2.5 mt-2 text-xs text-stone-500 hover:text-stone-700 border border-stone-200 rounded-xl bg-white hover:bg-stone-50 transition">
+        📂 歷史記錄 ({history.length})
+      </button>
+
+      {showHistory && (
+        <div className="mt-3 space-y-2">
+          {history.length === 0 ? (
+            <p className="text-xs text-stone-400 text-center py-3">尚無記錄</p>
+          ) : (
+            <>
+              <div className="flex gap-2 mb-2">
+                <button onClick={() => { setCompareMode(false); setSelectedOld(null) }}
+                  className={`text-xs px-3 py-1.5 rounded-full ${!compareMode ? 'bg-emerald-100 text-emerald-700' : 'bg-stone-100 text-stone-500'}`}>
+                  📋 列表
+                </button>
+                <button onClick={() => setCompareMode(true)}
+                  className={`text-xs px-3 py-1.5 rounded-full ${compareMode ? 'bg-emerald-100 text-emerald-700' : 'bg-stone-100 text-stone-500'}`}>
+                  📊 對比模式
+                </button>
+                {history.length > 0 && (
+                  <button onClick={clearHistory}
+                    className="text-xs px-3 py-1.5 rounded-full bg-red-50 text-red-500 ml-auto">
+                    🗑 清除
+                  </button>
+                )}
+              </div>
+
+              {!compareMode ? (
+                history.map((h, i) => {
+                  const date = new Date(h.savedAt)
+                  return (
+                    <div key={i} className="bg-white border border-stone-200 rounded-xl p-3">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-stone-700">{h.type}</p>
+                          <p className="text-xs text-stone-400">{date.toLocaleDateString('zh-TW')} {date.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' })}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-xs text-stone-500">能量 {h.energy}%</p>
+                          <p className="text-xs text-stone-500">壓力 {h.stress}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })
+              ) : selectedOld ? (
+                <div className="space-y-2">
+                  <div className="bg-stone-50 rounded-xl p-3">
+                    <p className="text-xs text-stone-500 mb-2">對比：{new Date(selectedOld.savedAt).toLocaleDateString('zh-TW')} vs 這次</p>
+                    <div className="space-y-2">
+                      {lifestyleDiff(result.constitution.lifestyle, selectedOld.lifestyle).map(item => (
+                        <div key={item.key} className="flex items-center gap-2">
+                          <span className="text-sm">{item.icon}</span>
+                          <span className="text-xs text-stone-600 w-10">{item.label}</span>
+                          <div className="flex-1 h-2 bg-stone-200 rounded-full overflow-hidden">
+                            <div className="h-full bg-stone-400 rounded-full" style={{ width: `${selectedOld.lifestyle[item.key]}%` }} />
+                          </div>
+                          <span className="text-xs text-stone-400 w-6 text-center">→</span>
+                          <div className="flex-1 h-2 bg-stone-200 rounded-full overflow-hidden">
+                            <div className={`h-full rounded-full ${item.diff > 0 ? 'bg-emerald-400' : item.diff < 0 ? 'bg-red-400' : 'bg-stone-400'}`}
+                              style={{ width: `${result.constitution.lifestyle[item.key]}%` }} />
+                          </div>
+                          <span className={`text-xs w-10 text-right ${item.diff > 0 ? 'text-emerald-500' : item.diff < 0 ? 'text-red-500' : 'text-stone-400'}`}>
+                            {item.diff > 0 ? '+' : ''}{item.diff}%
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <button onClick={() => setSelectedOld(null)}
+                    className="text-xs text-stone-400 hover:text-stone-600">← 重新選擇</button>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <p className="text-xs text-stone-500 text-center">選擇一筆記錄來對比：</p>
+                  {history.map((h, i) => {
+                    const date = new Date(h.savedAt)
+                    return (
+                      <button key={i} onClick={() => setSelectedOld(h)}
+                        className="w-full bg-white border border-stone-200 rounded-xl p-3 text-left hover:border-emerald-300 transition">
+                        <p className="text-sm font-medium text-stone-700">{h.type}</p>
+                        <p className="text-xs text-stone-400">{date.toLocaleDateString('zh-TW')} {date.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' })}</p>
+                      </button>
+                    )
+                  })}
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      )}
+
+
+      <p className="text-xs text-stone-400 mt-3 text-center">
+        🔐 免費儲存10筆記錄。登入會員解鎖無限歷史 + 雲端同步
+      </p>
+    </div>
+  )
 }
 
 // ============================================
@@ -488,6 +670,7 @@ interface ResultData {
   tongue?: Record<string, unknown>
   face?: Record<string, unknown>
   questionnaire_answers: Record<string, string>
+  savedAt?: string // ISO date string for comparison
 }
 
 // ============================================
@@ -595,7 +778,7 @@ export default function Home() {
           if (res.ok) faceResult = await res.json()
         } catch { /* silent */ }
       }
-      setResult({ constitution, tongue: tongueInfo, face: faceResult, questionnaire_answers: answers })
+      setResult({ constitution, tongue: tongueInfo, face: faceResult, questionnaire_answers: answers, savedAt: new Date().toISOString() })
       setStep('result')
     } catch (err) {
       console.error(err)
@@ -945,7 +1128,7 @@ export default function Home() {
           </button>
           {!tongueFile && (
             <button onClick={() => {
-              setResult({ constitution: analyzeCondition(answers), questionnaire_answers: answers })
+              setResult({ constitution: analyzeCondition(answers), questionnaire_answers: answers, savedAt: new Date().toISOString() })
               setStep('result')
             }} className="w-full py-3 text-sm text-stone-400 hover:text-stone-600 transition mt-2">
               跳過舌苔分析
@@ -1290,17 +1473,17 @@ export default function Home() {
           }} className="w-full py-3 text-sm text-emerald-600 hover:text-emerald-700 mt-2">
             📤 分享給家人朋友
           </button>
-          {/* 7天後回來對比提示 */}
-          <div className="mt-6 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl p-5 border border-emerald-100 text-center">
-            <div className="text-3xl mb-2">📅</div>
-            <p className="text-sm font-medium text-emerald-700 mb-1">7天後回來對比</p>
-            <p className="text-xs text-emerald-600 leading-relaxed">
-              中醫調理需要時間，建議你<br />
-              <span className="font-semibold">7天後重新做一次問卷</span>，觀察體質變化
-            </p>
-            <p className="text-xs text-stone-400 mt-3">
-              🔐 登入會員可一鍵記錄每次結果，輕鬆追蹤健康變化
-            </p>
+          {/* 結果保存/對比提示 */}
+          <div className="mt-6 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl p-5 border border-emerald-100">
+            <div className="text-center mb-4">
+              <div className="text-3xl mb-2">📅</div>
+              <p className="text-sm font-medium text-emerald-700">7天後回來對比</p>
+              <p className="text-xs text-emerald-600 leading-relaxed mt-1">
+                中醫調理需要時間，建議<strong>7天後重新做一次問卷</strong>，觀察體質變化
+              </p>
+            </div>
+
+            <ResultSaveSection result={result} />
           </div>
         </main>
       )}
