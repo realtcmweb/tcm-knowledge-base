@@ -82,5 +82,12 @@
   },
   "language": {
     "label": "语言"
+  },
+  "tongue": {
+    "title": "舌苔特征",
+    "color": "舌色",
+    "coating": "苔色",
+    "teeth": "齿痕",
+    "cracks": "裂纹"
   }
 }

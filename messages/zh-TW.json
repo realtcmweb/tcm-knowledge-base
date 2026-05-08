@@ -47,8 +47,8 @@
   "mode": {
     "fast": "快速問診",
     "detailed": "詳細問診",
-    "fastDesc": "精選3題，快速了解核心問題",
-    "detailedDesc": "全面分析，含8道補充題"
+    "fastDesc": "2 分鐘，精選核心題，快速獲得分析",
+    "detailedDesc": "5-8 分鐘，完整十問歌，深度分析體質"
   },
   "questionnaire": {
     "step": "第 {current} 步",
@@ -82,5 +82,12 @@
   },
   "language": {
     "label": "語言"
+  },
+  "tongue": {
+    "title": "舌苔特徵",
+    "color": "舌色",
+    "coating": "苔色",
+    "teeth": "齒痕",
+    "cracks": "裂紋"
   }
 }

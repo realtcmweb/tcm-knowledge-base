@@ -82,5 +82,12 @@
   },
   "language": {
     "label": "Idioma"
+  },
+  "tongue": {
+    "title": "Tongue Features",
+    "color": "Tongue Color",
+    "coating": "Coating Color",
+    "teeth": "Teeth Marks",
+    "cracks": "Cracks"
   }
 }

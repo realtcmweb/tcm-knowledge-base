@@ -459,7 +459,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-stone-50 text-stone-800" style={{ fontFamily: "'Noto Serif TC', serif" }}>
-      <Head><title>中醫智能問診 | TCM AI</title></Head>
+      <Head><title>{t('header.title')} | TCM AI</title></Head>
 
       {/* Header */}
       <header className="bg-white/90 backdrop-blur-sm border-b border-stone-200 sticky top-0 z-50">
@@ -487,16 +487,16 @@ export default function Home() {
         <main className="max-w-lg mx-auto px-4 py-10 min-h-[75vh] flex flex-col justify-center">
           <div className="text-center mb-8">
             <div className="text-5xl mb-4">🌿</div>
-            <h2 className="text-2xl font-light text-stone-700 mb-2">中醫智能問診</h2>
-            <p className="text-sm text-stone-500">由資深中醫師認證，基於千年中醫古籍與現代臨床經驗</p>
+            <h2 className="text-2xl font-light text-stone-700 mb-2">{t('header.title')}</h2>
+            <p className="text-sm text-stone-500">{t('home.certified')}</p>
           </div>
           <div className="space-y-3 mb-8">
             <button onClick={() => { setMode('fast'); setStep('basic') }}
               className="w-full py-5 px-5 bg-white border-2 border-stone-200 rounded-2xl text-left hover:border-emerald-400 transition group">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium text-stone-800 group-hover:text-emerald-700">⚡ 快速問診</p>
-                  <p className="text-xs text-stone-400 mt-1">2 分鐘，精選核心題，快速獲得分析</p>
+                  <p className="font-medium text-stone-800 group-hover:text-emerald-700">⚡ {t('mode.fast')}</p>
+                  <p className="text-xs text-stone-400 mt-1">{t('mode.fastDesc')}</p>
                 </div>
                 <span className="text-stone-300 group-hover:text-emerald-400">→</span>
               </div>
@@ -505,8 +505,8 @@ export default function Home() {
               className="w-full py-5 px-5 bg-white border-2 border-stone-200 rounded-2xl text-left hover:border-emerald-400 transition group">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium text-stone-800 group-hover:text-emerald-700">🔍 詳細問診</p>
-                  <p className="text-xs text-stone-400 mt-1">5-8 分鐘，完整十問歌，深度分析體質</p>
+                  <p className="font-medium text-stone-800 group-hover:text-emerald-700">🔍 {t('mode.detailed')}</p>
+                  <p className="text-xs text-stone-400 mt-1">{t('mode.detailedDesc')}</p>
                 </div>
                 <span className="text-stone-300 group-hover:text-emerald-400">→</span>
               </div>
@@ -514,8 +514,8 @@ export default function Home() {
           </div>
           <div className="bg-stone-100 rounded-xl p-4 text-center">
             <p className="text-xs text-stone-500 leading-relaxed">
-              基於中醫十問歌：中醫師千年傳承診斷智慧<br />
-              您的資料僅用於本次分析，不會保存
+              {t('home.tenQuestions')}<br />
+              {t('home.privacy')}
             </p>
           </div>
         </main>
@@ -526,7 +526,7 @@ export default function Home() {
         <main className="max-w-lg mx-auto px-4 py-8 min-h-[70vh] flex flex-col justify-center">
           <div className="text-center mb-6">
             <p className="text-xs text-stone-400 tracking-widest mb-1">基本資料</p>
-            <p className="text-xs text-emerald-600">{mode === 'fast' ? '快速問診' : '詳細問診'} · 協助精準判斷</p>
+            <p className="text-xs text-emerald-600">{mode === 'fast' ? t('mode.fast') : t('mode.detailed')} · 協助精準判斷</p>
           </div>
           {(() => {
             const q = BASIC_QUESTIONS[qIndex]
@@ -603,7 +603,7 @@ export default function Home() {
         <main className="max-w-lg mx-auto px-4 py-8 min-h-[70vh] flex flex-col justify-center">
           <div className="text-center mb-6">
             <p className="text-xs text-stone-400 tracking-widest mb-1">
-              {mode === 'detailed' ? '詳細問診' : '快速問診'} · 第 {qIndex + 1} / {totalQ} 題
+              {mode === 'detailed' ? t('mode.detailed') : t('mode.fast')} · {t('questionnaire.step', { current: qIndex + 1 })} / {totalQ}
             </p>
             {mode === 'detailed' && (
               <span className="inline-block mt-1 text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">
@@ -700,11 +700,11 @@ export default function Home() {
         <main className="max-w-lg mx-auto px-4 py-8">
           <div className="text-center mb-5">
             <div className="text-4xl mb-2">🎉</div>
-            <p className="text-xs text-emerald-600 tracking-widest">體質分析結果</p>
+            <p className="text-xs text-emerald-600 tracking-widest">{t('result.title')}</p>
             <h2 className="text-2xl font-light text-stone-700 mt-1">{result.constitution.type}</h2>
             <p className="text-sm text-emerald-600">{result.constitution.sub}</p>
             <span className="inline-block mt-2 text-xs bg-stone-100 text-stone-500 px-3 py-1 rounded-full">
-              辨證：{result.constitution.pattern}
+              {t('result.pattern')}：{result.constitution.pattern}
             </span>
           </div>
 
@@ -715,14 +715,14 @@ export default function Home() {
           {result.tongue && (
             <div className="bg-white rounded-2xl p-5 shadow-sm border border-stone-100 mb-4">
               <h3 className="text-sm font-semibold text-emerald-700 mb-3 flex items-center gap-2">
-                <span>👅</span> 舌苔特徵
+                <span>👅</span> {t('tongue.title') || '舌苔特徵'}
               </h3>
               <div className="grid grid-cols-2 gap-3 text-sm">
                 {[
-                  { label: '舌色', value: (result.tongue.tongue_color as string) || '—' },
-                  { label: '苔色', value: (result.tongue.coating_color as string) || '—' },
-                  { label: '齒痕', value: ['無', '輕微', '明顯'][(result.tongue.teeth_mark as number) || 0] },
-                  { label: '裂紋', value: ['無', '輕微', '明顯'][(result.tongue.cracks as number) || 0] },
+                  { label: t('tongue.color') || '舌色', value: (result.tongue.tongue_color as string) || '—' },
+                  { label: t('tongue.coating') || '苔色', value: (result.tongue.coating_color as string) || '—' },
+                  { label: t('tongue.teeth') || '齒痕', value: ['無', '輕微', '明顯'][(result.tongue.teeth_mark as number) || 0] },
+                  { label: t('tongue.cracks') || '裂紋', value: ['無', '輕微', '明顯'][(result.tongue.cracks as number) || 0] },
                 ].map(item => (
                   <div key={item.label} className="bg-stone-50 rounded-xl p-3">
                     <p className="text-xs text-stone-400 mb-1">{item.label}</p>
@@ -736,7 +736,7 @@ export default function Home() {
           {result.constitution.suggestions.length > 0 && (
             <div className="bg-white rounded-2xl p-5 shadow-sm border border-stone-100 mb-4">
               <h3 className="text-sm font-semibold text-emerald-700 mb-3 flex items-center gap-2">
-                <span>✅</span> 調養建議
+                <span>✅</span> {t('result.suggestions')}
               </h3>
               <div className="space-y-2">
                 {result.constitution.suggestions.map((s, i) => (
@@ -752,7 +752,7 @@ export default function Home() {
           {result.constitution.herbs.length > 0 && (
             <div className="bg-amber-50 rounded-2xl p-5 border border-amber-100 mb-4">
               <h3 className="text-sm font-semibold text-amber-700 mb-3 flex items-center gap-2">
-                <span>💊</span> 常用中成藥（僅供參考）
+                <span>💊</span> {t('result.herbs')}
               </h3>
               <div className="space-y-2">
                 {result.constitution.herbs.map((h, i) => (
@@ -771,7 +771,7 @@ export default function Home() {
           {result.constitution.diet.length > 0 && (
             <div className="bg-white rounded-2xl p-5 shadow-sm border border-stone-100 mb-4">
               <h3 className="text-sm font-semibold text-emerald-700 mb-3 flex items-center gap-2">
-                <span>🍲</span> 食療方
+                <span>🍲</span> {t('result.diet')}
               </h3>
               <div className="space-y-3">
                 {result.constitution.diet.map((d, i) => (
@@ -786,7 +786,7 @@ export default function Home() {
           {result.constitution.acupoints.length > 0 && (
             <div className="bg-white rounded-2xl p-5 shadow-sm border border-stone-100 mb-4">
               <h3 className="text-sm font-semibold text-stone-700 mb-3 flex items-center gap-2">
-                <span>🦶</span> 穴位按摩
+                <span>🦶</span> {t('result.acupoints')}
               </h3>
               <div className="space-y-2">
                 {result.constitution.acupoints.map((a, i) => (
@@ -803,7 +803,7 @@ export default function Home() {
           {result.constitution.avoid.length > 0 && (
             <div className="bg-red-50 rounded-2xl p-5 border border-red-100 mb-4">
               <h3 className="text-sm font-semibold text-red-600 mb-3 flex items-center gap-2">
-                <span>⚠️</span> 應避免
+                <span>⚠️</span> {t('result.avoid')}
               </h3>
               <div className="flex flex-wrap gap-2">
                 {result.constitution.avoid.map((a, i) => (
@@ -815,22 +815,22 @@ export default function Home() {
 
           <div className="text-center py-4">
             <p className="text-xs text-stone-400 leading-relaxed">
-              本系統基於中醫十問歌與千年古籍文獻分析<br />
-              僅供奉生參考，不作為醫療診斷依據<br />
-              如有不適請諮詢中醫師
+              {t('disclaimer.line1')}<br />
+              {t('disclaimer.line2')}<br />
+              {t('disclaimer.line3')}
             </p>
           </div>
 
           <button onClick={reset}
             className="w-full py-3 border-2 border-stone-200 rounded-xl text-sm text-stone-500 hover:border-emerald-400 hover:text-emerald-600 transition">
-            重新問診
+            {t('result.retake')}
           </button>
         </main>
       )}
 
       <footer className="text-center py-6 text-xs text-stone-400 border-t border-stone-200 mt-4">
-        <p>本系統僅供奉生參考，不作為醫療診斷依據</p>
-        <p className="mt-1">中醫師認證 · 千古驗方 · 中醫智能問診 © 2026</p>
+        <p>{t('disclaimer.line2')}</p>
+        <p className="mt-1">{t('footer.copyright')}</p>
       </footer>
     </div>
   )
