@@ -25,6 +25,7 @@ interface Question {
 // 問卷題目庫
 // ============================================
 const CHIEF_COMPLAINTS = [
+  { value: '調養', label: '調養身體 / 健康檢查', icon: '🌱' },
   { value: '失眠', label: '失眠 / 睡不好', icon: '🌙' },
   { value: '疲倦', label: '疲倦 / 沒精神', icon: '😴' },
   { value: '消化', label: '腹瀉 / 便祕 / 胃脹', icon: '🔄' },
@@ -35,6 +36,9 @@ const CHIEF_COMPLAINTS = [
   { value: '情緒', label: '情緒 / 壓力問題', icon: '💢' },
   { value: '月經', label: '月經失調（女性）', icon: '🌸' },
   { value: '疼痛', label: '腰酸 / 關節 / 各種痛', icon: '💉' },
+  { value: '減肥', label: '減肥 / 控制體重', icon: '⚖️' },
+  { value: '備孕', label: '備孕 / 調理不孕', icon: '🤰' },
+  { value: '過敏', label: '過敏 / 鼻炎 / 氣喘', icon: '🤧' },
   { value: '其他', label: '其他問題', icon: '📋' },
 ]
 
@@ -56,9 +60,9 @@ const BASIC_QUESTIONS: Question[] = [
     { value: '男', label: '👨 男性' },
     { value: '女', label: '👩 女性' },
   ]},
+  { id: 'age', text: '您的年齡是？', options: AGE_OPTIONS, hasCustomAgeInput: true },
   { id: 'height', text: '身高（選填）', type: 'input_number', placeholder: '例：170', unit: 'cm' },
   { id: 'weight', text: '體重（選填）', type: 'input_number', placeholder: '例：65', unit: 'kg' },
-  { id: 'age', text: '您的年齡是？', options: AGE_OPTIONS, hasCustomAgeInput: true },
 ]
 
 // 快速問診核心題（每主訴精選3題）
@@ -252,8 +256,93 @@ const FAST_QUESTIONS: Record<string, Question[]> = {
       { value: '天氣', label: '與天氣變化相關' },
     ]},
   ],
+  '減肥': [
+    { id: 'f_l1', text: '減肥的主要原因是？', options: [
+      { value: '美觀', label: '外觀 / 線條' },
+      { value: '健康', label: '健康考量（三高/脂肪肝）' },
+      { value: '活力', label: '提升活力' },
+      { value: '生育', label: '備孕需要' },
+    ]},
+    { id: 'f_l2', text: '目前體重困擾程度？', options: [
+      { value: '輕微', label: '輕微（想稍微緊實）' },
+      { value: '中等', label: '中等（已影響自信）' },
+      { value: '嚴重', label: '嚴重（健康亮紅燈）' },
+    ]},
+    { id: 'f_l3', text: '有嘗試過減肥嗎？', options: [
+      { value: '無', label: '很少或沒有' },
+      { value: '運動', label: '運動減肥' },
+      { value: '飲食', label: '控制飲食' },
+      { value: '藥物', label: '吃藥/產品' },
+    ]},
+  ],
+  '備孕': [
+    { id: 'f_b1', text: '備孕多久了？', options: [
+      { value: '未開始', label: '還沒正式備孕' },
+      { value: '半年內', label: '半年內' },
+      { value: '1年內', label: '半年～1年' },
+      { value: '1年以上', label: '超過1年' },
+    ]},
+    { id: 'f_b2', text: '有沒有做過相關檢查？', options: [
+      { value: '無', label: '沒有' },
+      { value: '先生', label: '先生有做過' },
+      { value: '太太', label: '太太有做過' },
+      { value: '雙方', label: '雙方都有' },
+    ]},
+    { id: 'f_b3', text: '月經規律嗎？（女性填寫）', options: [
+      { value: '規律', label: '規律（25-35天）' },
+      { value: '不規律', label: '不規律' },
+      { value: '停經', label: '已停經' },
+      { value: '不適用', label: '不適用' },
+    ]},
+  ],
+  '過敏': [
+    { id: 'f_a1', text: '過敏主要症狀？', options: [
+      { value: '鼻', label: '鼻過敏 / 打噴嚏 / 鼻塞' },
+      { value: '皮', label: '皮膚癢 / 蕁麻疹 / 濕疹' },
+      { value: '眼', label: '眼睛癢 / 紅腫' },
+      { value: '呼', label: '氣喘 / 呼吸困難' },
+    ]},
+    { id: 'f_a2', text: '過敏頻率？', options: [
+      { value: '季節性', label: '季節性（春夏/秋冬）' },
+      { value: '常年', label: '常年都有' },
+      { value: '偶發', label: '偶爾發作' },
+      { value: '嚴重', label: '經常發作且嚴重' },
+    ]},
+    { id: 'f_a3', text: '有沒有做過過敏原檢測？', options: [
+      { value: '無', label: '沒有' },
+      { value: '有', label: '有，知道過敏原' },
+      { value: '部分', label: '有，但不完全' },
+    ]},
+  ],
+  '調養': [
+    { id: 'f_w1', text: '您想要調養哪方面？', options: [
+      { value: ' general', label: '整體身體調養' },
+      { value: '免疫', label: '提升免疫力' },
+      { value: '疲勞', label: '改善慢性疲勞' },
+      { value: '睡眠', label: '改善睡眠品質' },
+      { value: '消化', label: '腸胃功能調整' },
+      { value: '情緒', label: '情緒壓力舒緩' },
+    ]},
+    { id: 'f_w2', text: '過去有做過健康檢查嗎？', options: [
+      { value: '無', label: '很少或沒有' },
+      { value: '正常', label: '檢查結果正常' },
+      { value: '異常', label: '有些異常指標' },
+      { value: '有問題', label: '有明確健康問題' },
+    ]},
+    { id: 'f_w3', text: '平時作息規律嗎？', options: [
+      { value: '規律', label: '規律（早睡早起）' },
+      { value: '一般', label: '還算正常' },
+      { value: '不規律', label: '常熬夜/日夜顛倒' },
+    ]},
+  ],
   '其他': [
-    { id: 'f_o1', text: '請描述主要困擾（選填）', type: 'input_text', placeholder: '簡短描述您的症狀...' },
+    { id: 'f_o1', text: '不舒服的部位或症狀？', options: [
+      { value: '頭部', label: '頭暈 / 頭痛' },
+      { value: '胸腹', label: '胸悶 / 腹脹 / 胃痛' },
+      { value: '四肢', label: '手腳麻木 / 關節痛' },
+      { value: '全身', label: '全身性症狀' },
+      { value: '其他', label: '其他部位' },
+    ]},
     { id: 'f_o2', text: '這個問題持續多久了？', options: [
       { value: '幾天', label: '几天内' },
       { value: '幾週', label: '几週' },
@@ -553,8 +642,8 @@ export default function Home() {
             </div>
           </div>
         </div>
-        {(step === 'questionnaire' || step === 'basic') && (
-          <div className="h-0.5 bg-stone-100">
+        {(step === 'questionnaire') && (
+          <div className="h-1 bg-stone-100">
             <div className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-500" style={{ width: `${progress}%` }} />
           </div>
         )}
@@ -720,6 +809,20 @@ export default function Home() {
               </span>
             )}
             <h2 className="text-xl font-light text-stone-700 leading-relaxed mt-2">{currentQ.text}</h2>
+            {/* 答題導航指示器 */}
+            <div className="flex justify-center gap-1.5 mt-3">
+              {currentQuestions.slice(0, 12).map((_, i) => (
+                <button key={i} onClick={() => setQIndex(i)}
+                  className={`w-2 h-2 rounded-full transition-all ${
+                    i === qIndex
+                      ? 'w-4 bg-emerald-500'
+                      : i < qIndex
+                        ? 'bg-emerald-300'
+                        : 'bg-stone-200'
+                  }`} />
+              ))}
+              {totalQ > 12 && <span className="text-xs text-stone-400">+{totalQ - 12}</span>}
+            </div>
           </div>
 
           {currentQ.type === 'input_text' ? (
@@ -1042,6 +1145,29 @@ export default function Home() {
             className="w-full py-3 border-2 border-stone-200 rounded-xl text-sm text-stone-500 hover:border-emerald-400 hover:text-emerald-600 transition">
             {t('result.retake')}
           </button>
+          {/* 分享按鈕 */}
+          <button onClick={() => {
+            if (navigator.share) {
+              navigator.share({ title: '中醫體質分析', text: `我是「${result.constitution.type}」體質，調理建議：${result.constitution.suggestions.slice(0,2).join('、')}` })
+            } else {
+              navigator.clipboard.writeText(`我是「${result.constitution.type}」體質，調理建議：${result.constitution.suggestions.join('、')}`)
+              alert('已複製到剪貼簿！')
+            }
+          }} className="w-full py-3 text-sm text-emerald-600 hover:text-emerald-700 mt-2">
+            📤 分享給家人朋友
+          </button>
+          {/* 7天後回來對比提示 */}
+          <div className="mt-6 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl p-5 border border-emerald-100 text-center">
+            <div className="text-3xl mb-2">📅</div>
+            <p className="text-sm font-medium text-emerald-700 mb-1">7天後回來對比</p>
+            <p className="text-xs text-emerald-600 leading-relaxed">
+              中醫調理需要時間，建議你<br />
+              <span className="font-semibold">7天後重新做一次問卷</span>，觀察體質變化
+            </p>
+            <p className="text-xs text-stone-400 mt-3">
+              🔐 登入會員可一鍵記錄每次結果，輕鬆追蹤健康變化
+            </p>
+          </div>
         </main>
       )}
 
