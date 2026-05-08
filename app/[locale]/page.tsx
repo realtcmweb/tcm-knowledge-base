@@ -4,6 +4,7 @@ import { useState, useRef, useCallback, useEffect } from 'react'
 import { useTranslations, useLocale } from 'next-intl'
 import Head from 'next/head'
 import LanguageSelector from '../../components/LanguageSelector'
+import { HerbRecommendation, getHerbTiming, SYNDROME_DATABASE } from '../../lib/tcm_knowledge'
 
 // ============================================
 // 題目類型
@@ -1814,13 +1815,42 @@ export default function Home() {
               <h3 className="text-sm font-semibold text-amber-700 mb-3 flex items-center gap-2">
                 <span>💊</span> {t('result.herbs')}
               </h3>
-              <div className="space-y-2">
-                {result.constitution.herbs.map((h, i) => (
-                  <div key={i} className="flex items-start gap-2.5 text-sm text-stone-700">
-                    <span className="text-amber-400 flex-shrink-0">◆</span>
-                    {h}
-                  </div>
-                ))}
+              <div className="space-y-3">
+                {result.constitution.herbs.map((h, i) => {
+                  const timing = getHerbTiming(h)
+                  return (
+                    <div key={i} className="bg-white rounded-xl p-3 border border-amber-100">
+                      <div className="flex items-start justify-between gap-2 mb-1">
+                        <div className="flex items-start gap-2">
+                          <span className="text-amber-400 flex-shrink-0 mt-0.5">◆</span>
+                          <span className="font-medium text-stone-800">{h}</span>
+                        </div>
+                        {timing && (
+                          <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full whitespace-nowrap">
+                            {timing.beforeOrAfterMeal}
+                          </span>
+                        )}
+                      </div>
+                      {timing ? (
+                        <div className="ml-6 space-y-0.5">
+                          <p className="text-xs text-emerald-600 flex items-center gap-1">
+                            <span>🕐</span> {timing.timing}
+                          </p>
+                          <p className="text-xs text-stone-500 flex items-center gap-1">
+                            <span>📍</span> {timing.meridianNote}
+                          </p>
+                          {timing.note && (
+                            <p className="text-xs text-amber-600 flex items-start gap-1">
+                              <span>💡</span> {timing.note}
+                            </p>
+                          )}
+                        </div>
+                      ) : (
+                        <p className="text-xs text-stone-400 ml-6">請諮詢中醫師確認服用時間</p>
+                      )}
+                    </div>
+                  )
+                })}
               </div>
               <p className="text-xs text-amber-500 mt-3 leading-relaxed">
                 ⚠️ {t('result.herbsNote')}
