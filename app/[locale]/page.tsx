@@ -386,6 +386,7 @@ type Mode = 'fast' | 'detailed'
 interface ResultData {
   constitution: ReturnType<typeof analyzeCondition>
   tongue?: Record<string, unknown>
+  face?: Record<string, unknown>
   questionnaire_answers: Record<string, string>
 }
 
@@ -402,10 +403,15 @@ export default function Home() {
   const [customInput, setCustomInput] = useState('')
   const [tongueFile, setTongueFile] = useState<File | null>(null)
   const [tonguePreview, setTonguePreview] = useState<string | null>(null)
+  const [faceFile, setFaceFile] = useState<File | null>(null)
+  const [facePreview, setFacePreview] = useState<string | null>(null)
+  const [faceInfo, setFaceInfo] = useState<Record<string, unknown> | null>(null)
+  const [showFaceCapture, setShowFaceCapture] = useState(false)
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState<ResultData | null>(null)
   const [imageLoaded, setImageLoaded] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
+  const faceFileRef = useRef<HTMLInputElement>(null)
 
   // 當前問卷題目列表
   const chief = answers.chief || '其他'
@@ -455,6 +461,14 @@ export default function Home() {
     reader.onloadend = () => setImageLoaded(true)
   }
 
+  const handleFaceUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setFaceFile(file)
+    const reader = new FileReader()
+    reader.onload = (ev) => setFacePreview(ev.target?.result as string)
+  }
+
   const handleSubmit = async () => {
     setLoading(true)
     try {
@@ -468,7 +482,16 @@ export default function Home() {
           if (res.ok) tongueInfo = await res.json()
         } catch { /* silent */ }
       }
-      setResult({ constitution, tongue: tongueInfo, questionnaire_answers: answers })
+      let faceResult: Record<string, unknown> | undefined
+      if (faceFile) {
+        const formData2 = new FormData()
+        formData2.append('image', faceFile)
+        try {
+          const res = await fetch('/api/face', { method: 'POST', body: formData2 })
+          if (res.ok) faceResult = await res.json()
+        } catch { /* silent */ }
+      }
+      setResult({ constitution, tongue: tongueInfo, face: faceResult, questionnaire_answers: answers })
       setStep('result')
     } catch (err) {
       console.error(err)
@@ -480,6 +503,7 @@ export default function Home() {
   const reset = () => {
     setMode(null); setStep('mode'); setQIndex(0); setAnswers({})
     setCustomInput(''); setTongueFile(null); setTonguePreview(null)
+    setFaceFile(null); setFacePreview(null); setFaceInfo(null); setShowFaceCapture(false)
     setResult(null); setImageLoaded(false)
   }
 
@@ -733,6 +757,45 @@ export default function Home() {
               🔒 <span className="font-medium">隱私聲明：</span>您的舌苔照片僅用於本次AI分析，系統不會保存、分享或用於任何其他用途。
             </p>
           </div>
+
+          {/* 面色拍攝（Beta，可跳過） */}
+          {!showFaceCapture ? (
+            <button onClick={() => setShowFaceCapture(true)}
+              className="w-full py-3 border-2 border-dashed border-stone-300 rounded-xl text-sm text-stone-400 hover:border-amber-300 hover:text-amber-600 transition mb-3">
+              🌡️ 拍攝面容（面色分析 Beta）— 選填
+            </button>
+          ) : (
+            <div className="mb-3">
+              <p className="text-xs text-amber-600 mb-2 font-medium">🌡️ 面色分析（Beta）</p>
+              <div className="relative bg-white rounded-2xl border-2 border-dashed border-amber-200 overflow-hidden">
+                {facePreview ? (
+                  <>
+                    <img src={facePreview} alt="面容預覽" className="w-full object-cover aspect-[4/3]" />
+                    <button onClick={() => { setFacePreview(null); setFaceFile(null) }}
+                      className="absolute top-3 right-3 w-8 h-8 bg-black/50 rounded-full text-white text-xs flex items-center justify-center">✕</button>
+                  </>
+                ) : (
+                  <div onClick={() => faceFileRef.current?.click()}
+                    className="aspect-[4/3] flex flex-col items-center justify-center text-stone-400 cursor-pointer hover:bg-stone-50 transition">
+                    <div className="text-4xl mb-2">😊</div>
+                    <p className="text-sm font-medium">點擊拍攝面容</p>
+                    <p className="text-xs mt-1 text-stone-400">請保持正面、自然光</p>
+                  </div>
+                )}
+                <input ref={faceFileRef} type="file" accept="image/*" capture="user" className="hidden" onChange={handleFaceUpload} />
+              </div>
+              <div className="bg-amber-50 rounded-xl p-3 mt-2">
+                <p className="text-xs text-amber-700 leading-relaxed">
+                  🔒 隱私：面容照片僅用於本次分析，不會保存或分享
+                </p>
+              </div>
+              <button onClick={() => { setShowFaceCapture(false); setFacePreview(null); setFaceFile(null) }}
+                className="w-full py-2 text-xs text-stone-400 hover:text-stone-600 mt-1">
+                取消面容分析
+              </button>
+            </div>
+          )}
+
           <button onClick={handleSubmit} disabled={loading || (!!tongueFile && !imageLoaded)}
             className="w-full py-4 bg-gradient-to-r from-emerald-600 to-teal-500 text-white rounded-2xl font-medium shadow-lg shadow-emerald-200 disabled:opacity-60 transition">
             {loading ? '分析中...' : tongueFile ? '✨ 分析舌苔 + 送出' : '✨ 略過舌苔，直接分析'}
@@ -799,6 +862,37 @@ export default function Home() {
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+
+          {result.face && (result.face as any).face_detected && (
+            <div className="bg-amber-50 rounded-2xl p-5 border border-amber-100 mb-4">
+              <h3 className="text-sm font-semibold text-amber-700 mb-3 flex items-center gap-2">
+                <span>😊</span> 面色分析（Beta）
+              </h3>
+              <div className="grid grid-cols-2 gap-3 text-sm mb-3">
+                <div className="bg-white rounded-xl p-3">
+                  <p className="text-xs text-stone-400 mb-1">面色</p>
+                  <p className="text-stone-700 font-medium">{(result.face as any).complexion || '—'}</p>
+                </div>
+                <div className="bg-white rounded-xl p-3">
+                  <p className="text-xs text-stone-400 mb-1">臉型</p>
+                  <p className="text-stone-700 font-medium">{(result.face as any).face_shape || '—'}</p>
+                </div>
+              </div>
+              <p className="text-sm text-stone-700 mb-3">{(result.face as any).description}</p>
+              {((result.face as any).suggestions as string[])?.length > 0 && (
+                <div className="space-y-1.5">
+                  <p className="text-xs text-amber-600 font-medium">面色調理建議：</p>
+                  {((result.face as any).suggestions as string[]).map((s: string, i: number) => (
+                    <div key={i} className="flex items-start gap-2 text-sm text-stone-700">
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400 flex-shrink-0 mt-1.5" />
+                      {s}
+                    </div>
+                  ))}
+                </div>
+              )}
+              <p className="text-xs text-amber-500 mt-3">Beta 功能僅供參考，精確分析請諮詢中醫師</p>
             </div>
           )}
 
