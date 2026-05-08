@@ -91,7 +91,7 @@ export default function LanguageSelector({ currentLocale }: LanguageSelectorProp
                 lang.code === currentLocale ? 'text-emerald-600 font-medium bg-emerald-50' : 'text-stone-600'
               }`}
             >
-              <span className="w-6 text-center text-stone-400">○</span>
+                <span>{lang.label}</span>
               <span>{lang.label}</span>
               {lang.code === currentLocale && <span className="ml-auto text-emerald-500">✓</span>}
             </button>

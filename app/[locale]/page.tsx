@@ -805,18 +805,13 @@ export default function Home() {
         <button
           key={opt.value}
           onClick={() => handleAnswer(opt.value)}
-          className={`w-full px-5 py-4 rounded-2xl text-left text-sm transition-all border-2 flex items-center gap-3 ${
+          className={`w-full px-5 py-4 rounded-2xl text-left text-sm transition-all border-2 ${
             isSelected
               ? 'border-emerald-500 bg-emerald-50 font-medium text-emerald-800 shadow-sm'
               : 'border-stone-200 bg-white text-stone-600 hover:border-emerald-300 active:bg-stone-50'
           }`}
         >
-          <span className={`w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-all ${
-            isSelected ? 'border-emerald-500 bg-emerald-500' : 'border-stone-300'
-          }`}>
-            {isSelected && <span className="w-2 h-2 bg-white rounded-full" />}
-          </span>
-          <span className="flex-1">{opt.label}</span>
+          {opt.label}
         </button>
       )
     })
@@ -1071,18 +1066,12 @@ export default function Home() {
               {renderOptions(currentQ)}
               {/* 其他選項 */}
               <button onClick={() => handleAnswer('其他')}
-                className={`w-full px-5 py-4 rounded-2xl text-left text-sm transition-all border-2 flex items-center gap-3 ${
+                className={`w-full px-5 py-4 rounded-2xl text-left text-sm transition-all border-2 ${
                   answers[currentQ.id] === '其他'
                     ? 'border-emerald-500 bg-emerald-50 font-medium text-emerald-800 shadow-sm'
                     : 'border-stone-200 bg-white text-stone-500 hover:border-emerald-300'
                 }`}>
-                <span className={`w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-all ${
-                  answers[currentQ.id] === '其他' ? 'border-emerald-500 bg-emerald-500' : 'border-stone-300'
-                }`}>
-                  {answers[currentQ.id] === '其他' && <span className="w-2 h-2 bg-white rounded-full" />}
-                </span>
-                <span className="flex-1">其他（自行描述）</span>
-                <span className="text-stone-400">→</span>
+                其他（自行描述）→
               </button>
             </div>
           )}
@@ -1117,25 +1106,41 @@ export default function Home() {
             <h2 className="text-xl font-light text-stone-700">拍攝舌苔</h2>
             <p className="text-xs text-stone-500 mt-1">舌苔能反映體內寒熱濕燥，協助AI更精準判斷</p>
           </div>
+
+          {/* 舌苔上傳區域 */}
           <div className="relative bg-white rounded-2xl border-2 border-dashed border-stone-300 overflow-hidden mb-4">
             {tonguePreview ? (
-              <>
-                <img src={tonguePreview} alt="舌苔預覽" className="w-full object-cover aspect-[4/3]" onLoad={() => setImageLoaded(true)} />
+              <div className="relative">
+                <img src={tonguePreview} alt="舌苔預覽" className="w-full object-cover aspect-[4/3]" />
+                {/* 成功標記 */}
+                <div className="absolute top-3 left-3 bg-emerald-500 text-white rounded-full w-8 h-8 flex items-center justify-center shadow-lg">
+                  <span className="text-sm">✓</span>
+                </div>
+                {/* 刪除按鈕 */}
                 <button onClick={() => { setTonguePreview(null); setTongueFile(null); setImageLoaded(false) }}
-                  className="absolute top-3 right-3 w-8 h-8 bg-black/50 rounded-full text-white text-xs flex items-center justify-center">✕</button>
-              </>
+                  className="absolute top-3 right-3 w-8 h-8 bg-black/50 hover:bg-black/70 rounded-full text-white text-xs flex items-center justify-center transition">
+                  ✕
+                </button>
+                {/* 已上傳標籤 */}
+                <div className="absolute bottom-3 right-3 bg-black/50 text-white text-xs px-2 py-1 rounded-full">
+                  已選擇
+                </div>
+              </div>
             ) : (
-              <div onClick={() => fileRef.current?.click()}
-                className="aspect-[4/3] flex flex-col items-center justify-center text-stone-400 cursor-pointer hover:bg-stone-50 transition">
+              <div className="aspect-[4/3] flex flex-col items-center justify-center text-stone-400 cursor-pointer hover:bg-stone-50 transition">
                 <div className="text-5xl mb-3">👅</div>
-                <p className="text-sm font-medium">點擊拍攝舌苔</p>
-                <p className="text-xs mt-1 text-stone-400">或從相簿選擇</p>
+                <p className="text-sm font-medium">點擊拍攝 / 選擇檔案</p>
+                <p className="text-xs mt-1 text-stone-400">可使用相機或從相簿挑選</p>
                 <p className="text-xs mt-3 text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-full">
                   💡 自然光、張嘴伸舌、舌頭放鬆
                 </p>
               </div>
             )}
-            <input ref={fileRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={handleTongueUpload} />
+            {/* 隱藏的檔案 input - 移除 capture 屬性，支援相機和檔案 */}
+            <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleTongueUpload} />
+            {!tonguePreview && (
+              <div onClick={() => fileRef.current?.click()} className="absolute inset-0" />
+            )}
           </div>
           <div className="bg-stone-100 rounded-xl p-4 mb-4">
             <p className="text-xs text-stone-500 leading-relaxed">
@@ -1159,20 +1164,33 @@ export default function Home() {
               <p className="text-xs text-amber-600 mb-2 font-medium">🌡️ 面色分析（Beta）</p>
               <div className="relative bg-white rounded-2xl border-2 border-dashed border-amber-200 overflow-hidden">
                 {facePreview ? (
-                  <>
+                  <div className="relative">
                     <img src={facePreview} alt="面容預覽" className="w-full object-cover aspect-[4/3]" />
+                    {/* 成功標記 */}
+                    <div className="absolute top-3 left-3 bg-amber-500 text-white rounded-full w-8 h-8 flex items-center justify-center shadow-lg">
+                      <span className="text-sm">✓</span>
+                    </div>
+                    {/* 刪除按鈕 */}
                     <button onClick={() => { setFacePreview(null); setFaceFile(null) }}
-                      className="absolute top-3 right-3 w-8 h-8 bg-black/50 rounded-full text-white text-xs flex items-center justify-center">✕</button>
-                  </>
+                      className="absolute top-3 right-3 w-8 h-8 bg-black/50 hover:bg-black/70 rounded-full text-white text-xs flex items-center justify-center transition">
+                      ✕
+                    </button>
+                    <div className="absolute bottom-3 right-3 bg-black/50 text-white text-xs px-2 py-1 rounded-full">
+                      已選擇
+                    </div>
+                  </div>
                 ) : (
-                  <div onClick={() => faceFileRef.current?.click()}
-                    className="aspect-[4/3] flex flex-col items-center justify-center text-stone-400 cursor-pointer hover:bg-stone-50 transition">
+                  <div className="aspect-[4/3] flex flex-col items-center justify-center text-stone-400 cursor-pointer hover:bg-stone-50 transition">
                     <div className="text-4xl mb-2">😊</div>
-                    <p className="text-sm font-medium">點擊拍攝面容</p>
+                    <p className="text-sm font-medium">點擊拍攝 / 選擇檔案</p>
                     <p className="text-xs mt-1 text-stone-400">請保持正面、自然光</p>
                   </div>
                 )}
-                <input ref={faceFileRef} type="file" accept="image/*" capture="user" className="hidden" onChange={handleFaceUpload} />
+                {/* 隱藏的檔案 input */}
+                <input ref={faceFileRef} type="file" accept="image/*" className="hidden" onChange={handleFaceUpload} />
+                {!facePreview && (
+                  <div onClick={() => faceFileRef.current?.click()} className="absolute inset-0" />
+                )}
               </div>
               <div className="bg-amber-50 rounded-xl p-3 mt-2">
                 <p className="text-xs text-amber-700 leading-relaxed">
@@ -1186,7 +1204,7 @@ export default function Home() {
             </div>
           )}
 
-          <button onClick={handleSubmit} disabled={loading || (!!tongueFile && !imageLoaded)}
+          <button onClick={handleSubmit} disabled={loading}
             className="w-full py-4 bg-gradient-to-r from-emerald-600 to-teal-500 text-white rounded-2xl font-medium shadow-lg shadow-emerald-200 disabled:opacity-60 transition">
             {loading ? '分析中...' : tongueFile ? '✨ 分析舌苔 + 送出' : '✨ 略過舌苔，直接分析'}
           </button>
