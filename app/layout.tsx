@@ -1,5 +1,4 @@
 import type { Metadata } from 'next'
-import './globals.css'
 
 export const metadata: Metadata = {
   title: '中醫藥知識庫 | TCM Knowledge Base',
@@ -11,9 +10,5 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  return (
-    <html lang="zh">
-      <body>{children}</body>
-    </html>
-  )
+  return children
 }

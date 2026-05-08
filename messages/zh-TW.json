@@ -1,0 +1,86 @@
+{
+  "header": {
+    "title": "中醫智能問診",
+    "subtitle": "AI 輔助養生參考"
+  },
+  "home": {
+    "certified": "由資深中醫師認證，基於千年中醫古籍與現代臨床經驗",
+    "tenQuestions": "基於中醫十問歌：中醫師千年傳傳承診斷智慧",
+    "privacy": "您的資料僅用於本次分析，不會保存",
+    "startBtn": "開始智能問診",
+    "selectComplaint": "請選擇您的主要困擾"
+  },
+  "chiefComplaints": {
+    "失眠": "失眠 / 睡不好",
+    "疲倦": "疲倦 / 沒精神",
+    "消化": "腹瀉 / 便祕 / 胃脹",
+    "冰冷": "手腳冰冷",
+    "頭痛": "頭痛 / 頭暈",
+    "咳嗽": "咳嗽 / 喉嚨問題",
+    "皮膚": "皮膚 / 過敏",
+    "情緒": "情緒 / 壓力問題",
+    "月經": "月經失調（女性）",
+    "疼痛": "腰酸 / 關節 / 各種痛",
+    "其他": "其他問題"
+  },
+  "basicQuestions": {
+    "age": "您的年齡是？",
+    "gender": "您的性別是？",
+    "height": "身高（選填）",
+    "weight": "體重（選填）",
+    "heightPlaceholder": "例：170",
+    "weightPlaceholder": "例：65",
+    "unit_cm": "cm",
+    "unit_kg": "kg"
+  },
+  "ageRanges": {
+    "18以下": "18 歲以下",
+    "18-30": "18 - 30 歲",
+    "31-45": "31 - 45 歲",
+    "46-60": "46 - 60 歲",
+    "60以上": "60 歲以上"
+  },
+  "gender": {
+    "男": "👨 男性",
+    "女": "👩 女性"
+  },
+  "mode": {
+    "fast": "快速問診",
+    "detailed": "詳細問診",
+    "fastDesc": "精選3題，快速了解核心問題",
+    "detailedDesc": "全面分析，含8道補充題"
+  },
+  "questionnaire": {
+    "step": "第 {current} 步",
+    "next": "下一步",
+    "back": "上一步",
+    "submit": "提交分析",
+    "skip": "跳過",
+    "optional": "（選填）"
+  },
+  "result": {
+    "title": "中醫體質分析結果",
+    "constitution": "您的體質",
+    "pattern": "證型",
+    "description": "分析說明",
+    "suggestions": "調理建議",
+    "herbs": "常用中成藥",
+    "herbsNote": "中成藥僅供參考，服用前建議看中醫師確認體質是否適合",
+    "diet": "食療方",
+    "acupoints": "穴位按摩",
+    "acupointsNote": "每天每穴按摩 2-3 分鐘，以酸脹為度",
+    "avoid": "應避免",
+    "retake": "重新問診"
+  },
+  "disclaimer": {
+    "line1": "本系統基於中醫十問歌與千年古籍文獻分析",
+    "line2": "僅供奉生參考，不作為醫療診斷依據",
+    "line3": "如有不適請諮詢中醫師"
+  },
+  "footer": {
+    "copyright": "中醫師認證 · 千古驗方 · 中醫智能問診 © 2026"
+  },
+  "language": {
+    "label": "語言"
+  }
+}

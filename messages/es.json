@@ -1,0 +1,86 @@
+{
+  "header": {
+    "title": "Diagnóstico Inteligente TCM",
+    "subtitle": "Referencia de Salud con IA"
+  },
+  "home": {
+    "certified": "Certificado por médicos TCM seniors, basado en clásicos médicos chinos milenarios y experiencia clínica moderna",
+    "tenQuestions": "Basado en la Canción de las Diez Preguntas TCM: mil años de sabiduría diagnóstica",
+    "privacy": "Sus datos se usan solo para este análisis y no se almacenarán",
+    "startBtn": "Iniciar Diagnóstico Inteligente",
+    "selectComplaint": "Seleccione su principal preocupación"
+  },
+  "chiefComplaints": {
+    "失眠": "Insomnio / Mal Sueño",
+    "疲倦": "Fatiga / Baja Energía",
+    "消化": "Diarrea / Estreñimiento / Hinchazón",
+    "冰冷": "Manos y Pies Fríos",
+    "頭痛": "Dolor de Cabeza / Mareo",
+    "咳嗽": "Tos / Problemas de Garganta",
+    "皮膚": "Piel / Alergias",
+    "情緒": "Emociones / Estrés",
+    "月經": "Trastornos Menstruales（Women）",
+    "疼痛": "Dolor Lumbar / Articulaciones / Dolores Generales",
+    "其他": "Otros Problemas"
+  },
+  "basicQuestions": {
+    "age": "¿Cuál es su edad?",
+    "gender": "¿Cuál es su género?",
+    "height": "Altura（opcional）",
+    "weight": "Peso（opcional）",
+    "heightPlaceholder": "ej: 170",
+    "weightPlaceholder": "ej: 65",
+    "unit_cm": "cm",
+    "unit_kg": "kg"
+  },
+  "ageRanges": {
+    "18以下": "Menos de 18",
+    "18-30": "18 - 30 años",
+    "31-45": "31 - 45 años",
+    "46-60": "46 - 60 años",
+    "60以上": "Más de 60"
+  },
+  "gender": {
+    "男": "👨 Masculino",
+    "女": "👩 Femenino"
+  },
+  "mode": {
+    "fast": "Consulta Rápida",
+    "detailed": "Consulta Detallada",
+    "fastDesc": "3 preguntas clave para visión rápida",
+    "detailedDesc": "Análisis completo con 8 preguntas adicionales"
+  },
+  "questionnaire": {
+    "step": "Paso {current}",
+    "next": "Siguiente",
+    "back": "Anterior",
+    "submit": "Enviar Análisis",
+    "skip": "Saltar",
+    "optional": "(opcional)"
+  },
+  "result": {
+    "title": "Resultado del Análisis de Constitución TCM",
+    "constitution": "Su Constitución",
+    "pattern": "Patrón",
+    "description": "Análisis",
+    "suggestions": "Sugerencias de Salud",
+    "herbs": "Fórmulas Herbales Comunes",
+    "herbsNote": "Las fórmulas herbales son solo referencia. Consulte un médico TCM antes de usar",
+    "diet": "Terapia Dietética",
+    "acupoints": "Masaje en Puntos de Acupuntura",
+    "acupointsNote": "Masajee cada punto 2-3 minutos diarios hasta sentir molestia",
+    "avoid": "Evitar",
+    "retake": "Hacer Nueva Consulta"
+  },
+  "disclaimer": {
+    "line1": "Análisis basado en la Canción de las Diez Preguntas TCM y textos clásicos milenarios",
+    "line2": "Solo para referencia de bienestar, no es diagnóstico médico",
+    "line3": "Consulte un médico TCM si se siente mal"
+  },
+  "footer": {
+    "copyright": "Certificado TCM · Receta Milenaria · Diagnóstico IA © 2026"
+  },
+  "language": {
+    "label": "Idioma"
+  }
+}

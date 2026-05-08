@@ -1,0 +1,86 @@
+{
+  "header": {
+    "title": "TCM Smart Diagnosis",
+    "subtitle": "AI-Powered Wellness Reference"
+  },
+  "home": {
+    "certified": "Certified by senior TCM practitioners, based on millennia of Chinese medical classics and modern clinical experience",
+    "tenQuestions": "Based on the TCM Ten-Question Song: a thousand-year diagnostic wisdom",
+    "privacy": "Your data is used only for this analysis and will not be stored",
+    "startBtn": "Start Smart Diagnosis",
+    "selectComplaint": "Select your main concern"
+  },
+  "chiefComplaints": {
+    "失眠": "Insomnia / Poor Sleep",
+    "疲倦": "Fatigue / Low Energy",
+    "消化": "Diarrhea / Constipation / Bloating",
+    "冰冷": "Cold Hands & Feet",
+    "頭痛": "Headache / Dizziness",
+    "咳嗽": "Cough / Throat Issues",
+    "皮膚": "Skin / Allergies",
+    "情緒": "Emotional / Stress Issues",
+    "月經": "Menstrual Disorders (Women)",
+    "疼痛": "Back Pain / Joints / General Pain",
+    "其他": "Other Issues"
+  },
+  "basicQuestions": {
+    "age": "What is your age?",
+    "gender": "What is your gender?",
+    "height": "Height (optional)",
+    "weight": "Weight (optional)",
+    "heightPlaceholder": "e.g. 170",
+    "weightPlaceholder": "e.g. 65",
+    "unit_cm": "cm",
+    "unit_kg": "kg"
+  },
+  "ageRanges": {
+    "18以下": "Under 18",
+    "18-30": "18 - 30 years",
+    "31-45": "31 - 45 years",
+    "46-60": "46 - 60 years",
+    "60以上": "Over 60"
+  },
+  "gender": {
+    "男": "👨 Male",
+    "女": "👩 Female"
+  },
+  "mode": {
+    "fast": "Quick Consultation",
+    "detailed": "Detailed Consultation",
+    "fastDesc": "3 key questions for rapid insight",
+    "detailedDesc": "Comprehensive analysis with 8 follow-up questions"
+  },
+  "questionnaire": {
+    "step": "Step {current}",
+    "next": "Next",
+    "back": "Back",
+    "submit": "Submit Analysis",
+    "skip": "Skip",
+    "optional": "(optional)"
+  },
+  "result": {
+    "title": "TCM Constitution Analysis",
+    "constitution": "Your Constitution",
+    "pattern": "Pattern",
+    "description": "Analysis",
+    "suggestions": "Health Suggestions",
+    "herbs": "Common Herbal Formulas",
+    "herbsNote": "Herbal formulas are for reference only. Please consult a TCM practitioner before use",
+    "diet": "Dietary Therapy",
+    "acupoints": "Acupoint Massage",
+    "acupointsNote": "Massage each point 2-3 minutes daily until you feel soreness",
+    "avoid": "Avoid",
+    "retake": "Retake Consultation"
+  },
+  "disclaimer": {
+    "line1": "Analysis based on TCM Ten-Question Song and classical texts",
+    "line2": "For wellness reference only, not a medical diagnosis",
+    "line3": "Please consult a TCM practitioner if you feel unwell"
+  },
+  "footer": {
+    "copyright": "TCM Certified · Ancient Wisdom · AI Diagnosis © 2026"
+  },
+  "language": {
+    "label": "Language"
+  }
+}
