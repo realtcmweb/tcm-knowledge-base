@@ -450,28 +450,31 @@ function getPatternKeys(type: string): string[] {
 function analyzeCondition(answers: Record<string, string>): {
   type: string; sub: string; pattern: string; description: string
   suggestions: string[]; avoid: string[]; herbs: string[]; acupoints: string[]; diet: string[]
+  energy: number; stress: number; resilience: number; innerEnergy: number
+  lifestyle: { exercise: number; nutrition: number; environment: number; psychology: number; sleep: number; hormonal: number }
+  meridianBalance: { left: number; right: number }
 } {
   const vals = Object.values(answers).join('')
 
   if (vals.includes('怕熱') && (vals.includes('盜汗') || vals.includes('自汗')) && (vals.includes('難入睡') || vals.includes('多夢') || vals.includes('易醒'))) {
-    return { type: '陰虛', sub: '心腎陰虛', pattern: '虛熱', description: '您屬於陰虛體質，虛火內擾，常見盜汗、失眠、口乾咽燥。調理以滋陰清熱、養心安神為主。', suggestions: ['少吃燒烤炸辣', '多吃百合、銀耳、麥冬、玉竹', '避免熬夜（23點前入睡）', '練習太極/冥想'], avoid: ['咖啡因', '酒精', '辛辣', '炸物'], herbs: ['六味地黃丸', '天王補心丹', '生脈飲'], acupoints: ['太溪穴（足內側）', '湧泉穴（足底）', '內關穴（手腕）'], diet: ['百合銀耳羹：百合30g + 銀耳20g + 冰糖', '麥冬玉竹茶：麥冬10g + 玉竹10g 熱水泡', '桑椹枸杞茶：桑椹15g + 枸杞10g'] }
+    return { type: '陰虛', sub: '心腎陰虛', pattern: '虛熱', description: '您屬於陰虛體質，虛火內擾，常見盜汗、失眠、口乾咽燥。調理以滋陰清熱、養心安神為主。', suggestions: ['少吃燒烤炸辣', '多吃百合、銀耳、麥冬、玉竹', '避免熬夜（23點前入睡）', '練習太極/冥想'], avoid: ['咖啡因', '酒精', '辛辣', '炸物'], herbs: ['六味地黃丸', '天王補心丹', '生脈飲'], acupoints: ['太溪穴（足內側）', '湧泉穴（足底）', '內關穴（手腕）'], diet: ['百合銀耳羹：百合30g + 銀耳20g + 冰糖', '麥冬玉竹茶：麥冬10g + 玉竹10g 熱水泡', '桑椹枸杞茶：桑椹15g + 枸杞10g'], energy: 68, stress: 3.8, resilience: 45, innerEnergy: 58, lifestyle: { exercise: 72, nutrition: 78, environment: 85, psychology: 65, sleep: 58, hormonal: 62 }, meridianBalance: { left: 1.42, right: 1.38 } }
   }
   if (vals.includes('怕冷') && (vals.includes('很怕') || vals.includes('極度')) && (vals.includes('腰') || vals.includes('冷痛') || vals.includes('夜尿') || vals.includes('清長'))) {
-    return { type: '陽虛', sub: '脾腎陽虛', pattern: '虛寒', description: '您屬於陽虛體質，火力不足，畏寒怕冷，容易疲倦。調理以溫補脾腎、助陽驅寒為主。', suggestions: ['多吃溫熱食物（羊肉、龍眼、紅紅棗、薑）', '忌生冷冰品', '每天熱水泡腳（加生薑）', '適度運動（快走、太極）'], avoid: ['冰品', '生菜水果', '冷飲', '西瓜'], herbs: ['理中丸', '金匱腎氣丸', '四神湯'], acupoints: ['關元穴（肚臍下）', '命門穴（後腰）', '足三里（膝蓋下）'], diet: ['羊肉當歸湯：羊肉250g + 當歸10g + 薑3片', '桂圓紅棗茶：桂圓10顆 + 紅棗5顆', '生薑紅糖水：生薑3片 + 紅糖'] }
+    return { type: '陽虛', sub: '脾腎陽虛', pattern: '虛寒', description: '您屬於陽虛體質，火力不足，畏寒怕冷，容易疲倦。調理以溫補脾腎、助陽驅寒為主。', suggestions: ['多吃溫熱食物（羊肉、龍眼、紅紅棗、薑）', '忌生冷冰品', '每天熱水泡腳（加生薑）', '適度運動（快走、太極）'], avoid: ['冰品', '生菜水果', '冷飲', '西瓜'], herbs: ['理中丸', '金匱腎氣丸', '四神湯'], acupoints: ['關元穴（肚臍下）', '命門穴（後腰）', '足三里（膝蓋下）'], diet: ['羊肉當歸湯：羊肉250g + 當歸10g + 薑3片', '桂圓紅棗茶：桂圓10顆 + 紅棗5顆', '生薑紅糖水：生薑3片 + 紅糖'], energy: 52, stress: 2.8, resilience: 55, innerEnergy: 62, lifestyle: { exercise: 65, nutrition: 70, environment: 88, psychology: 75, sleep: 68, hormonal: 58 }, meridianBalance: { left: 1.52, right: 1.54 } }
   }
   if ((vals.includes('疲倦') || vals.includes('整天') || vals.includes('早上')) && (vals.includes('輕微') || vals.includes('很弱') || vals.includes('說話') || vals.includes('正常') === false)) {
-    return { type: '氣虛', sub: '脾肺氣虛', pattern: '虛', description: '您屬於氣虛體質，元氣不足，容易疲勞，說話無力，稍動即喘。調理以補氣健脾、益肺固表為主。', suggestions: ['多吃山藥、黃耆、黨參、紅棗', '忌耗氣食物（白蘿蔔、茶葉）', '保證充足睡眠（8小時）', '避免過度疲勞'], avoid: ['過度勞累', '熬夜', '劇烈運動', '減肥節食'], herbs: ['補中益氣丸', '四君子湯', '生脈飲'], acupoints: ['氣海穴（肚臍下）', '肺俞穴（背部）', '足三里（膝蓋下）'], diet: ['山藥粥：山藥200g + 粳米100g 煮粥', '黨參黃耆茶：黨參10g + 黃耆10g', '紅棗桂圓湯：紅棗10顆 + 桂圓15g'] }
+    return { type: '氣虛', sub: '脾肺氣虛', pattern: '虛', description: '您屬於氣虛體質，元氣不足，容易疲勞，說話無力，稍動即喘。調理以補氣健脾、益肺固表為主。', suggestions: ['多吃山藥、黃耆、黨參、紅棗', '忌耗氣食物（白蘿蔔、茶葉）', '保證充足睡眠（8小時）', '避免過度疲勞'], avoid: ['過度勞累', '熬夜', '劇烈運動', '減肥節食'], herbs: ['補中益氣丸', '四君子湯', '生脈飲'], acupoints: ['氣海穴（肚臍下）', '肺俞穴（背部）', '足三里（膝蓋下）'], diet: ['山藥粥：山藥200g + 粳米100g 煮粥', '黨參黃耆茶：黨參10g + 黃耆10g', '紅棗桂圓湯：紅棗10顆 + 桂圓15g'], energy: 44, stress: 2.2, resilience: 40, innerEnergy: 55, lifestyle: { exercise: 58, nutrition: 72, environment: 82, psychology: 70, sleep: 52, hormonal: 65 }, meridianBalance: { left: 1.35, right: 1.40 } }
   }
   if ((vals.includes('黏') || vals.includes('胃脹') || vals.includes('痰多') || vals.includes('渾身')) && (vals.includes('疲倦') || vals.includes('沉重'))) {
-    return { type: '痰濕', sub: '痰濕困脾', pattern: '實', description: '您屬於痰濕體質，濕濁內蘊，身體沉重，容易長痘或出油。調理以燥濕化痰、健脾利濕為主。', suggestions: ['少吃甜食油膩', '多吃薏仁、赤小豆、冬瓜', '保持環境乾燥', '規律運動（微汗為佳）'], avoid: ['甜食', '油炸', '糯米', '奶製品', '酒'], herbs: ['平胃散', '二陳湯', '溫膽湯'], acupoints: ['陰陵泉（小腿內側）', '豐隆穴（小腿外側）', '中脘穴（肚臍上）'], diet: ['薏仁紅豆粥：薏仁30g + 赤小豆30g', '冬瓜排骨湯：冬瓜500g + 排骨250g', '陳皮普洱茶：陳皮5g + 普洱5g'] }
+    return { type: '痰濕', sub: '痰濕困脾', pattern: '實', description: '您屬於痰濕體質，濕濁內蘊，身體沉重，容易長痘或出油。調理以燥濕化痰、健脾利濕為主。', suggestions: ['少吃甜食油膩', '多吃薏仁、赤小豆、冬瓜', '保持環境乾燥', '規律運動（微汗為佳）'], avoid: ['甜食', '油炸', '糯米', '奶製品', '酒'], herbs: ['平胃散', '二陳湯', '溫膽湯'], acupoints: ['陰陵泉（小腿內側）', '豐隆穴（小腿外側）', '中脘穴（肚臍上）'], diet: ['薏仁紅豆粥：薏仁30g + 赤小豆30g', '冬瓜排骨湯：冬瓜500g + 排骨250g', '陳皮普洱茶：陳皮5g + 普洱5g'], energy: 48, stress: 3.2, resilience: 42, innerEnergy: 60, lifestyle: { exercise: 55, nutrition: 58, environment: 78, psychology: 72, sleep: 62, hormonal: 68 }, meridianBalance: { left: 1.60, right: 1.45 } }
   }
   if ((vals.includes('易怒') || vals.includes('焦慮') || vals.includes('壓力')) && (vals.includes('胸悶') || vals.includes('胃') || vals.includes('腹脹'))) {
-    return { type: '氣鬱', sub: '肝氣鬱結', pattern: '實', description: '您屬於氣鬱體質，肝氣不舒，情緒波動大，胸脅脹悶。調理以疏肝理氣、解鬱安神為主。', suggestions: ['多喝花茶（玫瑰花、菊花、茉莉花）', '找人傾訴', '按摩太衝穴', '規律作息'], avoid: ['過度壓抑情緒', '酒精', '熬夜', '生悶氣'], herbs: ['逍遙丸', '柴胡疏肝散', '甘麥大棗湯'], acupoints: ['太衝穴（足大趾旁）', '合谷穴（手虎口）', '膻中穴（胸口）'], diet: ['玫瑰花茶：玫瑰花5g 熱水泡', '茉莉花茶：茉莉花5g + 綠茶', '菊花枸杞茶：菊花5g + 枸杞10g'] }
+    return { type: '氣鬱', sub: '肝氣鬱結', pattern: '實', description: '您屬於氣鬱體質，肝氣不舒，情緒波動大，胸脅脹悶。調理以疏肝理氣、解鬱安神為主。', suggestions: ['多喝花茶（玫瑰花、菊花、茉莉花）', '找人傾訴', '按摩太衝穴', '規律作息'], avoid: ['過度壓抑情緒', '酒精', '熬夜', '生悶氣'], herbs: ['逍遙丸', '柴胡疏肝散', '甘麥大棗湯'], acupoints: ['太衝穴（足大趾旁）', '合谷穴（手虎口）', '膻中穴（胸口）'], diet: ['玫瑰花茶：玫瑰花5g 熱水泡', '茉莉花茶：茉莉花5g + 綠茶', '菊花枸杞茶：菊花5g + 枸杞10g'], energy: 55, stress: 4.2, resilience: 38, innerEnergy: 65, lifestyle: { exercise: 60, nutrition: 75, environment: 80, psychology: 55, sleep: 50, hormonal: 72 }, meridianBalance: { left: 1.30, right: 1.55 } }
   }
   if ((vals.includes('稀軟') || vals.includes('腹瀉') || vals.includes('不振') || vals.includes('胃脹') || vals.includes('吃一點'))) {
-    return { type: '脾虛', sub: '脾胃虛弱', pattern: '虛', description: '您屬於脾虛體質，運化失常，大便異常，食慾不振。調理以健脾和胃、補中益氣為主。', suggestions: ['定時定量用餐', '多吃山藥、茯苓、蓮子', '飯後散步30分鐘', '少吃生冷油膩'], avoid: ['冰品', '空腹吃水果', '暴飲暴食', '甜食'], herbs: ['參苓白朮散', '四君子湯', '附子理中丸'], acupoints: ['足三里（膝蓋下3寸）', '中脘穴（肚臍上4寸）', '脾俞穴（背部）'], diet: ['山藥蓮子粥：山藥50g + 蓮子30g + 粳米100g', '茯苓餅：茯苓粉30g + 麵粉100g 煎', '四神豬肚湯：山藥/茯苓/蓮子/芡實 各15g + 豬肚'] }
+    return { type: '脾虛', sub: '脾胃虛弱', pattern: '虛', description: '您屬於脾虛體質，運化失常，大便異常，食慾不振。調理以健脾和胃、補中益氣為主。', suggestions: ['定時定量用餐', '多吃山藥、茯苓、蓮子', '飯後散步30分鐘', '少吃生冷油膩'], avoid: ['冰品', '空腹吃水果', '暴飲暴食', '甜食'], herbs: ['參苓白朮散', '四君子湯', '附子理中丸'], acupoints: ['足三里（膝蓋下3寸）', '中脘穴（肚臍上4寸）', '脾俞穴（背部）'], diet: ['山藥蓮子粥：山藥50g + 蓮子30g + 粳米100g', '茯苓餅：茯苓粉30g + 麵粉100g 煎', '四神豬肚湯：山藥/茯苓/蓮子/芡實 各15g + 豬肚'], energy: 50, stress: 2.5, resilience: 48, innerEnergy: 58, lifestyle: { exercise: 62, nutrition: 62, environment: 85, psychology: 78, sleep: 65, hormonal: 70 }, meridianBalance: { left: 1.48, right: 1.44 } }
   }
-  return { type: '需調理', sub: '陰陽偏頗', pattern: 'mixed', description: '根據您的描述，您有陰陽氣血輕度偏頗。建議規律作息、均衡飲食、適度運動以維持健康平衡。', suggestions: ['保持規律作息', '均衡飲食', '每週運動3次', '保持心情愉快'], avoid: ['過度疲勞', '情緒大波動', '熬夜'], herbs: [], acupoints: [], diet: [] }
+  return { type: '需調理', sub: '陰陽偏頗', pattern: 'mixed', description: '根據您的描述，您有陰陽氣血輕度偏頗。建議規律作息、均衡飲食、適度運動以維持健康平衡。', suggestions: ['保持規律作息', '均衡飲食', '每週運動3次', '保持心情愉快'], avoid: ['過度疲勞', '情緒大波動', '熬夜'], herbs: [], acupoints: [], diet: [], energy: 65, stress: 2.8, resilience: 60, innerEnergy: 70, lifestyle: { exercise: 70, nutrition: 75, environment: 82, psychology: 78, sleep: 72, hormonal: 75 }, meridianBalance: { left: 1.45, right: 1.45 } }
 }
 
 // ============================================
@@ -962,6 +965,137 @@ export default function Home() {
             <span className="inline-block mt-2 text-xs bg-stone-100 text-stone-500 px-3 py-1 rounded-full">
               {t('result.pattern')}：{result.constitution.pattern}
             </span>
+          </div>
+
+          {/* ── 能量分析儀表板 ── */}
+          <div className="bg-gradient-to-br from-stone-50 to-stone-100 rounded-2xl p-5 border border-stone-200 mb-5">
+            <h3 className="text-sm font-semibold text-stone-600 mb-4 flex items-center gap-2">
+              <span>📊</span> 能量分析
+            </h3>
+            <div className="grid grid-cols-2 gap-3 mb-4">
+              {/* 能量儀表 */}
+              <div className="bg-white rounded-xl p-3 shadow-sm">
+                <p className="text-xs text-stone-400 mb-1">身體能量</p>
+                <div className="flex items-center gap-2">
+                  <span className={`text-lg font-bold ${
+                    result.constitution.energy >= 60 ? 'text-emerald-500' :
+                    result.constitution.energy >= 45 ? 'text-amber-500' : 'text-red-500'
+                  }`}>{result.constitution.energy}%</span>
+                  <div className="flex-1 h-2 bg-stone-100 rounded-full overflow-hidden">
+                    <div className="h-full bg-gradient-to-r from-emerald-400 to-teal-500 rounded-full"
+                      style={{ width: `${result.constitution.energy}%` }} />
+                  </div>
+                </div>
+                <p className="text-xs text-stone-400 mt-1">
+                  {result.constitution.energy >= 60 ? '最佳' : result.constitution.energy >= 45 ? '正常' : '偏低'}
+                </p>
+              </div>
+              {/* 壓力儀表 */}
+              <div className="bg-white rounded-xl p-3 shadow-sm">
+                <p className="text-xs text-stone-400 mb-1">身心壓力</p>
+                <div className="flex items-center gap-2">
+                  <span className={`text-lg font-bold ${
+                    result.constitution.stress <= 3 ? 'text-emerald-500' :
+                    result.constitution.stress <= 4 ? 'text-amber-500' : 'text-red-500'
+                  }`}>{result.constitution.stress}</span>
+                  <div className="flex-1 h-2 bg-stone-100 rounded-full overflow-hidden">
+                    <div className={`h-full rounded-full ${
+                      result.constitution.stress <= 3 ? 'bg-emerald-400' :
+                      result.constitution.stress <= 4 ? 'bg-amber-400' : 'bg-red-400'
+                    }`} style={{ width: `${result.constitution.stress * 10}%` }} />
+                  </div>
+                </div>
+                <p className="text-xs text-stone-400 mt-1">
+                  {result.constitution.stress <= 3 ? '正常' : result.constitution.stress <= 4 ? '略高' : '過高'}
+                </p>
+              </div>
+              {/* 彈力 */}
+              <div className="bg-white rounded-xl p-3 shadow-sm">
+                <p className="text-xs text-stone-400 mb-1">恢復彈力</p>
+                <div className="flex items-center gap-2">
+                  <span className={`text-lg font-bold ${
+                    result.constitution.resilience >= 50 ? 'text-emerald-500' : 'text-amber-500'
+                  }`}>{result.constitution.resilience}%</span>
+                  <div className="flex-1 h-2 bg-stone-100 rounded-full overflow-hidden">
+                    <div className="h-full bg-gradient-to-r from-blue-400 to-cyan-500 rounded-full"
+                      style={{ width: `${result.constitution.resilience}%` }} />
+                  </div>
+                </div>
+              </div>
+              {/* 內在能量 */}
+              <div className="bg-white rounded-xl p-3 shadow-sm">
+                <p className="text-xs text-stone-400 mb-1">內在能量儲備</p>
+                <div className="flex items-center gap-2">
+                  <span className={`text-lg font-bold ${
+                    result.constitution.innerEnergy >= 60 ? 'text-emerald-500' : 'text-amber-500'
+                  }`}>{result.constitution.innerEnergy}%</span>
+                  <div className="flex-1 h-2 bg-stone-100 rounded-full overflow-hidden">
+                    <div className="h-full bg-gradient-to-r from-purple-400 to-pink-500 rounded-full"
+                      style={{ width: `${result.constitution.innerEnergy}%` }} />
+                  </div>
+                </div>
+              </div>
+            </div>
+            {/* 神經平衡 */}
+            <div className="bg-white rounded-xl p-3 shadow-sm">
+              <p className="text-xs text-stone-400 mb-2">交感/副交感神經平衡</p>
+              <div className="flex items-center gap-3">
+                <div className="flex-1">
+                  <div className="h-2 bg-stone-100 rounded-full relative">
+                    <div className="absolute left-1/2 top-0 w-0.5 h-2 bg-stone-300 -translate-x-1/2" />
+                    <div className={`absolute top-0 h-2 w-3 rounded-full -translate-x-1/2 ${
+                      result.constitution.meridianBalance.left < 1.5 ? 'bg-emerald-400' :
+                      result.constitution.meridianBalance.left < 2.0 ? 'bg-amber-400' : 'bg-red-400'
+                    }`} style={{ left: `${Math.min(result.constitution.meridianBalance.left / 3 * 100, 90)}%` }} />
+                  </div>
+                  <p className="text-xs text-stone-400 mt-1">左 {result.constitution.meridianBalance.left}</p>
+                </div>
+                <span className="text-xs text-stone-400">vs</span>
+                <div className="flex-1">
+                  <div className="h-2 bg-stone-100 rounded-full relative">
+                    <div className="absolute left-1/2 top-0 w-0.5 h-2 bg-stone-300 -translate-x-1/2" />
+                    <div className={`absolute top-0 h-2 w-3 rounded-full -translate-x-1/2 ${
+                      result.constitution.meridianBalance.right < 1.5 ? 'bg-emerald-400' :
+                      result.constitution.meridianBalance.right < 2.0 ? 'bg-amber-400' : 'bg-red-400'
+                    }`} style={{ left: `${Math.min(result.constitution.meridianBalance.right / 3 * 100, 90)}%` }} />
+                  </div>
+                  <p className="text-xs text-stone-400 mt-1">右 {result.constitution.meridianBalance.right}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ── 生活方式雷達圖（用長條圖替代） ── */}
+          <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl p-5 border border-emerald-100 mb-5">
+            <h3 className="text-sm font-semibold text-emerald-700 mb-4 flex items-center gap-2">
+              <span>🌿</span> 生活方式評分
+            </h3>
+            <div className="space-y-3">
+              {[
+                { key: 'exercise', label: '運動', icon: '🏃', value: result.constitution.lifestyle.exercise },
+                { key: 'nutrition', label: '營養', icon: '🥗', value: result.constitution.lifestyle.nutrition },
+                { key: 'environment', label: '環境', icon: '🌤', value: result.constitution.lifestyle.environment },
+                { key: 'psychology', label: '心理', icon: '🧘', value: result.constitution.lifestyle.psychology },
+                { key: 'sleep', label: '睡眠', icon: '😴', value: result.constitution.lifestyle.sleep },
+                { key: 'hormonal', label: '荷爾蒙', icon: '⚖️', value: result.constitution.lifestyle.hormonal },
+              ].map(item => {
+                const color = item.value >= 75 ? 'bg-emerald-400' : item.value >= 60 ? 'bg-amber-400' : 'bg-red-400'
+                const status = item.value >= 75 ? '理想' : item.value >= 60 ? '正常' : '偏低'
+                return (
+                  <div key={item.key} className="flex items-center gap-3">
+                    <span className="text-base">{item.icon}</span>
+                    <span className="text-xs text-stone-600 w-12">{item.label}</span>
+                    <div className="flex-1 h-2.5 bg-stone-200 rounded-full overflow-hidden">
+                      <div className={`h-full ${color} rounded-full transition-all duration-700`}
+                        style={{ width: `${item.value}%` }} />
+                    </div>
+                    <span className="text-xs font-medium text-stone-600 w-8">{item.value}%</span>
+                    <span className="text-xs text-stone-400 w-8">{status}</span>
+                  </div>
+                )
+              })}
+            </div>
+            <p className="text-xs text-stone-400 mt-4 text-center">依據您的調理進度，各項指標建議逐步提升至綠色區間</p>
           </div>
 
           {/* 辯證要點 */}
