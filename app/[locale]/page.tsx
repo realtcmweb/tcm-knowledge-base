@@ -308,6 +308,48 @@ const DETAILED_EXTRA: Question[] = [
 // ============================================
 // 中醫體質/證型分析引擎
 // ============================================
+// 辯證要點：每種體質的關鍵判定指標
+const PATTERN_KEYS: Record<string, string[]> = {
+  '陰虛': ['怕熱', '盜汗/自汗', '失眠/多夢/易醒'],
+  '陽虛': ['怕冷', '腰酸/冷痛', '夜尿多/尿清'],
+  '氣虛': ['疲倦乏力', '說話無力', '稍動即喘'],
+  '痰濕': ['身體沉重', '大便黏膩', '舌苔厚膩'],
+  '氣鬱': ['情緒波動大', '胸脅脹悶', '易怒/焦慮'],
+  '脾虛': ['食欲不振', '大便異常', '飯後腹脹'],
+  '需調理': ['陰陽偏頗', '輕度失衡', '需持續調養'],
+}
+
+// 中成藥用藥禁忌（通用版）
+const HERB_CAUTIONS: Record<string, string[]> = {
+  '六味地黃丸': ['脾胃虛弱、腹瀉者慎用', '孕婦慎用', '感冒期間停用'],
+  '天王補心丹': ['脾胃虛寒、腹瀉者慎用', '孕婦慎用', '不宜與咖啡因同服'],
+  '生脈飲': ['感冒發燒時停用', '有實熱證者慎用'],
+  '理中丸': ['胃熱、胃潰疡者不宜', '孕婦慎用', '口乾咽燥者慎用'],
+  '金匱腎氣丸': ['孕婦禁用', '有實熱證（口瘡、便秘）者慎用', '心悸失眠者慎用'],
+  '四神湯': ['孕婦慎用', '胃潰疡急性期慎用', '對食材過敏者慎用'],
+  '補中益氣丸': ['感冒發燒時停用', '血壓高者慎用', '不宜與蘿蔔同服'],
+  '四君子湯': ['感冒發燒時停用', '有實熱證者慎用'],
+  '平胃散': ['胃潰疡、胃酸過多者慎用', '孕婦慎用', '陰虛體質慎用'],
+  '二陳湯': ['孕婦慎用', '胃酸過多者慎用', '乾咳無痰者慎用'],
+  '溫膽湯': ['孕婦慎用', '胃潰疡者慎用', '心悸心慌者慎用'],
+  '逍遙丸': ['感冒發燒時停用', '月經過多者慎用', '孕婦慎用'],
+  '柴胡疏肝散': ['孕婦慎用', '肝陰不足（眩暈、口乾）者慎用', '胃潰疡者慎用'],
+  '甘麥大棗湯': ['對小麥過敏者禁用', '血糖高者注意糖分'],
+  '參苓白朮散': ['感冒發燒時停用', '有實熱證者慎用', '便秘者慎用'],
+  '附子理中丸': ['孕婦禁用', '高血壓、心臟病者慎用', '胃潰疡出血者禁用'],
+}
+
+function getHerbCautions(herbs: string[]): string[] {
+  return herbs.flatMap(h => HERB_CAUTIONS[h] || []).filter((v, i, a) => a.indexOf(v) === i)
+}
+
+function getPatternKeys(type: string): string[] {
+  return PATTERN_KEYS[type] || PATTERN_KEYS['需調理']
+}
+
+// ============================================
+// 分析引擎
+// ============================================
 function analyzeCondition(answers: Record<string, string>): {
   type: string; sub: string; pattern: string; description: string
   suggestions: string[]; avoid: string[]; herbs: string[]; acupoints: string[]; diet: string[]
@@ -318,7 +360,7 @@ function analyzeCondition(answers: Record<string, string>): {
     return { type: '陰虛', sub: '心腎陰虛', pattern: '虛熱', description: '您屬於陰虛體質，虛火內擾，常見盜汗、失眠、口乾咽燥。調理以滋陰清熱、養心安神為主。', suggestions: ['少吃燒烤炸辣', '多吃百合、銀耳、麥冬、玉竹', '避免熬夜（23點前入睡）', '練習太極/冥想'], avoid: ['咖啡因', '酒精', '辛辣', '炸物'], herbs: ['六味地黃丸', '天王補心丹', '生脈飲'], acupoints: ['太溪穴（足內側）', '湧泉穴（足底）', '內關穴（手腕）'], diet: ['百合銀耳羹：百合30g + 銀耳20g + 冰糖', '麥冬玉竹茶：麥冬10g + 玉竹10g 熱水泡', '桑椹枸杞茶：桑椹15g + 枸杞10g'] }
   }
   if (vals.includes('怕冷') && (vals.includes('很怕') || vals.includes('極度')) && (vals.includes('腰') || vals.includes('冷痛') || vals.includes('夜尿') || vals.includes('清長'))) {
-    return { type: '陽虛', sub: '脾腎陽虛', pattern: '虛寒', description: '您屬於陽虛體質，火力不足，畏寒怕冷，容易疲倦。調理以溫補脾腎、助陽驅寒為主。', suggestions: ['多吃溫熱食物（羊肉、龍眼、紅棗、薑）', '忌生冷冰品', '每天熱水泡腳（加生薑）', '適度運動（快走、太極）'], avoid: ['冰品', '生菜水果', '冷飲', '西瓜'], herbs: ['理中丸', '金匱腎氣丸', '四神湯'], acupoints: ['關元穴（肚臍下）', '命門穴（後腰）', '足三里（膝蓋下）'], diet: ['羊肉當歸湯：羊肉250g + 當歸10g + 薑3片', '桂圓紅棗茶：桂圓10顆 + 紅棗5顆', '生薑紅糖水：生薑3片 + 紅糖'] }
+    return { type: '陽虛', sub: '脾腎陽虛', pattern: '虛寒', description: '您屬於陽虛體質，火力不足，畏寒怕冷，容易疲倦。調理以溫補脾腎、助陽驅寒為主。', suggestions: ['多吃溫熱食物（羊肉、龍眼、紅紅棗、薑）', '忌生冷冰品', '每天熱水泡腳（加生薑）', '適度運動（快走、太極）'], avoid: ['冰品', '生菜水果', '冷飲', '西瓜'], herbs: ['理中丸', '金匱腎氣丸', '四神湯'], acupoints: ['關元穴（肚臍下）', '命門穴（後腰）', '足三里（膝蓋下）'], diet: ['羊肉當歸湯：羊肉250g + 當歸10g + 薑3片', '桂圓紅棗茶：桂圓10顆 + 紅棗5顆', '生薑紅糖水：生薑3片 + 紅糖'] }
   }
   if ((vals.includes('疲倦') || vals.includes('整天') || vals.includes('早上')) && (vals.includes('輕微') || vals.includes('很弱') || vals.includes('說話') || vals.includes('正常') === false)) {
     return { type: '氣虛', sub: '脾肺氣虛', pattern: '虛', description: '您屬於氣虛體質，元氣不足，容易疲勞，說話無力，稍動即喘。調理以補氣健脾、益肺固表為主。', suggestions: ['多吃山藥、黃耆、黨參、紅棗', '忌耗氣食物（白蘿蔔、茶葉）', '保證充足睡眠（8小時）', '避免過度疲勞'], avoid: ['過度勞累', '熬夜', '劇烈運動', '減肥節食'], herbs: ['補中益氣丸', '四君子湯', '生脈飲'], acupoints: ['氣海穴（肚臍下）', '肺俞穴（背部）', '足三里（膝蓋下）'], diet: ['山藥粥：山藥200g + 粳米100g 煮粥', '黨參黃耆茶：黨參10g + 黃耆10g', '紅棗桂圓湯：紅棗10顆 + 桂圓15g'] }
@@ -489,6 +531,12 @@ export default function Home() {
             <div className="text-5xl mb-4">🌿</div>
             <h2 className="text-2xl font-light text-stone-700 mb-2">{t('header.title')}</h2>
             <p className="text-sm text-stone-500">{t('home.certified')}</p>
+            <p className="text-xs text-stone-400 mt-1">{t('home.tenQuestions')}</p>
+          </div>
+          <div className="bg-stone-100 rounded-xl p-4 mb-4">
+            <p className="text-xs text-stone-500 leading-relaxed">
+              🔒 {t('home.privacy')}
+            </p>
           </div>
           <div className="space-y-3 mb-8">
             <button onClick={() => { setMode('fast'); setStep('basic') }}
@@ -680,6 +728,11 @@ export default function Home() {
               <span className="font-medium text-stone-700">拍攝技巧：</span>自然光或室內光 · 張嘴伸舌自然下垂 · 舌頭佔據畫面主體
             </p>
           </div>
+          <div className="bg-amber-50 rounded-xl p-4 mb-4 border border-amber-100">
+            <p className="text-xs text-amber-700 leading-relaxed">
+              🔒 <span className="font-medium">隱私聲明：</span>您的舌苔照片僅用於本次AI分析，系統不會保存、分享或用於任何其他用途。
+            </p>
+          </div>
           <button onClick={handleSubmit} disabled={loading || (!!tongueFile && !imageLoaded)}
             className="w-full py-4 bg-gradient-to-r from-emerald-600 to-teal-500 text-white rounded-2xl font-medium shadow-lg shadow-emerald-200 disabled:opacity-60 transition">
             {loading ? '分析中...' : tongueFile ? '✨ 分析舌苔 + 送出' : '✨ 略過舌苔，直接分析'}
@@ -706,6 +759,22 @@ export default function Home() {
             <span className="inline-block mt-2 text-xs bg-stone-100 text-stone-500 px-3 py-1 rounded-full">
               {t('result.pattern')}：{result.constitution.pattern}
             </span>
+          </div>
+
+          {/* 辯證要點 */}
+          <div className="bg-emerald-50 rounded-2xl p-5 border border-emerald-100 mb-4">
+            <h3 className="text-sm font-semibold text-emerald-700 mb-3 flex items-center gap-2">
+              <span>🔑</span> 辯證要點
+            </h3>
+            <p className="text-xs text-stone-500 mb-3">判定為 {result.constitution.type} 體質的核心指標：</p>
+            <div className="space-y-2">
+              {getPatternKeys(result.constitution.type).map((key, i) => (
+                <div key={i} className="flex items-start gap-2.5 text-sm text-stone-700">
+                  <span className="w-5 h-5 rounded-full bg-emerald-200 text-emerald-700 flex items-center justify-center text-xs flex-shrink-0 font-medium">{i + 1}</span>
+                  {key}
+                </div>
+              ))}
+            </div>
           </div>
 
           <div className="bg-white rounded-2xl p-5 shadow-sm border border-stone-100 mb-4">
@@ -763,8 +832,25 @@ export default function Home() {
                 ))}
               </div>
               <p className="text-xs text-amber-500 mt-3 leading-relaxed">
-                ⚠️ 中成藥僅供參考，服用前建議看中醫師確認體質是否適合
+                ⚠️ {t('result.herbsNote')}
               </p>
+            </div>
+          )}
+
+          {/* 中成藥用藥禁忌 */}
+          {result.constitution.herbs.length > 0 && getHerbCautions(result.constitution.herbs).length > 0 && (
+            <div className="bg-red-50 rounded-2xl p-5 border border-red-100 mb-4">
+              <h3 className="text-sm font-semibold text-red-600 mb-3 flex items-center gap-2">
+                <span>⚠️</span> 服用禁忌（重要）
+              </h3>
+              <div className="space-y-2">
+                {getHerbCautions(result.constitution.herbs).map((c, i) => (
+                  <div key={i} className="flex items-start gap-2.5 text-sm text-stone-700">
+                    <span className="w-1.5 h-1.5 rounded-full bg-red-400 flex-shrink-0 mt-2" />
+                    {c}
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 
