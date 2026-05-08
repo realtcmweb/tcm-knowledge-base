@@ -1080,27 +1080,6 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
             </svg>
           </div>
 
-          {/* 用戶評價輪播 */}
-          <div className="mb-6">
-            <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl p-4 border border-emerald-100">
-              <div className="flex items-center gap-1 mb-2">
-                <span className="text-amber-400 text-sm">★★★★★</span>
-                <span className="text-xs text-stone-400 ml-1">基於真實用戶回饋</span>
-              </div>
-              <div className="overflow-hidden">
-                <p className="text-sm text-stone-600 italic leading-relaxed">
-                  「做了分析才知道自己是氣虛體質，照著建議調整了一個月，明顯覺得精神好多了！中醫師說分析很準確。」
-                </p>
-                <p className="text-xs text-stone-400 mt-1">— 台北，陳小姐，42歲</p>
-              </div>
-              <div className="flex gap-1.5 mt-3">
-                {[0,1,2].map(i => (
-                  <div key={i} className={`h-1 rounded-full transition-all ${i === 0 ? 'w-4 bg-emerald-400' : 'w-1 bg-stone-300'}`}/>
-                ))}
-              </div>
-            </div>
-          </div>
-
           {/* 三分鐘流程說明 */}
           <div className="mb-6">
             <div className="flex items-stretch gap-2">
@@ -1163,6 +1142,28 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
               </div>
             </button>
           </div>
+          {/* 用戶評價輪播 */}
+          <div className="mb-6">
+            <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl p-4 border border-emerald-100">
+              <div className="flex items-center gap-1 mb-2">
+                <span className="text-amber-400 text-sm">★★★★★</span>
+                <span className="text-xs text-stone-400 ml-1">基於真實用戶回饋</span>
+              </div>
+              <div className="overflow-hidden">
+                <p className="text-sm text-stone-600 italic leading-relaxed">
+                  「做了分析才知道自己是氣虛體質，照著建議調整了一個月，明顯覺得精神好多了！中醫師說分析很準確。」
+                </p>
+                <p className="text-xs text-stone-400 mt-1">— 台北，陳小姐，42歲</p>
+              </div>
+              <div className="flex gap-1.5 mt-3">
+                {[0,1,2].map(i => (
+                  <div key={i} className={`h-1 rounded-full transition-all ${i === 0 ? 'w-4 bg-emerald-400' : 'w-1 bg-stone-300'}`}/>
+                ))}
+              </div>
+            </div>
+          </div>
+
+
           <div className="bg-stone-100 rounded-xl p-4 text-center">
             <p className="text-xs text-stone-500 leading-relaxed">
               {t('home.tenQuestions')}<br />
@@ -1262,46 +1263,25 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
           </div>
           <div className="grid grid-cols-2 gap-3 mb-4">
             {[
-              {
-                value: '調養', label: '調養身體', desc: '健康檢查、保養', icon: '🌱', color: 'from-emerald-50 to-teal-50', border: 'hover:border-emerald-300', active: 'border-emerald-400 bg-gradient-to-br from-emerald-50 to-teal-50'
-              },
-              {
-                value: '減肥', label: '減肥控重', desc: '體重管理、雕塑', icon: '⚖️', color: 'from-amber-50 to-orange-50', border: 'hover:border-amber-300', active: 'border-amber-400 bg-gradient-to-br from-amber-50 to-orange-50'
-              },
-              {
-                value: '備孕', label: '備孕調理', desc: '不孕調理、孕前準備', icon: '🤰', color: 'from-pink-50 to-rose-50', border: 'hover:border-pink-300', active: 'border-pink-400 bg-gradient-to-br from-pink-50 to-rose-50'
-              },
-              {
-                value: '過敏', label: '過敏/鼻炎', desc: '鼻過敏、皮膚過敏、氣喘', icon: '🤧', color: 'from-blue-50 to-cyan-50', border: 'hover:border-blue-300', active: 'border-blue-400 bg-gradient-to-br from-blue-50 to-cyan-50'
-              },
+              { value: '調養', label: '調養身體', desc: '健康檢查、保養', icon: '🌱', color: 'from-emerald-50 to-teal-50', border: 'hover:border-emerald-300', active: 'border-emerald-400 bg-gradient-to-br from-emerald-50 to-teal-50' },
+              { value: '減肥', label: '減肥控重', desc: '體重管理、雕塑', icon: '⚖️', color: 'from-amber-50 to-orange-50', border: 'hover:border-amber-300', active: 'border-amber-400 bg-gradient-to-br from-amber-50 to-orange-50' },
+              { value: '失眠', label: '失眠/睡不好', desc: '入睡困難、易醒', icon: '🌙', color: 'from-violet-50 to-purple-50', border: 'hover:border-violet-300', active: 'border-violet-400 bg-gradient-to-br from-violet-50 to-purple-50' },
+              { value: '情緒', label: '情緒/壓力', desc: '焦慮、抑鬱、暴躁', icon: '💢', color: 'from-red-50 to-pink-50', border: 'hover:border-red-300', active: 'border-red-400 bg-gradient-to-br from-red-50 to-pink-50' },
+              { value: '疼痛', label: '腰酸/關節痛', desc: '各種慢性疼痛', icon: '💉', color: 'from-orange-50 to-amber-50', border: 'hover:border-orange-300', active: 'border-orange-400 bg-gradient-to-br from-orange-50 to-amber-50' },
+              { value: '過敏', label: '過敏/鼻炎', desc: '鼻過敏、皮膚、氣喘', icon: '🤧', color: 'from-blue-50 to-cyan-50', border: 'hover:border-blue-300', active: 'border-blue-400 bg-gradient-to-br from-blue-50 to-cyan-50' },
+              { value: '皮膚', label: '皮膚問題', desc: '濕疹、蕁麻疹、痘痘', icon: '🔴', color: 'from-lime-50 to-green-50', border: 'hover:border-lime-300', active: 'border-lime-400 bg-gradient-to-br from-lime-50 to-green-50' },
+              { value: '月經', label: '月經/婦科', desc: '經期問題、子宮調理', icon: '🌸', color: 'from-pink-50 to-rose-50', border: 'hover:border-pink-300', active: 'border-pink-400 bg-gradient-to-br from-pink-50 to-rose-50', femaleOnly: true },
+              { value: '備孕', label: '備孕調理', desc: '不孕調理、孕前準備', icon: '🤰', color: 'from-pink-50 to-rose-50', border: 'hover:border-pink-300', active: 'border-pink-400 bg-gradient-to-br from-pink-50 to-rose-50', femaleOnly: true },
             ].map(c => {
+              // 性別過濾：月經、備孕僅限女性
+              if (c.femaleOnly && answers.gender === '男') return null
               const isActive = answers.chief === c.value
               return (
                 <button key={c.value}
                   onClick={() => { setAnswers({ ...answers, chief: c.value }); setStep('questionnaire'); setQIndex(0) }}
-                  className={`py-5 px-3 bg-white border-2 rounded-2xl text-center transition-all active:scale-95 ${isActive ? c.active : 'border-stone-200 ' + c.border}`}>
-                  <div className="text-3xl mb-2">{c.icon}</div>
+                  className={`py-4 px-2 bg-white border-2 rounded-2xl text-center transition-all active:scale-95 ${isActive ? c.active : 'border-stone-200 ' + c.border}`}>
+                  <div className="text-2xl mb-1">{c.icon}</div>
                   <p className={`text-sm font-medium ${isActive ? 'text-stone-800' : 'text-stone-700'}`}>{c.label}</p>
-                  <p className="text-xs text-stone-400 mt-0.5">{c.desc}</p>
-                </button>
-              )
-            })}
-          </div>
-          <div className="grid grid-cols-2 gap-3 mb-4">
-            {[
-              { value: '皮膚', label: '皮膚/過敏', desc: '濕疹、蕁麻疹、痘痘', icon: '🔴' },
-              { value: '月經', label: '月經/婦科', desc: '經期問題、子宮調理', icon: '🌸' },
-            ].map(c => {
-              if (c.value === '月經') {
-                const ageNum = parseInt(answers.age || '')
-                if (answers.gender === '男' || (!isNaN(ageNum) && (ageNum < 10 || ageNum > 65))) return null
-              }
-              return (
-                <button key={c.value}
-                  onClick={() => { setAnswers({ ...answers, chief: c.value }); setStep('questionnaire'); setQIndex(0) }}
-                  className="py-5 px-3 bg-white border-2 border-stone-200 rounded-2xl text-center hover:border-stone-300 transition active:scale-95">
-                  <div className="text-3xl mb-2">{c.icon}</div>
-                  <p className="text-sm font-medium text-stone-700">{c.label}</p>
                   <p className="text-xs text-stone-400 mt-0.5">{c.desc}</p>
                 </button>
               )
