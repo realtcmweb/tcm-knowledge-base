@@ -1049,10 +1049,12 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
           </div>
           <div className="flex items-center gap-2">
             {/* 字體縮放 */}
-            <div className="flex items-center bg-stone-100 rounded-full px-1 py-0.5 gap-0.5">
-              <button onClick={() => setFontScale(100)} className={`w-7 h-7 rounded-full text-xs font-bold transition ${fontScale === 100 ? 'bg-emerald-500 text-white' : 'text-stone-400 hover:text-stone-600'}`}>A</button>
-              <button onClick={() => setFontScale(115)} className={`w-7 h-7 rounded-full text-sm font-bold transition ${fontScale === 115 ? 'bg-emerald-500 text-white' : 'text-stone-400 hover:text-stone-600'}`}>A</button>
-              <button onClick={() => setFontScale(130)} className={`w-7 h-7 rounded-full text-base font-bold transition ${fontScale === 130 ? 'bg-emerald-500 text-white' : 'text-stone-400 hover:text-stone-600'}`}>A</button>
+            <div className="flex items-center bg-stone-100 rounded-full px-1 py-0.5 gap-1">
+              <button onClick={() => setFontScale(Math.max(100, fontScale - 15))}
+                className="w-7 h-7 rounded-full text-stone-500 hover:text-stone-700 hover:bg-stone-200 transition flex items-center justify-center font-bold text-lg">−</button>
+              <span className="text-xs text-stone-500 w-5 text-center font-medium">{fontScale}%</span>
+              <button onClick={() => setFontScale(Math.min(160, fontScale + 15))}
+                className="w-7 h-7 rounded-full text-stone-500 hover:text-stone-700 hover:bg-stone-200 transition flex items-center justify-center font-bold text-lg">+</button>
             </div>
             <Link href="/login"
               className="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white text-xs rounded-full transition">
@@ -1084,36 +1086,6 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
             </svg>
           </div>
 
-          {/* 三分鐘流程說明 */}
-          <div className="mb-6">
-            <div className="flex items-stretch gap-2">
-              {[
-                { step: '1', icon: '📝', title: '回答10題', sub: '2分鐘', color: 'from-amber-50 to-amber-100 border-amber-200' },
-                { step: '2', icon: '👅', title: '拍舌苔', sub: '可跳過', color: 'from-emerald-50 to-emerald-100 border-emerald-200' },
-                { step: '3', icon: '🌿', title: 'AI分析', sub: '立即出結果', color: 'from-teal-50 to-teal-100 border-teal-200' },
-              ].map(item => (
-                <div key={item.step} className={`flex-1 bg-gradient-to-b ${item.color} rounded-xl p-3 text-center border`}>
-                  <div className="text-xl mb-1">{item.icon}</div>
-                  <p className="text-xs font-medium text-stone-700">{item.title}</p>
-                  <p className="text-xs text-stone-400">{item.sub}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="text-center mb-6">
-            <div className="text-5xl mb-3">🌿</div>
-            <h2 className="text-2xl font-light text-stone-700 mb-1">{t('header.title')}</h2>
-            <p className="text-sm text-stone-500">{t('home.certified')}</p>
-          </div>
-
-          <FaqAccordion />
-
-          <div className="bg-stone-100 rounded-xl p-4 mb-4">
-            <p className="text-xs text-stone-500 leading-relaxed">
-              🔒 {t('home.privacy')}
-            </p>
-          </div>
           <div className="space-y-3 mb-6">
             <button onClick={() => { setMode('fast'); setStep('basic') }}
               className="w-full py-5 px-5 bg-white border-2 border-stone-200 rounded-2xl text-left hover:border-emerald-400 transition group">
@@ -1146,6 +1118,38 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
               </div>
             </button>
           </div>
+
+          {/* 三分鐘流程說明 */}
+          <div className="mb-6">
+            <div className="flex items-stretch gap-2">
+              {[
+                { step: '1', icon: '📝', title: '回答10題', sub: '2分鐘', color: 'from-amber-50 to-amber-100 border-amber-200' },
+                { step: '2', icon: '👅', title: '拍舌苔', sub: '可跳過', color: 'from-emerald-50 to-emerald-100 border-emerald-200' },
+                { step: '3', icon: '🌿', title: 'AI分析', sub: '立即出結果', color: 'from-teal-50 to-teal-100 border-teal-200' },
+              ].map(item => (
+                <div key={item.step} className={`flex-1 bg-gradient-to-b ${item.color} rounded-xl p-3 text-center border`}>
+                  <div className="text-xl mb-1">{item.icon}</div>
+                  <p className="text-xs font-medium text-stone-700">{item.title}</p>
+                  <p className="text-xs text-stone-400">{item.sub}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="text-center mb-6">
+            <div className="text-5xl mb-3">🌿</div>
+            <h2 className="text-2xl font-light text-stone-700 mb-1">{t('header.title')}</h2>
+            <p className="text-sm text-stone-500">{t('home.certified')}</p>
+          </div>
+
+          <FaqAccordion />
+
+          <div className="bg-stone-100 rounded-xl p-4 mb-4">
+            <p className="text-xs text-stone-500 leading-relaxed">
+              🔒 {t('home.privacy')}
+            </p>
+          </div>
+
           {/* 用戶評價輪播 */}
           <div className="mb-6">
             <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl p-4 border border-emerald-100">
