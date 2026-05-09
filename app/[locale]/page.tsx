@@ -82,18 +82,6 @@ function ResultSaveSection({ result }: { result: ResultData }) {
   const [compareMode, setCompareMode] = useState(false)
   const [selectedOld, setSelectedOld] = useState<SavedResult | null>(null)
 
-  // Close menu when clicking outside
-  useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        setMenuOpen(false)
-      }
-    }
-    if (menuOpen) {
-      document.addEventListener('mousedown', handleClickOutside)
-    }
-    return () => { document.removeEventListener('mousedown', handleClickOutside) }
-  }, [menuOpen])
 
   useEffect(() => {
     const stored = localStorage.getItem('tcm_result_history')
