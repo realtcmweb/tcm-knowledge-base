@@ -286,341 +286,248 @@ const BASIC_QUESTIONS: Question[] = [
   { id: 'weight', text: '體重（選填）', type: 'input_number', placeholder: '例：65', unit: 'kg' },
 ]
 
-// 快速問診核心題（每主訴精選3題）
+// 快速問診核心題（每主訴精選1題，共14題）
 const FAST_QUESTIONS: Record<string, Question[]> = {
   '失眠': [
-    { id: 'f_s1', text: '睡覺時主要困擾是什麼？', options: [
-      { value: '難入睡', label: '很難入睡（超過30分鐘）' },
-      { value: '易醒', label: '容易醒 / 淺眠' },
-      { value: '早醒', label: '早醒後睡不著' },
-      { value: '多夢', label: '多夢，像沒睡過' },
-    ]},
-    { id: 'f_s2', text: '睡覺時是否出汗？', options: [
-      { value: '無', label: '沒有出汗' },
-      { value: '盜汗', label: '睡到一半出汗（盜汗）' },
-      { value: '自汗', label: '稍微動一下就滿頭大汗' },
-    ]},
-    { id: 'f_s3', text: '白天是否有以下情況？', options: [
-      { value: 'none', label: '沒有，正常' },
-      { value: '心煩', label: '心煩 / 想事情停不下來' },
-      { value: '疲倦', label: '白天很疲倦沒精神' },
-      { value: '心悸', label: '心悸 / 胸悶' },
+    { id: 'f_s1', text: '你睡覺的問題主要是什麼？', options: [
+      { value: '難入睡', label: '睡不著（超過30分鐘）' },
+      { value: '易醒', label: '容易醒、淺眠' },
+      { value: '早醒', label: '早醒後再也睡不著' },
+      { value: '多夢', label: '多夢，像沒睡過一樣' },
     ]},
   ],
   '疲倦': [
-    { id: 'f_t1', text: '疲倦主要集中在什麼時間？', options: [
-      { value: '早上', label: '一起床就累' },
-      { value: '下午', label: '下午3-5點最明顯' },
-      { value: '晚上', label: '晚上才開始累' },
-      { value: '整天', label: '整天都累' },
-    ]},
-    { id: 'f_t2', text: '說話聲音是否低弱無力？', options: [
-      { value: '正常', label: '正常' },
-      { value: '輕微', label: '稍微低弱' },
-      { value: '很弱', label: '很微弱' },
-    ]},
-    { id: 'f_t3', text: '手腳沉重嗎？', options: [
-      { value: '無', label: '沒有' },
-      { value: '輕微', label: '輕微' },
-      { value: '明顯', label: '很明顯' },
+    { id: 'f_t1', text: '你疲勞的特點是什麼？', options: [
+      { value: '早上累', label: '一起床就累、沒精神' },
+      { value: '下午累', label: '下午3-5點最明顯' },
+      { value: '整天累', label: '整天都累、提不起勁' },
+      { value: '說話無力', label: '說話低弱無力' },
     ]},
   ],
   '消化': [
-    { id: 'f_d1', text: '大便形態？', options: [
+    { id: 'f_d1', text: '你的大便形態最接近哪種？', options: [
       { value: '正常', label: '成形正常' },
-      { value: '稀軟', label: '偏軟 / 腹瀉' },
-      { value: '硬', label: '乾硬 / 便祕' },
-      { value: '黏', label: '黏膩 / 粘馬桶' },
-    ]},
-    { id: 'f_d2', text: '吃飯後容易腹脹嗎？', options: [
-      { value: '無', label: '沒有' },
-      { value: '輕微', label: '稍微腹脹' },
-      { value: '嚴重', label: '很脹不舒服' },
-    ]},
-    { id: 'f_d3', text: '整體怕冷還是怕熱？', options: [
-      { value: '怕冷', label: '怕冷（吃冷的腸胃不適）' },
-      { value: '怕熱', label: '怕熱（想吃冰的）' },
-      { value: '兩者', label: '兩者都有' },
-      { value: '無', label: '沒有特別' },
+      { value: '乾硬', label: '乾硬、便秘（2-3天一次）' },
+      { value: '稀軟', label: '偏軟、容易腹瀉' },
+      { value: '黏', label: '黏膩、粘馬桶、冲不乾淨' },
     ]},
   ],
   '冰冷': [
-    { id: 'f_c1', text: '手腳冰冷主要集中在哪裡？', options: [
-      { value: '手', label: '手冷為主' },
-      { value: '腳', label: '腳冷為主' },
+    { id: 'f_c1', text: '你手腳冰冷的部位？', options: [
       { value: '手腳', label: '手腳都冷' },
-      { value: '四肢', label: '冷到手臂/大腿' },
-    ]},
-    { id: 'f_c2', text: '上半身和下半身溫度差異？', options: [
-      { value: '上身熱下身冷', label: '上身熱、下身冷（常見）' },
-      { value: '差不多', label: '上下差不多' },
-      { value: '只有手腳', label: '只有手腳冷，身體正常' },
-    ]},
-    { id: 'f_c3', text: '晚上睡覺會因為腳冷而醒來嗎？', options: [
-      { value: '無', label: '不會' },
-      { value: '有時', label: '有時會' },
-      { value: '經常', label: '經常冷到睡不著' },
+      { value: '腳', label: '腳冷為主' },
+      { value: '手', label: '手冷為主' },
+      { value: '冷到手臂', label: '冷到手臂/大腿' },
     ]},
   ],
   '頭痛': [
-    { id: 'f_h1', text: '頭痛位置主要在哪裡？', options: [
+    { id: 'f_h1', text: '你的頭痛主要在哪裡？', options: [
       { value: '兩側', label: '兩側太陽穴' },
       { value: '前額', label: '前額 / 眉心' },
       { value: '頭頂', label: '頭頂' },
       { value: '後腦', label: '後腦勺' },
-      { value: '整頭', label: '整個頭都痛' },
-    ]},
-    { id: 'f_h2', text: '頭痛的性質？', options: [
-      { value: '脹', label: '脹痛（血往上衝）' },
-      { value: '刺痛', label: '刺痛（像針刺）' },
-      { value: '悶痛', label: '悶痛 / 昏沉' },
-      { value: '暈', label: '頭暈為主' },
-    ]},
-    { id: 'f_h3', text: '頭痛與月經/情緒有關嗎？', options: [
-      { value: '無', label: '無關' },
-      { value: '月經', label: '與月經週期相關' },
-      { value: '情緒', label: '與情緒壓力相關' },
-      { value: '感冒', label: '感冒/發燒時加劇' },
     ]},
   ],
   '咳嗽': [
-    { id: 'f_k1', text: '咳嗽有痰還是乾咳？', options: [
+    { id: 'f_k1', text: '你是乾咳還是有痰？', options: [
       { value: '乾咳', label: '乾咳（沒有痰）' },
-      { value: '有痰', label: '有痰' },
-      { value: '痰多', label: '痰很多' },
-    ]},
-    { id: 'f_k2', text: '痰的顏色？', options: [
-      { value: '白', label: '白 / 透明' },
-      { value: '黃', label: '黃 / 綠' },
-      { value: '少', label: '很少痰' },
-    ]},
-    { id: 'f_k3', text: '咳嗽什麼時間最嚴重？', options: [
-      { value: '白天', label: '白天為主' },
-      { value: '晚上', label: '晚上躺下後' },
-      { value: '清晨', label: '清晨起床時' },
-      { value: '全天', label: '整天都咳' },
+      { value: '有痰', label: '有痰（白/黃）' },
+      { value: '痰多', label: '痰很多、喉嚨有異物' },
     ]},
   ],
   '皮膚': [
-    { id: 'f_sk1', text: '皮膚問題主要在哪裡？', options: [
-      { value: '臉', label: '臉部' },
-      { value: '手腳', label: '手腳' },
-      { value: '背部', label: '背部' },
-      { value: '全身', label: '全身都有' },
-    ]},
-    { id: 'f_sk2', text: '癢的時間規律？', options: [
-      { value: '晚上', label: '晚上睡覺時最癢' },
-      { value: '白天', label: '白天活動時' },
-      { value: '悶熱', label: '悶熱/流汗時' },
-      { value: '無規律', label: '沒特別規律' },
-    ]},
-    { id: 'f_sk3', text: '皮膚問題持續多久了？', options: [
-      { value: '幾天', label: '幾天（急性）' },
-      { value: '幾週', label: '幾週' },
-      { value: '幾月', label: '幾個月' },
-      { value: '年以上', label: '一年以上（慢性）' },
+    { id: 'f_sk1', text: '皮膚問題最困擾你的是什麼？', options: [
+      { value: '癢', label: '癢（尤其晚上/悶熱時）' },
+      { value: '長痘', label: '長痘/瘡/囊腫' },
+      { value: '過敏', label: '過敏/紅疹/蕁麻疹' },
+      { value: '脫皮', label: '脫皮/乾燥/緊繃' },
     ]},
   ],
   '情緒': [
-    { id: 'f_e1', text: '情緒主要狀態？', options: [
+    { id: 'f_e1', text: '你的情緒主要是哪種狀態？', options: [
       { value: '焦慮', label: '焦慮 / 緊張 / 擔心' },
-      { value: '低落', label: '低落 / 抑鬱 / 對什麼都沒興趣' },
+      { value: '低落', label: '低落 / 對什麼都沒興趣' },
       { value: '易怒', label: '易怒 / 脾氣大' },
       { value: '壓力', label: '壓力大 / 緊繃' },
     ]},
-    { id: 'f_e2', text: '睡眠受到情緒影響嗎？', options: [
-      { value: '無', label: '沒有，睡眠正常' },
-      { value: '輕微', label: '輕微影響' },
-      { value: '嚴重', label: '失眠或嗜睡' },
-    ]},
-    { id: 'f_e3', text: '身體有沒有不舒服伴隨情緒問題？', options: [
-      { value: '胸悶', label: '胸悶 / 心悸' },
-      { value: '胃', label: '胃痛 / 消化問題' },
-      { value: '頭痛', label: '頭痛 / 頭暈' },
-      { value: '無', label: '主要是情緒問題' },
-    ]},
   ],
   '月經': [
-    { id: 'f_m1', text: '月經週期正常嗎？', options: [
-      { value: '正常', label: '正常（25-35天）' },
+    { id: 'f_m1', text: '你的月經週期正常嗎？', options: [
+      { value: '正常', label: '正常（25-35天一次）' },
       { value: '提前', label: '提前（不到25天）' },
       { value: '推遲', label: '推遲（超過35天）' },
-      { value: '不規律', label: '不規律' },
-    ]},
-    { id: 'f_m2', text: '經量情況？', options: [
-      { value: '正常', label: '正常' },
-      { value: '多', label: '量多（側漏）' },
-      { value: '少', label: '量少（2天就結束）' },
-    ]},
-    { id: 'f_m3', text: '經期有沒有痛經？', options: [
-      { value: '無', label: '沒有' },
-      { value: '輕微', label: '輕微不適' },
-      { value: '嚴重', label: '疼痛影響生活' },
+      { value: '不規律', label: '不規律、時早時遲' },
     ]},
   ],
   '疼痛': [
-    { id: 'f_p1', text: '疼痛位置？', options: [
-      { value: '腰', label: '腰痛 / 腰酸' },
+    { id: 'f_p1', text: '你哪裡最痛？', options: [
+      { value: '腰', label: '腰痛 / 腰膝酸軟' },
       { value: '關節', label: '關節疼痛' },
-      { value: '肌肉', label: '肌肉酸痛' },
-      { value: '神經', label: '神經痛（刺痛/麻木）' },
-    ]},
-    { id: 'f_p2', text: '疼痛性質？', options: [
-      { value: '冷痛', label: '冷痛（遇冷加劇）' },
-      { value: '熱痛', label: '熱痛（遇熱加劇）' },
-      { value: '刺痛', label: '刺痛 / 針刺感' },
-      { value: '酸痛', label: '酸軟無力' },
-    ]},
-    { id: 'f_p3', text: '疼痛與時間/活動關係？', options: [
-      { value: '休息', label: '休息時更痛' },
-      { value: '活動', label: '活動/走路時更痛' },
-      { value: '天氣', label: '與天氣變化相關' },
+      { value: '肩頸', label: '肩頸僵硬/酸痛' },
+      { value: '肌肉', label: '肌肉酸痛 / 全身痛' },
     ]},
   ],
   '減肥': [
-    { id: 'f_l1', text: '減肥的主要原因是？', options: [
-      { value: '美觀', label: '外觀 / 線條' },
-      { value: '健康', label: '健康考量（三高/脂肪肝）' },
-      { value: '活力', label: '提升活力' },
-      { value: '生育', label: '備孕需要' },
-    ]},
-    { id: 'f_l2', text: '目前體重困擾程度？', options: [
+    { id: 'f_l1', text: '減肥困擾你多久了？', options: [
       { value: '輕微', label: '輕微（想稍微緊實）' },
       { value: '中等', label: '中等（已影響自信）' },
       { value: '嚴重', label: '嚴重（健康亮紅燈）' },
     ]},
-    { id: 'f_l3', text: '有嘗試過減肥嗎？', options: [
-      { value: '無', label: '很少或沒有' },
-      { value: '運動', label: '運動減肥' },
-      { value: '飲食', label: '控制飲食' },
-      { value: '藥物', label: '吃藥/產品' },
-    ]},
   ],
   '備孕': [
-    { id: 'f_b1', text: '備孕多久了？', options: [
+    { id: 'f_b1', text: '備孕或不孕困擾你多久了？', options: [
       { value: '未開始', label: '還沒正式備孕' },
       { value: '半年內', label: '半年內' },
-      { value: '1年內', label: '半年～1年' },
-      { value: '1年以上', label: '超過1年' },
-    ]},
-    { id: 'f_b2', text: '有沒有做過相關檢查？', options: [
-      { value: '無', label: '沒有' },
-      { value: '先生', label: '先生有做過' },
-      { value: '太太', label: '太太有做過' },
-      { value: '雙方', label: '雙方都有' },
-    ]},
-    { id: 'f_b3', text: '月經規律嗎？（女性填寫）', options: [
-      { value: '規律', label: '規律（25-35天）' },
-      { value: '不規律', label: '不規律' },
-      { value: '停經', label: '已停經' },
-      { value: '不適用', label: '不適用' },
+      { value: '半年到一年', label: '半年～1年' },
+      { value: '一年以上', label: '超過1年' },
     ]},
   ],
   '過敏': [
-    { id: 'f_a1', text: '過敏主要症狀？', options: [
+    { id: 'f_a1', text: '過敏主要症狀是什麼？', options: [
       { value: '鼻', label: '鼻過敏 / 打噴嚏 / 鼻塞' },
       { value: '皮', label: '皮膚癢 / 蕁麻疹 / 濕疹' },
       { value: '眼', label: '眼睛癢 / 紅腫' },
       { value: '呼', label: '氣喘 / 呼吸困難' },
     ]},
-    { id: 'f_a2', text: '過敏頻率？', options: [
-      { value: '季節性', label: '季節性（春夏/秋冬）' },
-      { value: '常年', label: '常年都有' },
-      { value: '偶發', label: '偶爾發作' },
-      { value: '嚴重', label: '經常發作且嚴重' },
-    ]},
-    { id: 'f_a3', text: '有沒有做過過敏原檢測？', options: [
-      { value: '無', label: '沒有' },
-      { value: '有', label: '有，知道過敏原' },
-      { value: '部分', label: '有，但不完全' },
-    ]},
   ],
   '調養': [
-    { id: 'f_w1', text: '您想要調養哪方面？', options: [
-      { value: ' general', label: '整體身體調養' },
-      { value: '免疫', label: '提升免疫力' },
-      { value: '疲勞', label: '改善慢性疲勞' },
+    { id: 'f_w1', text: '你最想改善的是什麼？', options: [
+      { value: '免疫', label: '提升免疫力 / 少感冒' },
+      { value: '疲勞', label: '改善慢性疲勞 / 沒精神' },
       { value: '睡眠', label: '改善睡眠品質' },
       { value: '消化', label: '腸胃功能調整' },
       { value: '情緒', label: '情緒壓力舒緩' },
     ]},
-    { id: 'f_w2', text: '過去有做過健康檢查嗎？', options: [
-      { value: '無', label: '很少或沒有' },
-      { value: '正常', label: '檢查結果正常' },
-      { value: '異常', label: '有些異常指標' },
-      { value: '有問題', label: '有明確健康問題' },
-    ]},
-    { id: 'f_w3', text: '平時作息規律嗎？', options: [
-      { value: '規律', label: '規律（早睡早起）' },
-      { value: '一般', label: '還算正常' },
-      { value: '不規律', label: '常熬夜/日夜顛倒' },
-    ]},
   ],
   '其他': [
-    { id: 'f_o1', text: '不舒服的部位或症狀？', options: [
+    { id: 'f_o1', text: '不舒服主要在哪裡？', options: [
       { value: '頭部', label: '頭暈 / 頭痛' },
       { value: '胸腹', label: '胸悶 / 腹脹 / 胃痛' },
       { value: '四肢', label: '手腳麻木 / 關節痛' },
       { value: '全身', label: '全身性症狀' },
-      { value: '其他', label: '其他部位' },
-    ]},
-    { id: 'f_o2', text: '這個問題持續多久了？', options: [
-      { value: '幾天', label: '几天内' },
-      { value: '幾週', label: '几週' },
-      { value: '幾月', label: '几个月' },
-      { value: '年以上', label: '一年以上' },
-    ]},
-    { id: 'f_o3', text: '有沒有做過相關檢查或治療？', options: [
-      { value: '無', label: '沒有' },
-      { value: '檢查', label: '有做過檢查' },
-      { value: '治療', label: '有治療過（中/西）' },
     ]},
   ],
 }
 
-// 詳細問診補充題
+// 詳細問診補充題（完整十問歌版本）
 const DETAILED_EXTRA: Question[] = [
-  { id: 'd1', text: '怕冷程度？', options: [
-    { value: '不怕', label: '不怕冷' },
-    { value: '輕微', label: '輕微怕冷' },
-    { value: '很怕', label: '很怕冷（冬天離不開被）' },
-    { value: '極度', label: '極度怕冷' },
+  // 一問寒熱
+  { id: 'd_cold', text: '你容易怕冷還是怕熱？', options: [
+    { value: '怕冷', label: '怕冷（手腳冰涼、喜歡熱）' },
+    { value: '怕熱', label: '怕熱（想吃冰的、容易出汗）' },
+    { value: '兩者', label: '兩者都有（上下半身溫差大）' },
+    { value: '正常', label: '對溫度沒有特別偏好' },
   ]},
-  { id: 'd2', text: '怕熱程度？', options: [
-    { value: '不怕', label: '不怕熱' },
-    { value: '輕微', label: '輕微怕熱' },
-    { value: '很怕', label: '很怕熱' },
+  { id: 'd_cold_2', text: '怕冷主要在身體哪個部位？', options: [
+    { value: '手腳', label: '手腳冰冷' },
+    { value: '腰背', label: '腰背冷痛/酸痛' },
+    { value: '全身', label: '全身都怕冷' },
+    { value: '無', label: '不怕冷' },
   ]},
-  { id: 'd3', text: '口渴情況？', options: [
-    { value: '不渴', label: '不口渴' },
-    { value: '想喝冷水', label: '想喝冷水 / 冰的' },
-    { value: '想喝熱水', label: '想喝熱水' },
-    { value: '喝不多', label: '口渴但不想喝水' },
+  { id: 'd_heat', text: '怕熱的表現是什麼？', options: [
+    { value: '手腳心', label: '手腳心發燙（下午/晚上明顯）' },
+    { value: '全身', label: '全身燥熱、想吹風' },
+    { value: '午後', label: '午後潮熱（下午3-5點最明顯）' },
+    { value: '無', label: '不怕熱' },
   ]},
-  { id: 'd4', text: '胃口情況？', options: [
-    { value: '正常', label: '正常' },
-    { value: '不振', label: '食慾不振' },
-    { value: '亢進', label: '容易飢餓' },
-    { value: '胃脹', label: '吃一點就飽' },
+  // 二問汗
+  { id: 'd_sweat', text: '你平時容易出汗嗎？', options: [
+    { value: '不容易', label: '不容易出汗' },
+    { value: '自汗', label: '稍微動一下就滿頭大汗（自汗）' },
+    { value: '盜汗', label: '睡覺時出汗、醒來就停（盜汗）' },
+    { value: '正常', label: '運動後正常出汗' },
   ]},
-  { id: 'd5', text: '小便情況？', options: [
-    { value: '正常', label: '正常' },
-    { value: '清長', label: '尿清、量多' },
-    { value: '短赤', label: '尿黃、量少' },
-    { value: '頻數', label: '尿頻 / 夜尿多' },
+  { id: 'd_sweat_2', text: '出汗的主要部位？', options: [
+    { value: '頭面', label: '頭面部為主' },
+    { value: '手腳', label: '手腳心為主' },
+    { value: '全身', label: '全身出汗' },
+    { value: '局部', label: '只有特定部位（如胸口）' },
   ]},
-  { id: 'd6', text: '有沒有耳鳴或聽力問題？', options: [
+  // 三問頭身
+  { id: 'd_head', text: '你有頭暈或頭痛嗎？', options: [
     { value: '無', label: '沒有' },
-    { value: '輕微', label: '輕微耳鳴' },
-    { value: '明顯', label: '明顯耳鳴/聽力下降' },
-  ]},
-  { id: 'd7', text: '過去有沒有大手術或長期服用藥物？', options: [
-    { value: '無', label: '沒有' },
-    { value: '手術', label: '有大手術史' },
-    { value: '藥物', label: '長期服用藥物' },
+    { value: '頭暈', label: '頭暈（昏沉、走路飄）' },
+    { value: '頭痛', label: '頭痛（脹/刺/悶）' },
     { value: '兩者', label: '兩者都有' },
   ]},
-  { id: 'd8', text: '您認為發病或症狀加重的原因是什麼？', type: 'input_text', placeholder: '壓力/飲食/作息/感冒/情緒...' },
+  { id: 'd_body', text: '身體有沒有酸痛或乏力？', options: [
+    { value: '無', label: '沒有' },
+    { value: '腰酸', label: '腰酸/腰膝酸軟' },
+    { value: '肩頸', label: '肩頸僵硬/酸痛' },
+    { value: '全身', label: '全身乏力/沉重' },
+  ]},
+  // 四問便
+  { id: 'd_stool', text: '大便形態？', options: [
+    { value: '正常', label: '成形正常' },
+    { value: '硬', label: '乾硬、便秘（2-3天一次）' },
+    { value: '軟', label: '偏軟、容易腹瀉' },
+    { value: '黏', label: '黏膩、粘馬桶、冲不乾淨' },
+  ]},
+  { id: 'd_urine', text: '小便情況？', options: [
+    { value: '正常', label: '正常（白天4-6次，夜晚0-1次）' },
+    { value: '清長', label: '尿清、量多（可能是氣虛/陽虛）' },
+    { value: '短赤', label: '尿黃、量少、有灼熱感' },
+    { value: '頻數', label: '尿頻、夜尿多（超過2次）' },
+  ]},
+  // 五問飲食
+  { id: 'd_appetite', text: '食欲情況？', options: [
+    { value: '正常', label: '正常' },
+    { value: '不振', label: '吃不下東西' },
+    { value: '過旺', label: '容易飢餓、吃很多' },
+    { value: '胃脹', label: '吃一點就飽、容易胃脹' },
+  ]},
+  { id: 'd_thirst', text: '口渴情況？', options: [
+    { value: '不渴', label: '不口渴、不想喝水' },
+    { value: '冷飲', label: '想喝冷水/冰的' },
+    { value: '熱飲', label: '想喝熱水/溫水' },
+    { value: '不多', label: '口渴但不想喝水（可能陰虛）' },
+  ]},
+  // 六問胸腹
+  { id: 'd_chest', text: '胸口或腹部有不舒服嗎？', options: [
+    { value: '無', label: '沒有' },
+    { value: '胸悶', label: '胸悶/心悸（氣機不暢）' },
+    { value: '腹脹', label: '腹脹/消化不良' },
+    { value: '脇痛', label: '脇肋脹痛（肝氣鬱結）' },
+  ]},
+  // 七問聽力
+  { id: 'd_ear', text: '聽力或耳朵有問題嗎？', options: [
+    { value: '無', label: '沒有' },
+    { value: '耳鳴', label: '耳鳴（蟬叫/嗡嗡聲）' },
+    { value: '聽力', label: '聽力下降' },
+    { value: '耳塞', label: '耳朵悶塞感' },
+  ]},
+  // 八問口咽
+  { id: 'd_mouth', text: '口腔/咽喉有什麼不適？', options: [
+    { value: '無', label: '沒有' },
+    { value: '口苦', label: '口苦（尤其早上）' },
+    { value: '口乾', label: '口乾（喝水也不解渴）' },
+    { value: '咽乾', label: '咽喉乾癢、異物感' },
+  ]},
+  // 九問舊病
+  { id: 'd_history', text: '過去有哪些健康問題？（可多選）', options: [
+    { value: '無', label: '沒有重大疾病' },
+    { value: '消化', label: '腸胃問題（胃炎/潰痬/便秘）' },
+    { value: '呼吸', label: '呼吸系統（氣喘/鼻炎/咳嗽）' },
+    { value: '代謝', label: '代謝問題（三高/甲狀腺）' },
+    { value: '情緒', label: '情緒問題（抑鬱/焦慮）' },
+    { value: '手術', label: '有大手術史' },
+  ]},
+  // 十問病因
+  { id: 'd_cause', text: '你認為引起不適的主要原因是什麼？', type: 'input_text', placeholder: '如：工作壓力大/飲食不正常/熬夜/感冒後遺症/情緒波動...' },
+  // 經帶（女性）
+  { id: 'd_menses', text: '月經情況？（女性填寫）', options: [
+    { value: '正常', label: '正常（25-35天一次，4-7天結束）' },
+    { value: '提前', label: '月經提前（不到25天）' },
+    { value: '推遲', label: '月經推遲（超過35天）' },
+    { value: '不規律', label: '不規律（時早時遲）' },
+    { value: '停經', label: '已停經/更年期' },
+  ]},
+  { id: 'd_discharge', text: '白帶情況？', options: [
+    { value: '正常', label: '正常（透明/乳白、無異味）' },
+    { value: '多', label: '白帶多（顏色黃/綠/有異味）' },
+    { value: '少', label: '陰道乾澀' },
+    { value: '不適用', label: '不適用（男性/停經）' },
+  ]},
 ]
 
 // ============================================

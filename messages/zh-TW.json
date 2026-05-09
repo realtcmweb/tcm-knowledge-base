@@ -47,8 +47,8 @@
   "mode": {
     "fast": "快速問診",
     "detailed": "詳細問診",
-    "fastDesc": "2 分鐘，精選核心題，快速獲得分析",
-    "detailedDesc": "5-8 分鐘，完整十問歌，深度分析體質"
+    "fastDesc": "2 分鐘 · 精選 12 題 · 適合想快點知道結果的你",
+    "detailedDesc": "10 分鐘 · 完整十問 · 適合真的想了解自己體質的你"
   },
   "questionnaire": {
     "step": "第 {current} 步",
