@@ -1088,7 +1088,7 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
 
       {/* Header — Zen minimal */}
       <header className="sticky top-0 z-50" style={{ background: 'rgba(250,250,247,0.92)', backdropFilter: 'blur(12px)', borderBottom: '1px solid #E5E2DA' }}>
-        <div className="max-w-lg mx-auto px-5 py-3.5 flex items-center justify-between">
+        <div className="max-w-2xl mx-auto px-5 py-3.5 flex items-center justify-between">
           {/* 左：標誌 */}
           <div className="flex items-center gap-3">
             <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1142,7 +1142,7 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
 
       {/* ── 模式選擇 ── */}
       {step === 'mode' && (
-        <main className="max-w-lg mx-auto px-5 py-14 min-h-[80vh] flex flex-col">
+        <main className="max-w-2xl mx-auto px-5 py-14 min-h-[80vh] flex flex-col">
 
           {/* ── Hero ── */}
           <div className="text-center mb-10">
@@ -1296,25 +1296,27 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
         </main>
       )}      {/* ── 基本資料 ── */}
       {step === 'basic' && BASIC_QUESTIONS[qIndex] && (
-        <main className="max-w-lg mx-auto px-5 py-10 min-h-[70vh] flex flex-col justify-center">
-          <div className="text-center mb-7">
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <div style={{ width: '24px', height: '1px', background: '#E5E2DA' }} />
-              <p className="text-xs tracking-widest" style={{ color: '#A3B5A0', letterSpacing: '0.15em' }}>基本資料</p>
-              <div style={{ width: '24px', height: '1px', background: '#E5E2DA' }} />
+        <main className="max-w-2xl mx-auto px-6 pt-20 pb-16 min-h-[80vh] flex flex-col justify-center">
+
+          <div className="text-center mb-14">
+            <div className="flex items-center justify-center gap-3 mb-3">
+              <div style={{ width: '28px', height: '1px', background: '#E5E2DA' }} />
+              <p className="text-xs tracking-widest" style={{ color: '#A3B5A0', letterSpacing: '0.18em' }}>基本資料</p>
+              <div style={{ width: '28px', height: '1px', background: '#E5E2DA' }} />
             </div>
-            <p className="text-xs" style={{ color: '#8B6E5A' }}>
+            <p className="text-base" style={{ color: '#8B6E5A' }}>
               {mode === 'fast' ? t('mode.fast') : mode === 'detailed' ? t('mode.detailed') : '智能問診'} · 協助精準判斷
             </p>
           </div>
+
           {(() => {
             const q = BASIC_QUESTIONS[qIndex]
             if (q.type === 'input_number') {
               const isHeight = q.id === 'height'
               return (
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {q.groupLabel && <p className="text-xs text-center mb-1" style={{ color: '#A3B5A0', letterSpacing: '0.12em' }}>{q.groupLabel}</p>}
-                  <h2 className="text-xl font-light text-center mb-6" style={{ color: '#1C2C24', letterSpacing: '0.06em', lineHeight: 1.8 }}>{q.text}</h2>
+                  <h2 className="text-3xl font-light text-center mb-10" style={{ color: '#1C2C24', letterSpacing: '-0.01em', lineHeight: 1.3 }}>{q.text}</h2>
                   <NumberInputWithUnit
                     value={answers[q.id] || ''}
                     onChange={v => setAnswers({ ...answers, [q.id]: v })}
@@ -1325,24 +1327,24 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
                     if (qIndex < BASIC_QUESTIONS.length - 1) setQIndex(qIndex + 1)
                     else (mode === 'smart' ? setStep('smart') : setStep('chief'))
                   }}
-                    className="w-full py-4 rounded-xl font-medium text-sm transition-all duration-200"
-                    style={{ background: '#2C4A3E', color: '#FAFAF7', letterSpacing: '0.08em' }}
-                    onMouseEnter={e => e.currentTarget.style.background = '#3D5E4F'}
-                    onMouseLeave={e => e.currentTarget.style.background = '#2C4A3E'}>
+                    className="w-full py-4 rounded-2xl font-medium text-base transition-all duration-300"
+                    style={{ background: '#1C2C24', color: '#FAFAF7', letterSpacing: '0.04em' }}
+                    onMouseEnter={e => e.currentTarget.style.background = '#2C4A3E'}
+                    onMouseLeave={e => e.currentTarget.style.background = '#1C2C24'}>
                     確定
                   </button>
                   <button onClick={() => {
                     if (qIndex < BASIC_QUESTIONS.length - 1) setQIndex(qIndex + 1)
                     else (mode === 'smart' ? setStep('smart') : setStep('chief'))
                   }}
-                    className="w-full py-3 text-sm transition-all duration-200"
+                    className="w-full py-3 text-sm transition-all duration-300"
                     style={{ color: '#A3B5A0' }}
                     onMouseEnter={e => e.currentTarget.style.color = '#8B6E5A'}
                     onMouseLeave={e => e.currentTarget.style.color = '#A3B5A0'}>
                     跳過（選填）
                   </button>
                   {qIndex > 0 && <button onClick={() => setQIndex(qIndex - 1)}
-                    className="text-xs transition-all duration-200"
+                    className="text-xs transition-all duration-300"
                     style={{ color: '#A3B5A0' }}
                     onMouseEnter={e => e.currentTarget.style.color = '#8B6E5A'}
                     onMouseLeave={e => e.currentTarget.style.color = '#A3B5A0'}>
@@ -1352,8 +1354,8 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
               )
             }
             return (
-              <div className="space-y-2.5">
-                <h2 className="text-xl font-light text-center mb-6" style={{ color: '#1C2C24', letterSpacing: '0.06em', lineHeight: 1.8 }}>{q.text}</h2>
+              <div className="space-y-3">
+                <h2 className="text-3xl font-light text-center mb-10" style={{ color: '#1C2C24', letterSpacing: '-0.01em', lineHeight: 1.3 }}>{q.text}</h2>
                 {q.options && q.options.map(opt => (
                   <button key={opt.value} onClick={() => {
                     const newA = { ...answers, [q.id]: opt.value }
@@ -1363,11 +1365,11 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
                       else (mode === 'smart' ? setStep('smart') : setStep('chief'))
                     }, 350)
                   }}
-                    className="w-full px-5 py-4 rounded-xl text-left text-sm transition-all duration-200"
+                    className="w-full py-4 px-5 rounded-2xl text-left text-base transition-all duration-300"
                     style={{
                       background: answers[q.id] === opt.value ? 'rgba(44,74,62,0.08)' : '#FFFFFF',
                       border: answers[q.id] === opt.value ? '1px solid #2C4A3E' : '1px solid #E5E2DA',
-                      color: answers[q.id] === opt.value ? '#2C4A3E' : '#3A3A32',
+                      color: answers[q.id] === opt.value ? '#2C4A3E' : '#1C2C24',
                       fontWeight: answers[q.id] === opt.value ? '500' : '400',
                       letterSpacing: '0.02em',
                     }}
@@ -1377,23 +1379,23 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
                   </button>
                 ))}
                 {q.hasCustomAgeInput && (
-                  <div className="mt-4 pt-4" style={{ borderTop: '1px solid #E5E2DA' }}>
-                    <p className="text-xs text-center mb-2" style={{ color: '#A3B5A0' }}>或直接輸入年齡：</p>
-                    <div className="flex items-center gap-3 bg-white rounded-xl px-4 py-3 transition"
+                  <div className="mt-5 pt-5" style={{ borderTop: '1px solid #E5E2DA' }}>
+                    <p className="text-xs text-center mb-3" style={{ color: '#A3B5A0' }}>或直接輸入年齡</p>
+                    <div className="flex items-center gap-3 bg-white rounded-2xl px-4 py-3.5 transition"
                       style={{ border: '1px solid #E5E2DA' }}
                       onFocus={e => e.currentTarget.style.borderColor = '#2C4A3E'}
                       onBlur={e => e.currentTarget.style.borderColor = '#E5E2DA'}>
                       <input type="number" placeholder="例：35"
                         value={answers[q.id] || ''}
                         onChange={e => setAnswers({ ...answers, [q.id]: e.target.value })}
-                        className="flex-1 outline-none" style={{ color: '#1C2C24' }} />
+                        className="flex-1 outline-none text-base" style={{ color: '#1C2C24' }} />
                       <span className="text-sm" style={{ color: '#A3B5A0' }}>歲</span>
                     </div>
                     <button onClick={() => {
                       if (qIndex < BASIC_QUESTIONS.length - 1) setQIndex(qIndex + 1)
                       else (mode === 'smart' ? setStep('smart') : setStep('chief'))
                     }}
-                      className="w-full py-3 mt-2 rounded-xl text-sm transition-all duration-200"
+                      className="w-full py-3 mt-3 rounded-2xl text-sm transition-all duration-300"
                       style={{ background: '#F0EDE6', color: '#7A7A6A' }}
                       onMouseEnter={e => { e.currentTarget.style.background = '#E5E2DA'; e.currentTarget.style.color = '#4A4A42' }}
                       onMouseLeave={e => { e.currentTarget.style.background = '#F0EDE6'; e.currentTarget.style.color = '#7A7A6A' }}>
@@ -1402,7 +1404,7 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
                   </div>
                 )}
                 <button onClick={() => setQIndex(qIndex - 1)}
-                  className="text-xs transition-all duration-200"
+                  className="text-xs transition-all duration-300"
                   style={{ color: '#A3B5A0' }}
                   onMouseEnter={e => e.currentTarget.style.color = '#8B6E5A'}
                   onMouseLeave={e => e.currentTarget.style.color = '#A3B5A0'}>
@@ -1413,69 +1415,73 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
           })()}
         </main>
       )}      {step === 'chief' && (
-        <main className="max-w-lg mx-auto px-5 py-10 min-h-[70vh] flex flex-col">
-          <div className="text-center mb-8">
-            <p className="text-xs tracking-widest mb-2" style={{ color: '#A3B5A0', letterSpacing: '0.15em' }}>第 1 步</p>
-            <h2 className="text-xl font-light mb-1" style={{ color: '#1C2C24', letterSpacing: '0.08em' }}>您今天想改善什麼？</h2>
-            <p className="text-xs" style={{ color: '#8B6E5A' }}>選一項，AI為您量身問診</p>
+        <main className="max-w-2xl mx-auto px-6 pt-20 pb-16 min-h-[80vh] flex flex-col justify-center">
+
+          <div className="text-center mb-12">
+            <p className="text-xs tracking-widest mb-3" style={{ color: '#A3B5A0', letterSpacing: '0.20em' }}>第 1 步</p>
+            <h2 className="text-4xl font-light mb-3" style={{ color: '#1C2C24', letterSpacing: '-0.01em', lineHeight: 1.15 }}>
+              您今天想改善什麼？
+            </h2>
+            <p className="text-base" style={{ color: '#8B6E5A' }}>選一項，AI為您量身問診</p>
           </div>
 
-          <div className="grid grid-cols-2 gap-3 mb-4">
+          <div className="grid grid-cols-2 gap-3 mb-10">
             {[
-              { value: '調養', label: '調養身體', desc: '健康保養', icon: <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M11 3C11 3 5 7.5 5 12a6 6 0 0012 0C17 7.5 11 3 11 3z" stroke="#4A7C6A" strokeWidth="1.2" fill="none"/><path d="M11 8v4M9 13h4" stroke="#4A7C6A" strokeWidth="1.2" strokeLinecap="round"/></svg> },
-              { value: '減肥', label: '減肥控重', desc: '體重管理', icon: <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="7.5" stroke="#8B6E5A" strokeWidth="1.2"/><path d="M11 7v8M8 9.5h6" stroke="#8B6E5A" strokeWidth="1.2" strokeLinecap="round"/></svg> },
-              { value: '失眠', label: '失眠問題', desc: '入睡困難', icon: <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M13 3L13 5M5.5 5.5L7 7M3 11L5 11M5.5 16.5L7 15M17 3L15 5M16.5 5.5L15 7M19 11L17 11" stroke="#4A7C6A" strokeWidth="1.2" strokeLinecap="round"/><path d="M11 7C8.5 7 6.5 9 6.5 11.5S8.5 16 11 16s4.5-2 4.5-4.5" stroke="#4A7C6A" strokeWidth="1.2" strokeLinecap="round"/></svg> },
-              { value: '情緒', label: '情緒壓力', desc: '焦慮抑鬱', icon: <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="7.5" stroke="#8B6E5A" strokeWidth="1.2"/><path d="M8 9c.8-1 2.2-1 3 0M13.5 11.5c0 1.5-1.5 2.5-2.5 2.5" stroke="#8B6E5A" strokeWidth="1.2" strokeLinecap="round"/></svg> },
-              { value: '疼痛', label: '腰酸關節痛', desc: '慢性疼痛', icon: <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M5 11h12M11 5v12" stroke="#8B6E5A" strokeWidth="1.2" strokeLinecap="round"/><circle cx="11" cy="11" r="3" stroke="#8B6E5A" strokeWidth="1.2"/></svg> },
-              { value: '過敏', label: '過敏鼻炎', desc: '鼻皮膚', icon: <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M11 4v14M7 8l4-4 4 4M4 14h14" stroke="#4A7C6A" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/></svg> },
-              { value: '皮膚', label: '皮膚問題', desc: '濕疹痘痘', icon: <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><ellipse cx="11" cy="11" rx="7.5" ry="5.5" stroke="#4A7C6A" strokeWidth="1.2" transform="rotate(-20 11 11)"/><circle cx="8" cy="10" r="1" fill="#4A7C6A"/><circle cx="12" cy="13" r="1" fill="#4A7C6A"/></svg> },
-              { value: '月經', label: '月經婦科', desc: '經期調理', icon: <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="7.5" stroke="#B5A0A0" strokeWidth="1.2"/><circle cx="11" cy="11" r="3.5" stroke="#B5A0A0" strokeWidth="1.2"/></svg>, femaleOnly: true },
-              { value: '備孕', label: '備孕調理', desc: '不孕孕前', icon: <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M11 4C11 4 6 8 6 13a5 5 0 0010 0C16 8 11 4 11 4z" stroke="#B5A0A0" strokeWidth="1.2" fill="none"/><path d="M8 13c0 1.5 1.5 2.5 3 2.5" stroke="#B5A0A0" strokeWidth="1.2" strokeLinecap="round"/></svg>, femaleOnly: true },
+              { value: '調養', label: '調養身體', desc: '健康保養', icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 4C12 4 7 9 7 13.5a5 5 0 0010 0C17 9 12 4 12 4z" stroke="#4A7C6A" strokeWidth="1.2" fill="none"/><path d="M12 9v3M10 13h4" stroke="#4A7C6A" strokeWidth="1.2" strokeLinecap="round"/></svg> },
+              { value: '減肥', label: '減肥控重', desc: '體重管理', icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="#8B6E5A" strokeWidth="1.2"/><path d="M12 8v8M8 12h8" stroke="#8B6E5A" strokeWidth="1.2" strokeLinecap="round"/></svg> },
+              { value: '失眠', label: '失眠問題', desc: '入睡困難', icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M14 3L14 6M5.5 6.5L7 8M4 12h3M17 12h3M5.5 17.5L7 16M14 18v3" stroke="#4A7C6A" strokeWidth="1.2" strokeLinecap="round"/><path d="M12 8C9.5 8 7.5 10 7.5 12.5S9.5 17 12 17s4.5-2 4.5-4.5" stroke="#4A7C6A" strokeWidth="1.2" strokeLinecap="round"/></svg> },
+              { value: '情緒', label: '情緒壓力', desc: '焦慮抑鬱', icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="#8B6E5A" strokeWidth="1.2"/><path d="M9 10c1-1 2.2-1.5 3 0M14.5 12.5c0 1.5-1.5 2.5-2.5 2.5" stroke="#8B6E5A" strokeWidth="1.2" strokeLinecap="round"/></svg> },
+              { value: '疼痛', label: '腰酸關節痛', desc: '慢性疼痛', icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M6 12h12M12 6v12" stroke="#8B6E5A" strokeWidth="1.2" strokeLinecap="round"/><circle cx="12" cy="12" r="3.5" stroke="#8B6E5A" strokeWidth="1.2"/></svg> },
+              { value: '過敏', label: '過敏鼻炎', desc: '鼻皮膚', icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M7 9l5-4 5 4M5 15h14" stroke="#4A7C6A" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/></svg> },
+              { value: '皮膚', label: '皮膚問題', desc: '濕疹痘痘', icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><ellipse cx="12" cy="12" rx="8" ry="6" stroke="#4A7C6A" strokeWidth="1.2" transform="rotate(-20 12 12)"/><circle cx="9" cy="11" r="1.2" fill="#4A7C6A"/><circle cx="14" cy="14" r="1.2" fill="#4A7C6A"/></svg> },
+              { value: '月經', label: '月經婦科', desc: '經期調理', icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="#B5A0A0" strokeWidth="1.2"/><circle cx="12" cy="12" r="4" stroke="#B5A0A0" strokeWidth="1.2"/></svg>, femaleOnly: true },
+              { value: '備孕', label: '備孕調理', desc: '不孕孕前', icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 4C12 4 7 9 7 14a5 5 0 0010 0C17 9 12 4 12 4z" stroke="#B5A0A0" strokeWidth="1.2" fill="none"/><path d="M9 14c0 1.5 1.5 2.5 3 2.5" stroke="#B5A0A0" strokeWidth="1.2" strokeLinecap="round"/></svg>, femaleOnly: true },
             ].map(c => {
               if (c.femaleOnly && answers.gender === '男') return null
               const isActive = answers.chief === c.value
               return (
                 <button key={c.value}
                   onClick={() => { setAnswers({ ...answers, chief: c.value }); setStep('questionnaire'); setQIndex(0) }}
-                  className="py-4 rounded-xl text-center transition-all duration-200 active:scale-95"
+                  className="py-7 px-4 rounded-2xl text-center transition-all duration-300 active:scale-95"
                   style={{
                     background: isActive ? 'rgba(44,74,62,0.08)' : '#FFFFFF',
                     border: isActive ? '1.5px solid #2C4A3E' : '1px solid #E5E2DA',
-                    boxShadow: isActive ? '0 2px 12px rgba(44,74,62,0.10)' : '0 1px 4px rgba(44,74,62,0.04)',
+                    boxShadow: isActive ? '0 4px 20px rgba(44,74,62,0.10)' : 'none',
                   }}>
-                  <div className="mb-2 flex justify-center">{c.icon}</div>
-                  <p className="text-sm font-medium" style={{ color: isActive ? '#2C4A3E' : '#1C2C24', letterSpacing: '0.03em' }}>{c.label}</p>
-                  <p className="text-xs mt-0.5" style={{ color: '#A3B5A0' }}>{c.desc}</p>
+                  <div className="mb-3 flex justify-center">{c.icon}</div>
+                  <p className="text-base font-medium mb-0.5" style={{ color: isActive ? '#2C4A3E' : '#1C2C24', letterSpacing: '0.02em' }}>{c.label}</p>
+                  <p className="text-xs" style={{ color: '#B5C4B8' }}>{c.desc}</p>
                 </button>
               )
             })}
           </div>
 
           <button onClick={() => { setAnswers({ ...answers, chief: '其他' }); setStep('questionnaire'); setQIndex(0) }}
-            className="w-full py-3.5 text-sm rounded-xl transition-all duration-200"
-            style={{ color: '#8B6E5A', border: '1px dashed #C5B8A8', background: 'transparent' }}
+            className="w-full py-4 text-sm rounded-2xl transition-all duration-300"
+            style={{ color: '#8B6E5A', border: '1px dashed #C5B8A8', background: 'transparent', letterSpacing: '0.04em' }}
             onMouseEnter={e => { e.currentTarget.style.borderColor = '#8B6E5A'; e.currentTarget.style.background = 'rgba(139,110,90,0.04)' }}
             onMouseLeave={e => { e.currentTarget.style.borderColor = '#C5B8A8'; e.currentTarget.style.background = 'transparent' }}>
             + 其他健康問題
           </button>
         </main>
       )}      {step === 'smart' && (
-        <main className="max-w-lg mx-auto px-5 py-10 min-h-[70vh] pb-28">
-          <div className="text-center mb-7">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full mb-3" style={{ background: 'rgba(139,110,90,0.10)' }}>
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1C6 1 2.5 4 2.5 6.5a3.5 3.5 0 007 0C9.5 4 6 1 6 1z" stroke="#8B6E5A" strokeWidth="0.8" fill="none"/><circle cx="6" cy="6.5" r="1.5" stroke="#8B6E5A" strokeWidth="0.8"/></svg>
+        <main className="max-w-2xl mx-auto px-6 pt-20 pb-28 min-h-[80vh]">
+
+          <div className="text-center mb-10">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full mb-4" style={{ background: 'rgba(139,110,90,0.10)' }}>
+              <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M6 1C6 1 2.5 4 2.5 6.5a3.5 3.5 0 007 0C9.5 4 6 1 6 1z" stroke="#8B6E5A" strokeWidth="0.8" fill="none"/><circle cx="6" cy="6.5" r="1.5" stroke="#8B6E5A" strokeWidth="0.8"/></svg>
               <span className="text-xs" style={{ color: '#8B6E5A', letterSpacing: '0.06em' }}>實驗功能</span>
             </div>
-            <h2 className="text-xl font-light mb-1" style={{ color: '#1C2C24', letterSpacing: '0.06em' }}>勾選您有的所有症狀</h2>
-            <p className="text-xs" style={{ color: '#8B6E5A' }}>可多選，越完整分析越準確</p>
+            <h2 className="text-4xl font-light mb-3" style={{ color: '#1C2C24', letterSpacing: '-0.01em', lineHeight: 1.15 }}>勾選您有的所有症狀</h2>
+            <p className="text-base" style={{ color: '#8B6E5A' }}>可多選，越完整分析越準確</p>
           </div>
 
           <div className="space-y-4">
             {SMART_SECTIONS.map(section => {
               const selected = smartAnswers[section.id] || []
               return (
-                <div key={section.id} className="rounded-xl p-4" style={{ background: '#FFFFFF', border: '1px solid #E5E2DA', boxShadow: '0 1px 4px rgba(44,74,62,0.04)' }}>
-                  <h3 className="text-sm font-medium mb-3 flex items-center gap-2" style={{ color: '#2C4A3E', letterSpacing: '0.04em' }}>
+                <div key={section.id} className="rounded-2xl p-5" style={{ background: '#FFFFFF', border: '1px solid #E5E2DA' }}>
+                  <h3 className="text-base font-medium mb-3 flex items-center gap-2" style={{ color: '#1C2C24', letterSpacing: '0.03em' }}>
                     <span style={{ color: '#A3B5A0' }}>{section.icon}</span> {section.title}
                   </h3>
                   <div className="flex flex-wrap gap-2">
@@ -1490,11 +1496,11 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
                               : [...current, symptom.value]
                             setSmartAnswers({ ...smartAnswers, [section.id]: next })
                           }}
-                          className="px-3 py-2 rounded-full text-xs transition-all"
+                          className="px-3 py-2 rounded-full text-sm transition-all"
                           style={{
                             background: isSelected ? 'rgba(44,74,62,0.08)' : 'rgba(44,74,62,0.04)',
                             border: isSelected ? '1px solid #2C4A3E' : '1px solid #E5E2DA',
-                            color: isSelected ? '#2C4A3E' : '#7A7A6A',
+                            color: isSelected ? '#2C4A3E' : '#6A6A5A',
                             fontWeight: isSelected ? '500' : '400',
                           }}>
                           {symptom.label}
@@ -1510,15 +1516,14 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
             })}
           </div>
 
-          {/* 底部固定提交欄 */}
-          <div className="fixed bottom-0 left-0 right-0 p-4 max-w-lg mx-auto" style={{ background: 'rgba(250,250,247,0.95)', backdropFilter: 'blur(12px)', borderTop: '1px solid #E5E2DA' }}>
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs" style={{ color: '#A3B5A0' }}>
+          <div className="fixed bottom-0 left-0 right-0 px-6 py-5 max-w-2xl mx-auto" style={{ background: 'rgba(250,250,247,0.95)', backdropFilter: 'blur(20px)', borderTop: '1px solid rgba(229,226,218,0.6)' }}>
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-sm" style={{ color: '#A3B5A0' }}>
                 已選擇 {Object.values(smartAnswers).flat().length} 項症狀
               </span>
               {Object.values(smartAnswers).flat().length > 0 && (
                 <button onClick={() => setSmartAnswers({})}
-                  className="text-xs transition-colors"
+                  className="text-sm transition-colors"
                   style={{ color: '#A3B5A0' }}
                   onMouseEnter={e => e.currentTarget.style.color = '#8B6E5A'}
                   onMouseLeave={e => e.currentTarget.style.color = '#A3B5A0'}>
@@ -1539,8 +1544,8 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
                 setStep('tongue_guide')
               }}
               disabled={Object.values(smartAnswers).flat().length === 0}
-              className="w-full py-4 rounded-xl font-medium text-sm transition-all duration-200 disabled:opacity-40"
-              style={{ background: Object.values(smartAnswers).flat().length > 0 ? '#2C4A3E' : '#C5D4C0', color: '#FAFAF7', letterSpacing: '0.08em', boxShadow: '0 2px 12px rgba(44,74,62,0.15)' }}>
+              className="w-full py-4 rounded-2xl font-medium text-base transition-all duration-300 disabled:opacity-40"
+              style={{ background: Object.values(smartAnswers).flat().length > 0 ? '#1C2C24' : '#C5D4C0', color: '#FAFAF7', letterSpacing: '0.04em', boxShadow: '0 4px 20px rgba(44,74,62,0.15)' }}>
               {Object.values(smartAnswers).flat().length === 0
                 ? '請先選擇症狀'
                 : `智能分析（${Object.values(smartAnswers).flat().length}項）`}
@@ -1549,15 +1554,15 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
         </main>
       )}      {/* ── 動態問卷 ── */}
       {step === 'questionnaire' && currentQ && (
-        <main className="max-w-lg mx-auto px-5 py-10 min-h-[70vh] flex flex-col justify-center">
-          <div className="text-center mb-6">
-            {/* Zen progress dots */}
-            <div className="flex justify-center gap-1.5 mb-4">
+        <main className="max-w-2xl mx-auto px-6 pt-20 pb-16 min-h-[80vh] flex flex-col justify-center">
+
+          <div className="text-center mb-14">
+            <div className="flex justify-center gap-1.5 mb-8">
               {currentQuestions.slice(0, 16).map((_, i) => (
                 <button key={i} onClick={() => setQIndex(i)}
                   className="rounded-full transition-all duration-300"
                   style={{
-                    width: i === qIndex ? '20px' : '6px',
+                    width: i === qIndex ? '28px' : '6px',
                     height: '6px',
                     background: i === qIndex ? '#2C4A3E' : i < qIndex ? '#A3B5A0' : '#E5E2DA',
                   }} />
@@ -1565,36 +1570,36 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
               {totalQ > 16 && <span className="text-xs self-center ml-1" style={{ color: '#B5C4B8' }}>+{totalQ - 16}</span>}
             </div>
 
-            <p className="text-xs tracking-widest mb-3" style={{ color: '#A3B5A0', letterSpacing: '0.15em' }}>
+            <p className="text-xs tracking-widest mb-5" style={{ color: '#A3B5A0', letterSpacing: '0.20em' }}>
               {mode === 'detailed' ? '詳細問診' : '快速問診'} · {qIndex + 1} / {totalQ}
             </p>
 
-            <h2 className="text-xl font-light leading-relaxed px-2" style={{ color: '#1C2C24', letterSpacing: '0.04em', lineHeight: 1.8 }}>
+            <h2 className="text-3xl font-light leading-tight px-2" style={{ color: '#1C2C24', letterSpacing: '-0.01em', lineHeight: 1.35 }}>
               {currentQ.text}
             </h2>
           </div>
 
           {currentQ.type === 'input_text' ? (
-            <div className="space-y-3">
+            <div className="space-y-4">
               <textarea value={customInput} onChange={e => setCustomInput(e.target.value)}
                 placeholder={currentQ.placeholder} rows={3}
-                className="w-full px-4 py-3 rounded-xl text-sm outline-none resize-none transition-colors"
-                style={{ background: '#FFFFFF', border: '1px solid #E5E2DA', color: '#1C2C24', letterSpacing: '0.03em' }}
+                className="w-full px-5 py-4 rounded-2xl text-base outline-none resize-none transition-colors"
+                style={{ background: '#FFFFFF', border: '1px solid #E5E2DA', color: '#1C2C24', letterSpacing: '0.02em' }}
                 onFocus={e => e.target.style.borderColor = '#2C4A3E'}
                 onBlur={e => e.target.style.borderColor = '#E5E2DA'} />
               <button onClick={handleInputSubmit} disabled={!customInput.trim()}
-                className="w-full py-4 rounded-xl font-medium text-sm transition-all duration-200 disabled:opacity-40"
-                style={{ background: '#2C4A3E', color: '#FAFAF7', letterSpacing: '0.06em' }}
-                onMouseEnter={e => !customInput.trim() || (e.currentTarget.style.background = '#3D5E4F')}
-                onMouseLeave={e => e.currentTarget.style.background = '#2C4A3E'}>
+                className="w-full py-4 rounded-2xl font-medium text-base transition-all duration-300 disabled:opacity-40"
+                style={{ background: '#1C2C24', color: '#FAFAF7', letterSpacing: '0.04em' }}
+                onMouseEnter={e => !customInput.trim() || (e.currentTarget.style.background = '#2C4A3E')}
+                onMouseLeave={e => e.currentTarget.style.background = '#1C2C24'}>
                 確定
               </button>
             </div>
           ) : (
-            <div className="space-y-2.5">
+            <div className="space-y-3">
               {renderOptions(currentQ)}
               <button onClick={() => handleAnswer('其他')}
-                className="w-full px-5 py-4 rounded-xl text-left text-sm transition-all duration-200"
+                className="w-full py-4 rounded-2xl text-sm transition-all duration-300"
                 style={{
                   background: answers[currentQ.id] === '其他' ? 'rgba(44,74,62,0.08)' : 'transparent',
                   border: answers[currentQ.id] === '其他' ? '1px solid #2C4A3E' : '1px solid #E5E2DA',
@@ -1606,68 +1611,68 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
             </div>
           )}
 
-          <div className="mt-6 flex items-center justify-between px-1">
+          <div className="mt-12 flex items-center justify-between px-1">
             {qIndex > 0 ? (
               <button onClick={() => setQIndex(qIndex - 1)}
-                className="flex items-center gap-1.5 text-sm px-3 py-2 rounded-lg transition-all duration-200"
+                className="flex items-center gap-2 text-sm px-4 py-2.5 rounded-xl transition-all duration-200"
                 style={{ color: '#8B6E5A' }}
                 onMouseEnter={e => e.currentTarget.style.background = 'rgba(139,110,90,0.06)'}
                 onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 3L5 7l4 4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 3L6 8l4 5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                 上一題
               </button>
             ) : (
               <button onClick={() => { setStep('chief'); setQIndex(0) }}
-                className="flex items-center gap-1.5 text-sm px-3 py-2 rounded-lg transition-all duration-200"
+                className="flex items-center gap-2 text-sm px-4 py-2.5 rounded-xl transition-all duration-200"
                 style={{ color: '#8B6E5A' }}
                 onMouseEnter={e => e.currentTarget.style.background = 'rgba(139,110,90,0.06)'}
                 onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 3L5 7l4 4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 3L6 8l4 5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                 重選主訴
               </button>
             )}
             {isLastQ && (
               <button onClick={() => setStep('tongue')}
-                className="flex items-center gap-1.5 text-sm px-3 py-2 rounded-lg font-medium transition-all duration-200"
+                className="flex items-center gap-2 text-sm px-4 py-2.5 rounded-xl font-medium transition-all duration-200"
                 style={{ color: '#2C4A3E' }}
                 onMouseEnter={e => e.currentTarget.style.background = 'rgba(44,74,62,0.06)'}
                 onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
                 跳過
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5 3l4 4-4 4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 3l4 5-4 5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
               </button>
             )}
           </div>
         </main>
       )}      {/* ── 舌象引導（選填） ── */}
       {step === 'tongue_guide' && (
-        <main className="max-w-lg mx-auto px-5 py-10 min-h-[70vh] flex flex-col justify-center">
-          <div className="text-center mb-8">
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <div style={{ width: '32px', height: '1px', background: 'linear-gradient(to right, transparent, #A3B5A0)' }} />
+        <main className="max-w-2xl mx-auto px-6 pt-20 pb-16 min-h-[70vh] flex flex-col justify-center">
+
+          <div className="text-center mb-10">
+            <div className="flex items-center justify-center gap-3 mb-5">
+              <div style={{ width: '36px', height: '1px', background: 'linear-gradient(to right, transparent, #A3B5A0)' }} />
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                 <circle cx="12" cy="12" r="9" stroke="#A3B5A0" strokeWidth="0.8" fill="none"/>
                 <path d="M12 5C12 5 8 9 8 12.5a4 4 0 008 0C16 9 12 5 12 5z" stroke="#A3B5A0" strokeWidth="0.8" fill="none"/>
               </svg>
-              <div style={{ width: '32px', height: '1px', background: 'linear-gradient(to right, #A3B5A0, transparent)' }} />
+              <div style={{ width: '36px', height: '1px', background: 'linear-gradient(to right, #A3B5A0, transparent)' }} />
             </div>
-            <p className="text-xs tracking-widest mb-2" style={{ color: '#A3B5A0', letterSpacing: '0.18em' }}>選填 · 可跳過</p>
-            <h2 className="text-xl font-light mb-1" style={{ color: '#1C2C24', letterSpacing: '0.06em' }}>觀察舌象</h2>
-            <p className="text-xs" style={{ color: '#8B6E5A' }}>協助AI更精準判斷體質</p>
+            <p className="text-xs tracking-widest mb-3" style={{ color: '#A3B5A0', letterSpacing: '0.18em' }}>選填 · 可跳過</p>
+            <h2 className="text-4xl font-light mb-3" style={{ color: '#1C2C24', letterSpacing: '-0.01em', lineHeight: 1.15 }}>觀察舌象</h2>
+            <p className="text-base" style={{ color: '#8B6E5A' }}>協助AI更精準判斷體質</p>
           </div>
 
-          <div className="space-y-5 mb-8">
-            {/* 舌頭抖動 */}
+          <div className="space-y-6 mb-10">
             <div>
-              <p className="text-sm font-medium mb-2" style={{ color: '#1C2C24', letterSpacing: '0.04em' }}>舌頭有沒有抖動？</p>
+              <p className="text-sm font-medium mb-3" style={{ color: '#1C2C24', letterSpacing: '0.04em' }}>舌頭有沒有抖動？</p>
               <div className="grid grid-cols-2 gap-2">
                 {[{value:'無',label:'正常不抖動'},{value:'輕微',label:'輕微顫動'},{value:'明顯',label:'明顯顫動'},{value:'不確定',label:'不確定'}].map(opt => (
                   <button key={opt.value}
                     onClick={() => setTongueGuideAnswers(prev => ({...prev, tremor: opt.value}))}
-                    className="px-3 py-2.5 rounded-xl text-xs text-left transition-all"
+                    className="px-3 py-3 rounded-xl text-sm text-left transition-all"
                     style={{
                       background: tongueGuideAnswers.tremor === opt.value ? 'rgba(44,74,62,0.08)' : '#FFFFFF',
                       border: tongueGuideAnswers.tremor === opt.value ? '1px solid #2C4A3E' : '1px solid #E5E2DA',
-                      color: tongueGuideAnswers.tremor === opt.value ? '#2C4A3E' : '#4A4A42',
+                      color: tongueGuideAnswers.tremor === opt.value ? '#2C4A3E' : '#3A3A32',
                       fontWeight: tongueGuideAnswers.tremor === opt.value ? '500' : '400',
                     }}>
                     {opt.label}
@@ -1676,18 +1681,17 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
               </div>
             </div>
 
-            {/* 齒痕情況 */}
             <div>
-              <p className="text-sm font-medium mb-2" style={{ color: '#1C2C24', letterSpacing: '0.04em' }}>舌頭邊緣有齒痕嗎？</p>
+              <p className="text-sm font-medium mb-3" style={{ color: '#1C2C24', letterSpacing: '0.04em' }}>舌頭邊緣有齒痕嗎？</p>
               <div className="grid grid-cols-2 gap-2">
                 {[{value:'無',label:'無齒痕（健康）'},{value:'輕微',label:'輕微齒痕'},{value:'明顯',label:'明顯齒痕'},{value:'不確定',label:'不確定'}].map(opt => (
                   <button key={opt.value}
                     onClick={() => setTongueGuideAnswers(prev => ({...prev, teethMark: opt.value}))}
-                    className="px-3 py-2.5 rounded-xl text-xs text-left transition-all"
+                    className="px-3 py-3 rounded-xl text-sm text-left transition-all"
                     style={{
                       background: tongueGuideAnswers.teethMark === opt.value ? 'rgba(44,74,62,0.08)' : '#FFFFFF',
                       border: tongueGuideAnswers.teethMark === opt.value ? '1px solid #2C4A3E' : '1px solid #E5E2DA',
-                      color: tongueGuideAnswers.teethMark === opt.value ? '#2C4A3E' : '#4A4A42',
+                      color: tongueGuideAnswers.teethMark === opt.value ? '#2C4A3E' : '#3A3A32',
                       fontWeight: tongueGuideAnswers.teethMark === opt.value ? '500' : '400',
                     }}>
                     {opt.label}
@@ -1696,15 +1700,14 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
               </div>
             </div>
 
-            {/* 特殊標記文字輸入 */}
             <div>
-              <p className="text-sm font-medium mb-2" style={{ color: '#1C2C24', letterSpacing: '0.04em' }}>舌頭外觀特別之處（選填）</p>
+              <p className="text-sm font-medium mb-3" style={{ color: '#1C2C24', letterSpacing: '0.04em' }}>舌頭外觀特別之處（選填）</p>
               <textarea
                 placeholder="例如：舌頭有裂紋、瘀點、潰瘍..."
                 value={tongueGuideAnswers.notes || ''}
                 onChange={e => setTongueGuideAnswers(prev => ({...prev, notes: e.target.value}))}
-                className="w-full px-4 py-3 rounded-xl text-sm resize-none transition"
-                style={{ background: '#FFFFFF', border: '1px solid #E5E2DA', color: '#1C2C24', letterSpacing: '0.03em', outline: 'none' }}
+                className="w-full px-4 py-3 rounded-2xl text-sm resize-none transition"
+                style={{ background: '#FFFFFF', border: '1px solid #E5E2DA', color: '#1C2C24', letterSpacing: '0.02em', outline: 'none' }}
                 onFocus={e => e.target.style.borderColor = '#2C4A3E'}
                 onBlur={e => e.target.style.borderColor = '#E5E2DA'}
                 rows={3}
@@ -1714,14 +1717,14 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
 
           <div className="space-y-3">
             <button onClick={() => setStep('tongue')}
-              className="w-full py-4 rounded-xl font-medium text-sm transition-all duration-200"
-              style={{ background: '#2C4A3E', color: '#FAFAF7', letterSpacing: '0.08em' }}
-              onMouseEnter={e => e.currentTarget.style.background = '#3D5E4F'}
-              onMouseLeave={e => e.currentTarget.style.background = '#2C4A3E'}>
+              className="w-full py-4 rounded-2xl font-medium text-base transition-all duration-300"
+              style={{ background: '#1C2C24', color: '#FAFAF7', letterSpacing: '0.04em' }}
+              onMouseEnter={e => e.currentTarget.style.background = '#2C4A3E'}
+              onMouseLeave={e => e.currentTarget.style.background = '#1C2C24'}>
               {Object.keys(tongueGuideAnswers).length > 0 ? '✓ 已記錄，繼續拍攝舌苔' : '直接拍攝舌苔'}
             </button>
             <button onClick={() => setStep('tongue')}
-              className="w-full py-3 text-sm transition-all duration-200"
+              className="w-full py-3 text-sm transition-all duration-300"
               style={{ color: '#A3B5A0' }}
               onMouseEnter={e => e.currentTarget.style.color = '#8B6E5A'}
               onMouseLeave={e => e.currentTarget.style.color = '#A3B5A0'}>
@@ -1731,29 +1734,30 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
         </main>
       )}      {/* ── 舌苔拍攝 ── */}
       {step === 'tongue' && (
-        <main className="max-w-lg mx-auto px-5 py-10 min-h-[70vh] flex flex-col justify-center">
-          <div className="text-center mb-8">
-            <div className="flex items-center justify-center gap-2 mb-3">
-              <div style={{ width: '24px', height: '1px', background: '#E5E2DA' }} />
-              <p className="text-xs tracking-widest" style={{ color: '#A3B5A0', letterSpacing: '0.15em' }}>最後一步</p>
-              <div style={{ width: '24px', height: '1px', background: '#E5E2DA' }} />
+        <main className="max-w-2xl mx-auto px-6 pt-20 pb-16 min-h-[70vh] flex flex-col justify-center">
+
+          <div className="text-center mb-10">
+            <div className="flex items-center justify-center gap-3 mb-3">
+              <div style={{ width: '36px', height: '1px', background: '#E5E2DA' }} />
+              <p className="text-xs tracking-widest" style={{ color: '#A3B5A0', letterSpacing: '0.18em' }}>最後一步</p>
+              <div style={{ width: '36px', height: '1px', background: '#E5E2DA' }} />
             </div>
-            <h2 className="text-xl font-light mb-1" style={{ color: '#1C2C24', letterSpacing: '0.06em' }}>拍攝舌苔</h2>
-            <p className="text-xs" style={{ color: '#8B6E5A' }}>舌苔能反映體內寒熱濕燥，協助AI更精準判斷</p>
+            <h2 className="text-4xl font-light mb-3" style={{ color: '#1C2C24', letterSpacing: '-0.01em', lineHeight: 1.15 }}>拍攝舌苔</h2>
+            <p className="text-base" style={{ color: '#8B6E5A' }}>舌苔能反映體內寒熱濕燥</p>
           </div>
 
           {/* 舌苔上傳區域 */}
-          <div className="relative rounded-xl overflow-hidden mb-4"
-            style={{ border: tonguePreview ? 'none' : '1px dashed #C5B8A8', background: '#FFFFFF' }}>
+          <div className="relative rounded-2xl overflow-hidden mb-5"
+            style={{ border: tonguePreview ? 'none' : '1.5px dashed #C5B8A8', background: '#FFFFFF' }}>
             {tonguePreview ? (
               <div className="relative">
                 <img src={tonguePreview} alt="舌苔預覽" className="w-full object-cover" style={{ aspectRatio: '4/3' }} />
-                <div className="absolute top-3 left-3 w-8 h-8 rounded-full flex items-center justify-center"
+                <div className="absolute top-4 left-4 w-9 h-9 rounded-full flex items-center justify-center"
                   style={{ background: '#2C4A3E', color: '#FAFAF7' }}>
                   <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7l3 3 5-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
                 </div>
                 <button onClick={() => { setTonguePreview(null); setTongueFile(null) }}
-                  className="absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center transition"
+                  className="absolute top-4 right-4 w-9 h-9 rounded-full flex items-center justify-center transition"
                   style={{ background: 'rgba(0,0,0,0.45)', color: '#FAFAF7' }}
                   onMouseEnter={e => e.currentTarget.style.background = 'rgba(0,0,0,0.65)'}
                   onMouseLeave={e => e.currentTarget.style.background = 'rgba(0,0,0,0.45)'}>
@@ -1765,12 +1769,12 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
                 style={{ background: '#FAFAF7' }}
                 onMouseEnter={e => e.currentTarget.style.background = '#F5F3EE'}
                 onMouseLeave={e => e.currentTarget.style.background = '#FAFAF7'}>
-                <svg width="40" height="40" viewBox="0 0 40 40" fill="none" className="mb-3" style={{ color: '#A3B5A0' }}>
-                  <circle cx="20" cy="20" r="15" stroke="currentColor" strokeWidth="0.8" fill="none"/>
-                  <path d="M20 9C20 9 13 14.5 13 20a7 7 0 0014 0C27 14.5 20 9 20 9z" stroke="currentColor" strokeWidth="0.8" fill="none"/>
+                <svg width="44" height="44" viewBox="0 0 44 44" fill="none" className="mb-3" style={{ color: '#A3B5A0' }}>
+                  <circle cx="22" cy="22" r="17" stroke="currentColor" strokeWidth="0.8" fill="none"/>
+                  <path d="M22 9C22 9 14 15.5 14 22a8 8 0 0016 0C30 15.5 22 9 22 9z" stroke="currentColor" strokeWidth="0.8" fill="none"/>
                 </svg>
-                <p className="text-sm font-medium mb-1" style={{ color: '#4A4A42' }}>點擊拍攝 / 選擇檔案</p>
-                <p className="text-xs" style={{ color: '#A3B5A0' }}>自然光 · 張嘴伸舌 · 舌頭放鬆</p>
+                <p className="text-base font-medium mb-1" style={{ color: '#4A4A42' }}>點擊拍攝 / 選擇檔案</p>
+                <p className="text-sm" style={{ color: '#A3B5A0' }}>自然光 · 張嘴伸舌 · 舌頭放鬆</p>
               </div>
             )}
             <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleTongueUpload} />
@@ -1779,43 +1783,40 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
             )}
           </div>
 
-          {/* 拍攝技巧 */}
-          <div className="rounded-xl px-4 py-3 mb-4" style={{ background: 'rgba(44,74,62,0.04)', border: '1px solid rgba(44,74,62,0.08)' }}>
-            <p className="text-xs leading-relaxed" style={{ color: '#7A7A6A' }}>
-              <span style={{ color: '#4A4A42', fontWeight: '500' }}>拍攝技巧：</span>自然光或室內光 · 張嘴伸舌自然下垂 · 舌頭佔據畫面主體
+          <div className="rounded-2xl px-4 py-3.5 mb-5" style={{ background: 'rgba(44,74,62,0.04)', border: '1px solid rgba(44,74,62,0.08)' }}>
+            <p className="text-sm leading-relaxed" style={{ color: '#4A4A42' }}>
+              <span style={{ color: '#1C2C24', fontWeight: '500' }}>拍攝技巧：</span>自然光或室內光 · 張嘴伸舌自然下垂 · 舌頭佔據畫面主體
             </p>
           </div>
 
-          {/* 隱私聲明 */}
-          <div className="rounded-xl px-4 py-3 mb-4" style={{ background: 'rgba(139,110,90,0.05)', border: '1px solid rgba(139,110,90,0.10)' }}>
-            <p className="text-xs leading-relaxed" style={{ color: '#8B6E5A' }}>
+          <div className="rounded-2xl px-4 py-3.5 mb-6" style={{ background: 'rgba(139,110,90,0.05)', border: '1px solid rgba(139,110,90,0.10)' }}>
+            <p className="text-sm leading-relaxed" style={{ color: '#8B6E5A' }}>
               🔒 您的舌苔照片僅用於本次AI分析，不會保存或分享
             </p>
           </div>
 
-          {/* 面色拍攝（Beta，可跳過） */}
           {!showFaceCapture ? (
             <button onClick={() => setShowFaceCapture(true)}
-              className="w-full py-3 rounded-xl text-sm mb-3 transition-all duration-200"
+              className="w-full py-3.5 rounded-2xl text-sm mb-5 transition-all duration-300"
               style={{ color: '#A3B5A0', border: '1px dashed #C5B8A8', background: 'transparent' }}
               onMouseEnter={e => { e.currentTarget.style.borderColor = '#8B6E5A'; e.currentTarget.style.color = '#8B6E5A' }}
               onMouseLeave={e => { e.currentTarget.style.borderColor = '#C5B8A8'; e.currentTarget.style.color = '#A3B5A0' }}>
               + 拍攝面容（面色分析 Beta）
             </button>
           ) : (
-            <div className="mb-4">
-              <p className="text-xs mb-2" style={{ color: '#8B6E5A', letterSpacing: '0.04em' }}>面色分析（Beta）</p>
-              <div className="relative rounded-xl overflow-hidden"
-                style={{ border: facePreview ? 'none' : '1px dashed #C5B8A8', background: '#FFFFFF' }}>
+            <div className="mb-5">
+              <p className="text-sm mb-3" style={{ color: '#8B6E5A', letterSpacing: '0.04em' }}>面色分析（Beta）</p>
+              <div className="relative rounded-2xl overflow-hidden"
+                style={{ border: facePreview ? 'none' : '1.5px dashed #C5B8A8', background: '#FFFFFF' }}>
                 {facePreview ? (
                   <div className="relative">
                     <img src={facePreview} alt="面容預覽" className="w-full object-cover" style={{ aspectRatio: '4/3' }} />
-                    <div className="absolute top-3 left-3 w-8 h-8 rounded-full flex items-center justify-center"
+                    <div className="absolute top-4 left-4 w-9 h-9 rounded-full flex items-center justify-center"
                       style={{ background: '#8B6E5A', color: '#FAFAF7' }}>
                       <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7l3 3 5-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
                     </div>
                     <button onClick={() => { setFacePreview(null); setFaceFile(null) }}
-                      className="absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center transition"
+                      className="absolute top-4 right-4 w-9 h-9 rounded-full flex items-center justify-center transition"
                       style={{ background: 'rgba(0,0,0,0.45)', color: '#FAFAF7' }}>
                       <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 2l6 6M8 2l-6 6" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/></svg>
                     </button>
@@ -1825,12 +1826,12 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
                     style={{ background: '#FAFAF7' }}
                     onMouseEnter={e => e.currentTarget.style.background = '#F5F3EE'}
                     onMouseLeave={e => e.currentTarget.style.background = '#FAFAF7'}>
-                    <svg width="36" height="36" viewBox="0 0 36 36" fill="none" className="mb-2" style={{ color: '#A3B5A0' }}>
-                      <circle cx="18" cy="18" r="12" stroke="currentColor" strokeWidth="0.8" fill="none"/>
-                      <circle cx="18" cy="18" r="5" stroke="currentColor" strokeWidth="0.8" fill="none"/>
+                    <svg width="40" height="40" viewBox="0 0 40 40" fill="none" className="mb-2" style={{ color: '#A3B5A0' }}>
+                      <circle cx="20" cy="20" r="14" stroke="currentColor" strokeWidth="0.8" fill="none"/>
+                      <circle cx="20" cy="20" r="6" stroke="currentColor" strokeWidth="0.8" fill="none"/>
                     </svg>
-                    <p className="text-sm font-medium mb-1" style={{ color: '#4A4A42' }}>點擊拍攝 / 選擇檔案</p>
-                    <p className="text-xs" style={{ color: '#A3B5A0' }}>正面、自然光拍攝</p>
+                    <p className="text-base font-medium mb-1" style={{ color: '#4A4A42' }}>點擊拍攝 / 選擇檔案</p>
+                    <p className="text-sm" style={{ color: '#A3B5A0' }}>正面、自然光拍攝</p>
                   </div>
                 )}
                 <input ref={faceFileRef} type="file" accept="image/*" className="hidden" onChange={handleFaceUpload} />
@@ -1839,7 +1840,7 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
                 )}
               </div>
               <button onClick={() => { setShowFaceCapture(false); setFacePreview(null); setFaceFile(null) }}
-                className="w-full py-2 text-xs mt-1 transition-all duration-200"
+                className="w-full py-2.5 mt-2 text-sm transition-all duration-300"
                 style={{ color: '#A3B5A0' }}
                 onMouseEnter={e => e.currentTarget.style.color = '#8B6E5A'}
                 onMouseLeave={e => e.currentTarget.style.color = '#A3B5A0'}>
@@ -1848,12 +1849,11 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
             </div>
           )}
 
-          {/* 提交按鈕 */}
           <button onClick={handleSubmit} disabled={loading}
-            className="w-full py-4 rounded-xl font-medium text-sm transition-all duration-200 disabled:opacity-40"
-            style={{ background: loading ? '#3D5E4F' : '#2C4A3E', color: '#FAFAF7', letterSpacing: '0.08em', boxShadow: '0 2px 12px rgba(44,74,62,0.15)' }}
-            onMouseEnter={e => { if (!loading) e.currentTarget.style.background = '#3D5E4F' }}
-            onMouseLeave={e => { if (!loading) e.currentTarget.style.background = '#2C4A3E' }}>
+            className="w-full py-4 rounded-2xl font-medium text-base transition-all duration-300 disabled:opacity-40"
+            style={{ background: loading ? '#2C4A3E' : '#1C2C24', color: '#FAFAF7', letterSpacing: '0.04em', boxShadow: '0 4px 20px rgba(44,74,62,0.15)' }}
+            onMouseEnter={e => { if (!loading) e.currentTarget.style.background = '#2C4A3E' }}
+            onMouseLeave={e => { if (!loading) e.currentTarget.style.background = '#1C2C24' }}>
             {loading ? '分析中...' : tongueFile ? '分析舌苔並送出' : '略過舌苔，直接分析'}
           </button>
           {!tongueFile && (
@@ -1861,7 +1861,7 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
               setResult({ constitution: analyzeCondition(answers), questionnaire_answers: answers, savedAt: new Date().toISOString() })
               setStep('result')
             }}
-              className="w-full py-3 text-sm mt-2 transition-all duration-200"
+              className="w-full py-3 text-sm mt-2 transition-all duration-300"
               style={{ color: '#A3B5A0' }}
               onMouseEnter={e => e.currentTarget.style.color = '#8B6E5A'}
               onMouseLeave={e => e.currentTarget.style.color = '#A3B5A0'}>
