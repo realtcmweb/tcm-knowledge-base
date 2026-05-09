@@ -885,6 +885,7 @@ export default function Home() {
   const [customInput, setCustomInput] = useState('')
   const [smartAnswers, setSmartAnswers] = useState<Record<string, string[]>>({})
 const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, string>>({})
+  const [tongueGuideOpen, setTongueGuideOpen] = useState(false)
   const [reportFile, setReportFile] = useState<File | null>(null)
   const [reportPreview, setReportPreview] = useState<string | null>(null)
   const reportFileRef = useRef<HTMLInputElement>(null)
@@ -1813,6 +1814,105 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
             </div>
             <h2 className="text-4xl font-light mb-3" style={{ color: '#1C2C24', letterSpacing: '-0.01em', lineHeight: 1.15 }}>拍攝舌苔</h2>
             <p className="text-base" style={{ color: '#8B6E5A' }}>舌苔能反映體內寒熱濕燥</p>
+          </div>
+
+          {/* ── 舌象拍攝引導（P0-3） ── */}
+          <div className="mb-5">
+            <button
+              onClick={() => setTongueGuideOpen(!tongueGuideOpen)}
+              className="w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all"
+              style={{
+                background: tongueGuideOpen ? 'rgba(44,74,62,0.04)' : '#FFFFFF',
+                border: `1px solid ${tongueGuideOpen ? '#2C4A3E' : '#E5E2DA'}`,
+              }}
+            >
+              <div className="flex items-center gap-3">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ color: '#2C4A3E' }}>
+                  <circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1"/>
+                  <path d="M8 5v3M8 9.5v.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+                </svg>
+                <span className="text-sm" style={{ color: '#1C2C24', letterSpacing: '0.02em' }}>
+                  如何拍出合格的舌象照片？
+                </span>
+              </div>
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
+                style={{ color: '#A3B5A0', transform: tongueGuideOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>
+                <path d="M3 5l4 4 4-4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+
+            {tongueGuideOpen && (
+              <div className="mt-2 rounded-2xl p-4"
+                style={{ background: '#FAFAF7', border: '1px solid #E5E2DA' }}>
+                
+                {/* 四個指引要點 */}
+                <div className="space-y-3">
+                  {[
+                    {
+                      icon: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="3" stroke="currentColor" strokeWidth="1.2"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/></svg>`,
+                      title: '光線要求',
+                      desc: '自然光最佳，避免直射陽光或昏暗環境。室內白燈也可以。'
+                    },
+                    {
+                      icon: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2C8 2 5 5 5 8.5a3 3 0 006 0C11 5 8 2 8 2z" stroke="currentColor" strokeWidth="1.2" fill="none"/><circle cx="8" cy="8.5" r="1.5" stroke="currentColor" strokeWidth="1"/></svg>`,
+                      title: '舌頭姿勢',
+                      desc: '張嘴伸舌，舌頭自然下垂放鬆，不要緊張或捲曲。'
+                    },
+                    {
+                      icon: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="10" rx="1.5" stroke="currentColor" strokeWidth="1.2"/><circle cx="8" cy="8" r="2" stroke="currentColor" strokeWidth="1"/></svg>`,
+                      title: '拍攝角度',
+                      desc: '舌頭佔畫面主體，水平拍攝，不要俯視或仰視。'
+                    },
+                    {
+                      icon: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" strokeWidth="1.2"/><path d="M5.5 8.5l2 2 3-3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/></svg>`,
+                      title: '避免事項',
+                      desc: '避免食物染色舌頭（如咖啡、藍莓），拍攝前漱口。'
+                    },
+                  ].map((item, idx) => (
+                    <div key={idx} className="flex items-start gap-3">
+                      <div className="flex items-center justify-center w-8 h-8 rounded-full flex-shrink-0"
+                        style={{ background: 'rgba(44,74,62,0.06)' }}
+                        dangerouslySetInnerHTML={{ __html: `<div style={{color:'#2C4A3E'}}>${item.icon}</div>` }} />
+                      <div>
+                        <p className="text-xs font-medium mb-0.5" style={{ color: '#1C2C24' }}>{item.title}</p>
+                        <p className="text-xs" style={{ color: '#4A4A42', lineHeight: 1.6 }}>{item.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* 示範對比圖（用 SVG 示意） */}
+                <div className="mt-4 rounded-xl p-3" style={{ background: '#FFFFFF', border: '1px solid #E5E2DA' }}>
+                  <p className="text-xs font-medium mb-3" style={{ color: '#1C2C24', letterSpacing: '0.04em' }}>正確 vs 範例</p>
+                  <div className="flex gap-3">
+                    {/* 正確示例 */}
+                    <div className="flex-1 text-center">
+                      <div className="rounded-xl overflow-hidden mb-2" style={{ background: '#F5F3EE' }}>
+                        <svg width="100%" height="70" viewBox="0 0 100 70" fill="none">
+                          <ellipse cx="50" cy="35" rx="28" ry="18" fill="#F5C9C9" stroke="#E5B5B5" strokeWidth="0.8"/>
+                          <ellipse cx="50" cy="38" rx="22" ry="12" fill="#F2D0D0"/>
+                          <path d="M50 32 Q56 36 50 42 Q44 36 50 32Z" fill="#E8A8A8" opacity="0.6"/>
+                          <path d="M22 30 Q50 26 78 30" stroke="#D5C4B5" strokeWidth="0.8" fill="none"/>
+                        </svg>
+                      </div>
+                      <span className="text-xs" style={{ color: '#4A7C6A' }}>✓ 合格</span>
+                    </div>
+                    {/* 不合格示例 */}
+                    <div className="flex-1 text-center">
+                      <div className="rounded-xl overflow-hidden mb-2" style={{ background: '#F5F3EE' }}>
+                        <svg width="100%" height="70" viewBox="0 0 100 70" fill="none">
+                          <ellipse cx="50" cy="35" rx="14" ry="10" fill="#F5C9C9" stroke="#E5B5B5" strokeWidth="0.8"/>
+                          <ellipse cx="50" cy="37" rx="10" ry="7" fill="#F2D0D0"/>
+                          <circle cx="70" cy="50" r="8" fill="#E8C8A8" stroke="#D4B090" strokeWidth="0.5"/>
+                          <path d="M62 42 L78 58" stroke="#E8C8A8" strokeWidth="4" strokeLinecap="round"/>
+                        </svg>
+                      </div>
+                      <span className="text-xs" style={{ color: '#C2544A' }}>✗ 舌頭太小/有遮擋</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* 舌苔上傳區域 */}
