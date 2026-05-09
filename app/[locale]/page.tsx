@@ -1087,55 +1087,36 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
       <Head><title>{t('header.title')} | TCM AI</title></Head>
 
       {/* Header — Apple Zen Navigation Bar */}
-      <header className="sticky top-0 z-50" style={{ background: 'rgba(255,255,255,0.82)', backdropFilter: 'blur(24px)', borderBottom: '1px solid rgba(229,226,218,0.4)' }}>
-        <div className="max-w-5xl mx-auto px-8 py-3.5 flex items-center justify-between">
-          {/* Left — YinYang mark + wordmark */}
-          <div className="flex items-center gap-2.5">
+      <header className="sticky top-0 z-50" style={{ background: 'rgba(255,255,255,0.80)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
+        <div style={{ maxWidth: '1024px', margin: '0 auto', height: '44px', padding: '0 22px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          {/* Left — YinYang Logo */}
+          <a href="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none' }}>
             <svg width="20" height="20" viewBox="0 0 28 28" fill="none">
-              <circle cx="14" cy="14" r="12" stroke="#2C4A3E" strokeWidth="1.2"/>
-              <path d="M14 2 Q20 8 14 14 Q8 20 14 26" stroke="#2C4A3E" strokeWidth="1.2" fill="none"/>
-              <path d="M14 26 Q8 20 14 14 Q20 8 14 2" stroke="#8B6E5A" strokeWidth="1.2" fill="none"/>
-              <circle cx="14" cy="8.5" r="2.5" fill="#8B6E5A"/>
-              <circle cx="14" cy="19.5" r="2.5" fill="#2C4A3E"/>
+              <circle cx="14" cy="14" r="12" stroke="#000" strokeWidth="1.2" fill="none"/>
+              <path d="M14 2 Q20 8 14 14 Q8 20 14 26" stroke="#000" strokeWidth="1.2" fill="none"/>
+              <path d="M14 26 Q8 20 14 14 Q20 8 14 2" stroke="#555" strokeWidth="1.2" fill="none"/>
+              <circle cx="14" cy="8.5" r="2.5" fill="#555"/>
+              <circle cx="14" cy="19.5" r="2.5" fill="#000"/>
             </svg>
-            <h1 className="text-sm font-medium" style={{ color: '#1C2C24', letterSpacing: '0.05em' }}>
+            <span style={{ fontSize: '15px', fontWeight: 500, color: '#000', letterSpacing: '-0.01em' }}>
               {t('header.title')}
-            </h1>
-          </div>
-          {/* Right */}
-          <div className="flex items-center gap-5">
-            <div className="flex items-center gap-2.5">
-              <button onClick={() => setFontScale(Math.max(100, fontScale - 15))}
-                className="text-sm font-light transition-colors"
-                style={{ color: '#8B6E5A' }}
-                onMouseEnter={e => e.currentTarget.style.color = '#1C2C24'}
-                onMouseLeave={e => e.currentTarget.style.color = '#8B6E5A'}>
-                A
-              </button>
-              <div style={{ width: '1px', height: '12px', background: '#E5E2DA' }} />
-              <button onClick={() => setFontScale(Math.min(160, fontScale + 15))}
-                className="text-lg font-light transition-colors"
-                style={{ color: '#8B6E5A' }}
-                onMouseEnter={e => e.currentTarget.style.color = '#1C2C24'}
-                onMouseLeave={e => { e.currentTarget.style.color = '#8B6E5A' }}>
-                A
-              </button>
-            </div>
-            <Link href="/login"
-              className="text-sm font-medium transition-colors"
-              style={{ color: '#1C2C24', letterSpacing: '0.03em' }}
-              onMouseEnter={e => e.currentTarget.style.color = '#8B6E5A'}
-              onMouseLeave={e => e.currentTarget.style.color = '#1C2C24'}>
-              登入
-            </Link>
+            </span>
+          </a>
+
+          {/* Right — Apple-style utility icons */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+            {/* Language selector — globe icon */}
             <LanguageSelector currentLocale={locale} />
+
+            {/* Login */}
+            <Link href="/login" style={{ display: 'flex', alignItems: 'center' }}>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ color: '#000' }}>
+                <path d="M8 7C6.9 7 6 7.9 6 9s.9 2 2 2 2-.9 2-2-.9-2-2-2zM11 4H5.5C4.84 4 4 4.45 4 5.1V6h8V5.1C12 4.45 11.16 4 10.5 4H11z" fill="currentColor"/>
+                <path d="M5 7.5C5 6.67 5.67 6 6.5 6h3c.83 0 1.5.67 1.5 1.5V8H5V7.5zM3 9.5L2 11v3h12v-3l-1-1.5" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+              </svg>
+            </Link>
           </div>
         </div>
-        {(step === 'questionnaire') && (
-          <div style={{ height: '1.5px', background: 'rgba(229,226,218,0.35)' }}>
-            <div style={{ height: '100%', background: '#2C4A3E', transition: 'width 0.5s ease', width: `${progress}%` }} />
-          </div>
-        )}
       </header>
       {/* ── 模式選擇 ── */}
       {step === 'mode' && (
