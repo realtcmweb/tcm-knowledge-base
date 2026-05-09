@@ -1086,208 +1086,180 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
     <div className="min-h-screen text-stone-800" style={{ background: '#FAFAF7', fontFamily: "'Noto Serif TC', serif", fontSize: fontScale === 100 ? '17px' : fontScale === 115 ? '19px' : '21px' }}>
       <Head><title>{t('header.title')} | TCM AI</title></Head>
 
-      {/* Header — Zen minimal */}
-      <header className="sticky top-0 z-50" style={{ background: 'rgba(250,250,247,0.92)', backdropFilter: 'blur(12px)', borderBottom: '1px solid #E5E2DA' }}>
-        <div className="max-w-2xl mx-auto px-5 py-3.5 flex items-center justify-between">
-          {/* 左：標誌 */}
-          <div className="flex items-center gap-3">
-            <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* Header — Apple Zen Navigation Bar */}
+      <header className="sticky top-0 z-50" style={{ background: 'rgba(255,255,255,0.82)', backdropFilter: 'blur(24px)', borderBottom: '1px solid rgba(229,226,218,0.4)' }}>
+        <div className="max-w-5xl mx-auto px-8 py-3.5 flex items-center justify-between">
+          {/* Left — YinYang mark + wordmark */}
+          <div className="flex items-center gap-2.5">
+            <svg width="20" height="20" viewBox="0 0 28 28" fill="none">
               <circle cx="14" cy="14" r="12" stroke="#2C4A3E" strokeWidth="1.2"/>
               <path d="M14 2 Q20 8 14 14 Q8 20 14 26" stroke="#2C4A3E" strokeWidth="1.2" fill="none"/>
               <path d="M14 26 Q8 20 14 14 Q20 8 14 2" stroke="#8B6E5A" strokeWidth="1.2" fill="none"/>
               <circle cx="14" cy="8.5" r="2.5" fill="#8B6E5A"/>
               <circle cx="14" cy="19.5" r="2.5" fill="#2C4A3E"/>
             </svg>
-            <div>
-              <h1 className="text-base font-light tracking-wide" style={{ color: '#1C2C24', letterSpacing: '0.08em' }}>{t('header.title')}</h1>
-              <p className="text-xs tracking-widest" style={{ color: '#A3B5A0', letterSpacing: '0.15em' }}>{t('header.subtitle')}</p>
-            </div>
+            <h1 className="text-sm font-medium" style={{ color: '#1C2C24', letterSpacing: '0.05em' }}>
+              {t('header.title')}
+            </h1>
           </div>
-          {/* 右：控制項 */}
-          <div className="flex items-center gap-3">
-            {/* 字體縮放 — Zen pill */}
-            <div className="flex items-center rounded-full px-0.5 py-0.5 gap-0.5" style={{ background: '#F0EDE6' }}>
+          {/* Right */}
+          <div className="flex items-center gap-5">
+            <div className="flex items-center gap-2.5">
               <button onClick={() => setFontScale(Math.max(100, fontScale - 15))}
-                className="w-7 h-7 rounded-full flex items-center justify-center transition-colors"
-                style={{ color: '#7A7A6A', fontSize: '18px', lineHeight: 1 }}
-                onMouseEnter={e => e.currentTarget.style.background = '#E5E2DA'}
-                onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-              >−</button>
-              <span className="text-xs w-6 text-center" style={{ color: '#7A7A6A', fontFamily: 'sans-serif' }}>{fontScale}</span>
+                className="text-sm font-light transition-colors"
+                style={{ color: '#8B6E5A' }}
+                onMouseEnter={e => e.currentTarget.style.color = '#1C2C24'}
+                onMouseLeave={e => e.currentTarget.style.color = '#8B6E5A'}>
+                A
+              </button>
+              <div style={{ width: '1px', height: '12px', background: '#E5E2DA' }} />
               <button onClick={() => setFontScale(Math.min(160, fontScale + 15))}
-                className="w-7 h-7 rounded-full flex items-center justify-center transition-colors"
-                style={{ color: '#7A7A6A', fontSize: '18px', lineHeight: 1 }}
-                onMouseEnter={e => e.currentTarget.style.background = '#E5E2DA'}
-                onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-              >+</button>
+                className="text-lg font-light transition-colors"
+                style={{ color: '#8B6E5A' }}
+                onMouseEnter={e => e.currentTarget.style.color = '#1C2C24'}
+                onMouseLeave={e => { e.currentTarget.style.color = '#8B6E5A' }}>
+                A
+              </button>
             </div>
             <Link href="/login"
-              className="px-3.5 py-1.5 text-xs rounded-full transition-colors"
-              style={{ background: '#2C4A3E', color: '#FAFAF7' }}
-              onMouseEnter={e => (e.currentTarget.style.background = '#3D5E4F')}
-              onMouseLeave={e => (e.currentTarget.style.background = '#2C4A3E')}
-            >
+              className="text-sm font-medium transition-colors"
+              style={{ color: '#1C2C24', letterSpacing: '0.03em' }}
+              onMouseEnter={e => e.currentTarget.style.color = '#8B6E5A'}
+              onMouseLeave={e => e.currentTarget.style.color = '#1C2C24'}>
               登入
             </Link>
             <LanguageSelector currentLocale={locale} />
           </div>
         </div>
-        {/* 問卷進度條 — Zen thin line */}
         {(step === 'questionnaire') && (
-          <div style={{ height: '2px', background: '#E5E2DA' }}>
+          <div style={{ height: '1.5px', background: 'rgba(229,226,218,0.35)' }}>
             <div style={{ height: '100%', background: '#2C4A3E', transition: 'width 0.5s ease', width: `${progress}%` }} />
           </div>
         )}
       </header>
-
       {/* ── 模式選擇 ── */}
       {step === 'mode' && (
-        <main className="max-w-2xl mx-auto px-5 py-14 min-h-[80vh] flex flex-col">
+        <main className="max-w-2xl mx-auto px-6 pt-24 pb-20 min-h-[90vh] flex flex-col justify-center">
 
-          {/* ── Hero ── */}
-          <div className="text-center mb-10">
-            <div className="flex items-center justify-center gap-4 mb-8">
-              <div style={{ width: '52px', height: '1px', background: 'linear-gradient(to right, transparent, #2C4A3E, transparent)' }} />
-              <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
-                <circle cx="18" cy="18" r="16" stroke="#2C4A3E" strokeWidth="0.8" fill="none"/>
-                <path d="M18 2 Q26 10 18 18 Q10 26 18 34" stroke="#2C4A3E" strokeWidth="0.8" fill="none"/>
-                <path d="M18 34 Q10 26 18 18 Q26 10 18 2" stroke="#8B6E5A" strokeWidth="0.8" fill="none"/>
-                <circle cx="18" cy="10" r="3.2" fill="#8B6E5A"/>
-                <circle cx="18" cy="26" r="3.2" fill="#2C4A3E"/>
+          {/* ── Apple Zen Hero ── */}
+          <div className="text-center mb-20">
+            <div className="flex justify-center mb-8">
+              <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                <circle cx="16" cy="16" r="14" stroke="#2C4A3E" strokeWidth="0.8" fill="none"/>
+                <path d="M16 2 Q23 9 16 16 Q9 23 16 30" stroke="#2C4A3E" strokeWidth="0.8" fill="none"/>
+                <path d="M16 30 Q9 23 16 16 Q23 9 16 2" stroke="#8B6E5A" strokeWidth="0.8" fill="none"/>
+                <circle cx="16" cy="9" r="3" fill="#8B6E5A"/>
+                <circle cx="16" cy="23" r="3" fill="#2C4A3E"/>
               </svg>
-              <div style={{ width: '52px', height: '1px', background: 'linear-gradient(to right, transparent, #2C4A3E, transparent)' }} />
             </div>
-
-            <h2 className="text-2xl font-light mb-2 tracking-widest" style={{ color: '#1C2C24', letterSpacing: '0.18em' }}>
+            <h2 className="text-5xl font-light mb-3" style={{ color: '#1C2C24', letterSpacing: '-0.02em', lineHeight: 1.05 }}>
               {t('header.title')}
             </h2>
-            <p className="text-sm font-light" style={{ color: '#8B6E5A', letterSpacing: '0.12em' }}>
+            <p className="text-base font-light" style={{ color: '#8B6E5A', letterSpacing: '0.03em' }}>
               中醫智慧 · 量身調理
             </p>
           </div>
 
-          {/* ── 3-Step Zen Process ── */}
-          <div className="flex gap-3 mb-10">
+          {/* ── 3-step table — Apple minimal ── */}
+          <div className="flex mb-20" style={{ borderTop: '1px solid #E5E2DA', borderBottom: '1px solid #E5E2DA' }}>
             {[
               { n: '壹', title: '填寫問卷', sub: '2分鐘' },
               { n: '貳', title: '舌象拍攝', sub: '選填' },
               { n: '參', title: 'AI 分析', sub: '立即' },
-            ].map((item) => (
-              <div key={item.n} className="flex-1 text-center py-4 rounded-xl"
-                style={{ background: '#FFFFFF', border: '1px solid #E5E2DA', boxShadow: '0 1px 4px rgba(44,74,62,0.05)' }}>
-                <div className="text-base font-light mb-1.5" style={{ color: '#C5D4C0' }}>{item.n}</div>
-                <p className="text-sm font-medium" style={{ color: '#2C4A3E', letterSpacing: '0.04em' }}>{item.title}</p>
+            ].map((item, idx) => (
+              <div key={item.n} className="flex-1 text-center py-5"
+                style={{ borderRight: idx < 2 ? '1px solid #E5E2DA' : 'none' }}>
+                <p className="text-xs mb-1" style={{ color: '#C5D4C0', letterSpacing: '0.10em' }}>{item.n}</p>
+                <p className="text-sm font-medium" style={{ color: '#1C2C24', letterSpacing: '0.04em' }}>{item.title}</p>
                 <p className="text-xs mt-0.5" style={{ color: '#B5C4B8' }}>{item.sub}</p>
               </div>
             ))}
           </div>
 
           {/* ── Mode Cards ── */}
-          <div className="space-y-3 mb-8">
-
-            {/* 快速問診 */}
+          <div className="space-y-2 mb-10">
             <button onClick={() => { setMode('fast'); setStep('basic') }}
               className="w-full rounded-xl px-5 py-4 text-left transition-all duration-200 group"
-              style={{ background: '#FFFFFF', border: '1px solid #E5E2DA', boxShadow: '0 1px 4px rgba(44,74,62,0.05)' }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = '#A3B5A0'; e.currentTarget.style.boxShadow = '0 3px 16px rgba(44,74,62,0.10)' }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = '#E5E2DA'; e.currentTarget.style.boxShadow = '0 1px 4px rgba(44,74,62,0.05)' }}>
+              style={{ background: '#FFFFFF', border: '1px solid #E5E2DA' }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = '#2C4A3E'; e.currentTarget.style.background = '#FAFAF7' }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = '#E5E2DA'; e.currentTarget.style.background = '#FFFFFF' }}>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ background: 'rgba(44,74,62,0.06)' }}>
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                      <path d="M10 3L10 17M3 10L17 10" stroke="#2C4A3E" strokeWidth="1.4" strokeLinecap="round"/>
-                      <circle cx="10" cy="10" r="3.5" stroke="#2C4A3E" strokeWidth="1.2"/>
-                    </svg>
-                  </div>
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ color: '#4A7C6A' }}>
+                    <path d="M10 3v14M3 10h14" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+                    <circle cx="10" cy="10" r="3.5" stroke="currentColor" strokeWidth="1.2"/>
+                  </svg>
                   <div>
-                    <p className="text-sm font-medium" style={{ color: '#1C2C24' }}>{t('mode.fast')}</p>
-                    <p className="text-xs mt-0.5" style={{ color: '#8B6E5A' }}>{t('mode.fastDesc')}</p>
+                    <p className="text-base font-medium" style={{ color: '#1C2C24', letterSpacing: '0.02em' }}>{t('mode.fast')}</p>
+                    <p className="text-sm" style={{ color: '#8B6E5A' }}>{t('mode.fastDesc')}</p>
                   </div>
                 </div>
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ color: '#A3B5A0' }}>
-                  <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ color: '#C5D4C0' }}>
+                  <path d="M4 8h8M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </div>
             </button>
 
-            {/* 詳細問診 */}
             <button onClick={() => { setMode('detailed'); setStep('basic') }}
               className="w-full rounded-xl px-5 py-4 text-left transition-all duration-200 group"
-              style={{ background: '#FFFFFF', border: '1px solid #E5E2DA', boxShadow: '0 1px 4px rgba(44,74,62,0.05)' }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = '#A3B5A0'; e.currentTarget.style.boxShadow = '0 3px 16px rgba(44,74,62,0.10)' }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = '#E5E2DA'; e.currentTarget.style.boxShadow = '0 1px 4px rgba(44,74,62,0.05)' }}>
+              style={{ background: '#FFFFFF', border: '1px solid #E5E2DA' }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = '#2C4A3E'; e.currentTarget.style.background = '#FAFAF7' }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = '#E5E2DA'; e.currentTarget.style.background = '#FFFFFF' }}>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ background: 'rgba(44,74,62,0.06)' }}>
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                      <circle cx="10" cy="10" r="7.5" stroke="#2C4A3E" strokeWidth="1.2"/>
-                      <path d="M10 5.5v4.5l3 2" stroke="#2C4A3E" strokeWidth="1.2" strokeLinecap="round"/>
-                    </svg>
-                  </div>
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ color: '#4A7C6A' }}>
+                    <circle cx="10" cy="10" r="7.5" stroke="currentColor" strokeWidth="1.2"/>
+                    <path d="M10 5.5v5l3.5 2" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+                  </svg>
                   <div>
-                    <p className="text-sm font-medium" style={{ color: '#1C2C24' }}>{t('mode.detailed')}</p>
-                    <p className="text-xs mt-0.5" style={{ color: '#8B6E5A' }}>{t('mode.detailedDesc')}</p>
+                    <p className="text-base font-medium" style={{ color: '#1C2C24', letterSpacing: '0.02em' }}>{t('mode.detailed')}</p>
+                    <p className="text-sm" style={{ color: '#8B6E5A' }}>{t('mode.detailedDesc')}</p>
                   </div>
                 </div>
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ color: '#A3B5A0' }}>
-                  <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ color: '#C5D4C0' }}>
+                  <path d="M4 8h8M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </div>
             </button>
 
-            {/* 智能問診 */}
             <button onClick={() => { setMode('smart'); setStep('basic') }}
               className="w-full rounded-xl px-5 py-4 text-left transition-all duration-200 group"
-              style={{ background: '#FFFFFF', border: '1px solid #DDD5C8', boxShadow: '0 1px 4px rgba(139,110,90,0.05)' }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = '#8B6E5A'; e.currentTarget.style.boxShadow = '0 3px 16px rgba(139,110,90,0.10)' }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = '#DDD5C8'; e.currentTarget.style.boxShadow = '0 1px 4px rgba(139,110,90,0.05)' }}>
+              style={{ background: '#FFFFFF', border: '1px solid #DDD5C8' }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = '#8B6E5A'; e.currentTarget.style.background = '#FAFAF7' }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = '#DDD5C8'; e.currentTarget.style.background = '#FFFFFF' }}>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ background: 'rgba(139,110,90,0.08)' }}>
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                      <path d="M10 2C10 2 4 7 4 11.5a6 6 0 0012 0C16 7 10 2 10 2z" stroke="#8B6E5A" strokeWidth="1.2" fill="none"/>
-                      <circle cx="10" cy="11.5" r="2.5" stroke="#8B6E5A" strokeWidth="1.2"/>
-                    </svg>
-                  </div>
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ color: '#8B6E5A' }}>
+                    <path d="M10 2C10 2 5 6.5 5 11a5 5 0 0010 0C15 6.5 10 2 10 2z" stroke="currentColor" strokeWidth="1.2" fill="none"/>
+                    <circle cx="10" cy="11" r="2.5" stroke="currentColor" strokeWidth="1.2"/>
+                  </svg>
                   <div>
                     <div className="flex items-center gap-2">
-                      <p className="text-sm font-medium" style={{ color: '#1C2C24' }}>智能問診</p>
-                      <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'rgba(139,110,90,0.12)', color: '#8B6E5A' }}>實驗</span>
+                      <p className="text-base font-medium" style={{ color: '#1C2C24', letterSpacing: '0.02em' }}>智能問診</p>
+                      <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'rgba(139,110,90,0.10)', color: '#8B6E5A' }}>實驗</span>
                     </div>
-                    <p className="text-xs mt-0.5" style={{ color: '#8B6E5A' }}>勾選所有症狀，AI一次性分析</p>
+                    <p className="text-sm" style={{ color: '#8B6E5A' }}>勾選所有症狀，AI一次性分析</p>
                   </div>
                 </div>
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ color: '#B5A898' }}>
-                  <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ color: '#C5B8A8' }}>
+                  <path d="M4 8h8M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </div>
             </button>
           </div>
 
           {/* ── Testimonials ── */}
-          <div className="rounded-xl p-5 mb-6" style={{ background: '#FFFFFF', border: '1px solid #E5E2DA', boxShadow: '0 1px 6px rgba(44,74,62,0.06)' }}>
-            <div className="flex items-center gap-2 mb-3">
-              <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
-                <path d="M2 7L4.5 3L6.5 5.5L8.5 3L11 7" stroke="#8B6E5A" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-                <path d="M2 9.5h9" stroke="#8B6E5A" strokeWidth="1" strokeLinecap="round"/>
-              </svg>
-              <p className="text-xs" style={{ color: '#8B6E5A', letterSpacing: '0.10em' }}>用家回饋</p>
-              <div className="flex-1" style={{ height: '1px', background: '#E5E2DA' }} />
-            </div>
-            <p className="text-sm leading-loose" style={{ color: '#4A4A42', lineHeight: 1.9 }}>
+          <div className="rounded-2xl px-5 py-5 mb-8" style={{ background: '#FAFAF7', border: '1px solid #E5E2DA' }}>
+            <p className="text-xs mb-3" style={{ color: '#A3B5A0', letterSpacing: '0.14em' }}>用家回饋</p>
+            <p className="text-sm leading-relaxed" style={{ color: '#4A4A42', lineHeight: 1.8 }}>
               「做了分析才知道自己是氣虛體質，照著建議調整了一個月，明顯覺得精神好多了。」
             </p>
             <p className="text-xs mt-2" style={{ color: '#A3B5A0' }}>— 台北，陳小姐，42歲</p>
-            <div className="flex gap-1.5 mt-3">
-              {[0,1,2].map(i => (
-                <div key={i} style={{ height: '3px', borderRadius: '2px', width: i === 0 ? '20px' : '6px', background: i === 0 ? '#2C4A3E' : '#E5E2DA', transition: 'all 0.3s' }}/>
-              ))}
-            </div>
           </div>
 
           {/* ── Privacy ── */}
-          <div className="rounded-xl px-4 py-3 mb-6 text-center" style={{ background: 'rgba(44,74,62,0.04)', border: '1px solid rgba(44,74,62,0.08)' }}>
-            <p className="text-xs leading-relaxed" style={{ color: '#7A7A6A' }}>
+          <div className="text-center mb-8">
+            <p className="text-xs" style={{ color: '#A3B5A0', letterSpacing: '0.03em' }}>
               🔒 資料完全保密 · 僅用於健康分析
             </p>
           </div>
