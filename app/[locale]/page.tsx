@@ -2007,6 +2007,27 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
               style={{ background: 'rgba(44,74,62,0.06)', color: '#2C4A3E', letterSpacing: '0.04em', border: '1px solid rgba(44,74,62,0.10)' }}>
               {t('result.pattern')}：{result.constitution.pattern}
             </span>
+            {/* 需調理：列出體質分數排行榜 */}
+            {result.constitution.type === '需調理' && result.constitution.constitution_scores && (
+              <div className="mt-3 rounded-xl px-4 py-3"
+                style={{ background: 'rgba(139,110,90,0.06)', border: '1px solid rgba(139,110,90,0.12)' }}>
+                <p className="text-xs mb-2" style={{ color: '#8B6E5A' }}>體質排行</p>
+                <div className="space-y-1.5">
+                  {Object.entries(result.constitution.constitution_scores)
+                    .sort(([,a],[,b]) => b - a)
+                    .slice(0, 6)
+                    .map(([type, score]) => (
+                      <div key={type} className="flex items-center gap-2">
+                        <span className="text-xs w-16" style={{ color: '#4A4A42' }}>{type}</span>
+                        <div className="flex-1 rounded-full h-1.5" style={{ background: 'rgba(44,74,62,0.08)' }}>
+                          <div className="rounded-full h-1.5" style={{ width: `${Math.min((score/10)*100,100)}%`, background: score > 3 ? '#2C4A3E' : score > 1 ? '#8B6E5A' : '#A3B5A0' }} />
+                        </div>
+                        <span className="text-xs w-5 text-right" style={{ color: '#2C4A3E' }}>{score}</span>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* 身體狀況摘要 */}
