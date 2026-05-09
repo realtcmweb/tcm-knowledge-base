@@ -82,6 +82,19 @@ function ResultSaveSection({ result }: { result: ResultData }) {
   const [compareMode, setCompareMode] = useState(false)
   const [selectedOld, setSelectedOld] = useState<SavedResult | null>(null)
 
+  // Close menu when clicking outside
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false)
+      }
+    }
+    if (menuOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+    return () => { document.removeEventListener('mousedown', handleClickOutside) }
+  }, [menuOpen])
+
   useEffect(() => {
     const stored = localStorage.getItem('tcm_result_history')
     if (stored) {
@@ -784,6 +797,8 @@ export default function Home() {
   const locale = useLocale()
   const [mode, setMode] = useState<Mode | null>(null)
   const [fontScale, setFontScale] = useState(100) // 100/115/130
+  const [menuOpen, setMenuOpen] = useState(false)
+  const menuRef = useRef<HTMLDivElement>(null)
   const [step, setStep] = useState<Step>('mode')
   const [resultTab, setResultTab] = useState<'detail'|'herbs'|'food'|'acupoints'|'lifestyle'>('detail')
   const [testimonialIndex, setTestimonialIndex] = useState(0)
@@ -1038,32 +1053,97 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
       <Head><title>{t('header.title')} | TCM AI</title></Head>
 
       {/* Header — Apple Zen Navigation Bar */}
-      <header className="sticky top-0 z-50" style={{ background: 'rgba(255,255,255,0.80)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
+      <header className="sticky top-0 z-50" style={{ background: 'rgba(255,255,255,0.82)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
         <div style={{ maxWidth: '1024px', margin: '0 auto', height: '44px', padding: '0 22px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           {/* Left — TCMAI Logo */}
           <a href="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none' }}>
             <img
               src="/tcmai-logo.jpg"
               alt="TCMAI"
-              style={{ width: '32px', height: 'auto', display: 'block' }}
+              style={{ width: '28px', height: 'auto', display: 'block' }}
             />
             <span style={{ fontSize: '15px', fontWeight: 500, color: '#1C2C24', letterSpacing: '-0.01em' }}>
               {t('header.title')}
             </span>
           </a>
 
-          {/* Right — Apple-style utility icons */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-            {/* Language selector — globe icon */}
-            <LanguageSelector currentLocale={locale} />
+          {/* Right — Apple-style hamburger dropdown */}
+          <div style={{ position: 'relative' }} ref={menuRef}>
+            {/* Hamburger / menu icon button */}
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '6px', display: 'flex', flexDirection: 'column', gap: '5px' }}
+              aria-label="Menu"
+            >
+              <span style={{ display: 'block', width: '18px', height: '1.5px', background: '#1C2C24', transition: 'all 0.2s', transform: menuOpen ? 'rotate(45deg) translate(4px, 4px)' : 'none' }} />
+              <span style={{ display: 'block', width: '18px', height: '1.5px', background: '#1C2C24', transition: 'all 0.2s', opacity: menuOpen ? 0 : 1 }} />
+              <span style={{ display: 'block', width: '18px', height: '1.5px', background: '#1C2C24', transition: 'all 0.2s', transform: menuOpen ? 'rotate(-45deg) translate(4px, -4px)' : 'none' }} />
+            </button>
 
-            {/* Login */}
-            <Link href="/login" style={{ display: 'flex', alignItems: 'center' }}>
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ color: '#000' }}>
-                <path d="M8 7C6.9 7 6 7.9 6 9s.9 2 2 2 2-.9 2-2-.9-2-2-2zM11 4H5.5C4.84 4 4 4.45 4 5.1V6h8V5.1C12 4.45 11.16 4 10.5 4H11z" fill="currentColor"/>
-                <path d="M5 7.5C5 6.67 5.67 6 6.5 6h3c.83 0 1.5.67 1.5 1.5V8H5V7.5zM3 9.5L2 11v3h12v-3l-1-1.5" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-              </svg>
-            </Link>
+            {/* Dropdown menu */}
+            {menuOpen && (
+              <div style={{
+                position: 'absolute',
+                right: 0,
+                top: '100%',
+                marginTop: '8px',
+                width: '220px',
+                background: '#FFFFFF',
+                borderRadius: '12px',
+                border: '1px solid #E5E2DA',
+                boxShadow: '0 8px 32px rgba(44,74,62,0.12)',
+                overflow: 'hidden',
+                zIndex: 100,
+              }}>
+                {/* Font size */}
+                <div style={{ padding: '12px 16px', borderBottom: '1px solid #E5E2DA' }}>
+                  <p style={{ fontSize: '11px', color: '#A3B5A0', letterSpacing: '0.08em', marginBottom: '8px' }}>字體大小</p>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <button onClick={() => setFontScale(Math.max(100, fontScale - 15))}
+                      style={{ background: 'none', border: '1px solid #E5E2DA', borderRadius: '6px', width: '28px', height: '28px', cursor: 'pointer', fontSize: '12px', color: '#1C2C24' }}>
+                      A
+                    </button>
+                    <span style={{ fontSize: '11px', color: '#8B6E5A', minWidth: '30px', textAlign: 'center' }}>{fontScale}%</span>
+                    <button onClick={() => setFontScale(Math.min(160, fontScale + 15))}
+                      style={{ background: 'none', border: '1px solid #E5E2DA', borderRadius: '6px', width: '28px', height: '28px', cursor: 'pointer', fontSize: '14px', color: '#1C2C24' }}>
+                      A
+                    </button>
+                  </div>
+                </div>
+
+                {/* Language */}
+                <div style={{ padding: '10px 16px', borderBottom: '1px solid #E5E2DA' }}>
+                  <p style={{ fontSize: '11px', color: '#A3B5A0', letterSpacing: '0.08em', marginBottom: '6px' }}>語言</p>
+                  <LanguageSelector currentLocale={locale} />
+                </div>
+
+                {/* Menu items */}
+                {[
+                  { label: '關於中醫AI', href: '/#about', icon: 'ℹ️' },
+                  { label: '常見問題', href: '/#faq', icon: '❓' },
+                  { label: '醫療免責聲明', href: '/#disclaimer', icon: '⚠️' },
+                ].map(item => (
+                  <a key={item.label} href={item.href}
+                    style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 16px', textDecoration: 'none', color: '#1C2C24', fontSize: '13px', transition: 'background 0.15s' }}
+                    onMouseEnter={e => e.currentTarget.style.background = '#FAFAF7'}
+                    onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                    <span>{item.icon}</span>
+                    {item.label}
+                  </a>
+                ))}
+
+                <div style={{ borderTop: '1px solid #E5E2DA', padding: '8px 16px' }}>
+                  <Link href="/login"
+                    style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 0', textDecoration: 'none', color: '#2C4A3E', fontSize: '13px', fontWeight: 500 }}
+                    onClick={() => setMenuOpen(false)}>
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ color: '#2C4A3E' }}>
+                      <path d="M7 6.5C5.9 6.5 5 7.4 5 8.5s.9 2 2 2 2-.9 2-2-.9-2-2-2zM9.5 3.5H4.5C4 3.5 3.5 4 3.5 4.5V5.5h7V4.5C10.5 4 10 3.5 9.5 3.5zM3.5 8.5h7V7H3.5v1.5zM2 9.5L1 11v2.5h12V11l-1-1.5" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                    登入 / 註冊
+                  </Link>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </header>
