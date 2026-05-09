@@ -878,6 +878,7 @@ export default function Home() {
   const [mode, setMode] = useState<Mode | null>(null)
   const [fontScale, setFontScale] = useState(100) // 100/115/130
   const [step, setStep] = useState<Step>('mode')
+  const [resultTab, setResultTab] = useState<'detail'|'herbs'|'food'|'acupoints'|'lifestyle'>('detail')
   const [testimonialIndex, setTestimonialIndex] = useState(0)
   const [helpedCount] = useState(12847)
   const [qIndex, setQIndex] = useState(0)
@@ -2132,7 +2133,7 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
           })()}
 
           {result.constitution.suggestions?.length > 0 && (
-            <div className="bg-white rounded-2xl p-5 shadow-sm border border-stone-100 mb-5">
+            <div className="bg-white rounded-2xl p-5 shadow-sm border border-stone-100 mb-5" style={{ display: resultTab === 'detail' ? 'block' : 'none' }}>
               <h3 className="text-sm font-semibold text-emerald-700 mb-3 flex items-center gap-2">
                 <span>✅</span> {t('result.suggestions')}
               </h3>
@@ -2147,8 +2148,33 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
             </div>
           )}
 
+          {/* ── Result Tabs（P0-4） ── */}
+          <div className="mb-5">
+            {/* Tab bar */}
+            <div className="flex rounded-xl overflow-hidden" style={{ border: '1px solid #E5E2DA' }}>
+              {[
+                { id: 'detail', label: '體質解讀' },
+                { id: 'herbs', label: '中藥建議' },
+                { id: 'food', label: '食療方案' },
+                { id: 'acupoints', label: '穴位按摩' },
+                { id: 'lifestyle', label: '生活調整' },
+              ].map(tab => (
+                <button key={tab.id}
+                  onClick={() => setResultTab(tab.id as any)}
+                  className="flex-1 py-2.5 text-xs transition-all"
+                  style={{
+                    background: resultTab === tab.id ? '#1C2C24' : '#FFFFFF',
+                    color: resultTab === tab.id ? '#FAFAF7' : '#8B6E5A',
+                    borderRight: tab.id !== 'lifestyle' ? '1px solid #E5E2DA' : 'none',
+                  }}>
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* ── 能量分析儀表板 ── */}
-          <div className="bg-gradient-to-br from-stone-50 to-stone-100 rounded-2xl p-5 border border-stone-200 mb-5">
+          <div className="bg-gradient-to-br from-stone-50 to-stone-100 rounded-2xl p-5 border border-stone-200 mb-5" style={{ display: resultTab === 'lifestyle' ? 'block' : 'none' }}>
             <h3 className="text-sm font-semibold text-stone-600 mb-4 flex items-center gap-2">
               <span>📊</span> 能量分析
             </h3>
@@ -2246,7 +2272,7 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
           </div>
 
           {/* ── 經脈運行參考圖 ── */}
-          <div className="bg-gradient-to-br from-slate-50 to-blue-50 rounded-2xl p-4 border border-slate-200 mb-5">
+          <div className="bg-gradient-to-br from-slate-50 to-blue-50 rounded-2xl p-4 border border-slate-200 mb-5" style={{ display: resultTab === 'lifestyle' ? 'block' : 'none' }}>
             <h3 className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
               <span>🕐</span> 十二經脈運行時間
             </h3>
@@ -2276,7 +2302,7 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
           </div>
 
           {/* ── 生活方式雷達圖（用長條圖替代） ── */}
-          <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl p-5 border border-emerald-100 mb-5">
+          <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl p-5 border border-emerald-100 mb-5" style={{ display: resultTab === 'lifestyle' ? 'block' : 'none' }}>
             <h3 className="text-sm font-semibold text-emerald-700 mb-4 flex items-center gap-2">
               <span>🌿</span> 生活方式評分
             </h3>
@@ -2478,7 +2504,7 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
 
           </div>
           {/* 辯證要點 */}
-          <div className="bg-emerald-50 rounded-2xl p-5 border border-emerald-100 mb-4">
+          <div className="bg-emerald-50 rounded-2xl p-5 border border-emerald-100 mb-4" style={{ display: resultTab === 'detail' ? 'block' : 'none' }}>
             <h3 className="text-sm font-semibold text-emerald-700 mb-3 flex items-center gap-2">
               <span>🔑</span> 辯證要點
             </h3>
@@ -2493,12 +2519,12 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl p-5 shadow-sm border border-stone-100 mb-4">
+          <div className="bg-white rounded-2xl p-5 shadow-sm border border-stone-100 mb-4" style={{ display: resultTab === 'detail' ? 'block' : 'none' }}>
             <p className="text-sm text-stone-700 leading-relaxed">{result.constitution.description}</p>
           </div>
 
           {result.tongue && (
-            <div className="bg-white rounded-2xl p-5 shadow-sm border border-stone-100 mb-4">
+            <div className="bg-white rounded-2xl p-5 shadow-sm border border-stone-100 mb-4" style={{ display: resultTab === 'detail' ? 'block' : 'none' }}>
               <h3 className="text-sm font-semibold text-emerald-700 mb-3 flex items-center gap-2">
                 <span>👅</span> {t('tongue.title') || '舌苔特徵'}
               </h3>
@@ -2519,7 +2545,7 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
           )}
 
           {result.face && (result.face as any).face_detected && (
-            <div className="bg-amber-50 rounded-2xl p-5 border border-amber-100 mb-4">
+            <div className="bg-amber-50 rounded-2xl p-5 border border-amber-100 mb-4" style={{ display: resultTab === 'detail' ? 'block' : 'none' }}>
               <h3 className="text-sm font-semibold text-amber-700 mb-3 flex items-center gap-2">
                 <span>😊</span> 面色分析（Beta）
               </h3>
@@ -2552,7 +2578,7 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
 
 
           {result.constitution.herbs.length > 0 && (
-            <div className="bg-amber-50 rounded-2xl p-5 border border-amber-100 mb-4">
+            <div className="bg-amber-50 rounded-2xl p-5 border border-amber-100 mb-4" style={{ display: resultTab === 'herbs' ? 'block' : 'none' }}>
               <h3 className="text-sm font-semibold text-amber-700 mb-3 flex items-center gap-2">
                 <span>💊</span> {t('result.herbs')}
               </h3>
@@ -2611,7 +2637,7 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
 
           {/* 中成藥（中成藥） */}
           {Array.isArray(result.constitution.chinese_patent_medicines) && result.constitution.chinese_patent_medicines.length > 0 && (
-            <div className="bg-purple-50 rounded-2xl p-5 border border-purple-100 mb-4">
+            <div className="bg-purple-50 rounded-2xl p-5 border border-purple-100 mb-4" style={{ display: resultTab === 'herbs' ? 'block' : 'none' }}>
               <h3 className="text-sm font-semibold text-purple-700 mb-3 flex items-center gap-2">
                 <span>💊</span> 中成藥建議
               </h3>
@@ -2643,7 +2669,7 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
 
           {/* 中成藥用藥禁忌 */}
           {result.constitution.herbs.length > 0 && getHerbCautions(result.constitution.herbs).length > 0 && (
-            <div className="bg-red-50 rounded-2xl p-5 border border-red-100 mb-4">
+            <div className="bg-red-50 rounded-2xl p-5 border border-red-100 mb-4" style={{ display: resultTab === 'herbs' ? 'block' : 'none' }}>
               <h3 className="text-sm font-semibold text-red-600 mb-3 flex items-center gap-2">
                 <span>⚠️</span> 服用禁忌（重要）
               </h3>
@@ -2659,7 +2685,7 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
           )}
 
           {result.constitution.diet.length > 0 && (
-            <div className="bg-white rounded-2xl p-5 shadow-sm border border-stone-100 mb-4">
+            <div className="bg-white rounded-2xl p-5 shadow-sm border border-stone-100 mb-4" style={{ display: resultTab === 'food' ? 'block' : 'none' }}>
               <h3 className="text-sm font-semibold text-emerald-700 mb-3 flex items-center gap-2">
                 <span>🍲</span> {t('result.diet')}
               </h3>
@@ -2675,7 +2701,7 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
 
           {/* 經方（古典方劑） */}
           {Array.isArray(result.constitution.classical_formulas) && result.constitution.classical_formulas.length > 0 && (
-            <div className="bg-blue-50 rounded-2xl p-5 border border-blue-100 mb-4">
+            <div className="bg-blue-50 rounded-2xl p-5 border border-blue-100 mb-4" style={{ display: resultTab === 'herbs' ? 'block' : 'none' }}>
               <h3 className="text-sm font-semibold text-blue-700 mb-3 flex items-center gap-2">
                 <span>🏛️</span> 經方建議
               </h3>
@@ -2703,7 +2729,7 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
           )}
 
           {result.constitution.acupoints.length > 0 && (
-            <div className="bg-white rounded-2xl p-5 shadow-sm border border-stone-100 mb-4">
+            <div className="bg-white rounded-2xl p-5 shadow-sm border border-stone-100 mb-4" style={{ display: resultTab === 'acupoints' ? 'block' : 'none' }}>
               <h3 className="text-sm font-semibold text-stone-700 mb-3 flex items-center gap-2">
                 <span>🦶</span> {t('result.acupoints')}
               </h3>
@@ -2720,7 +2746,7 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
           )}
 
           {result.constitution.avoid.length > 0 && (
-            <div className="bg-red-50 rounded-2xl p-5 border border-red-100 mb-4">
+            <div className="bg-red-50 rounded-2xl p-5 border border-red-100 mb-4" style={{ display: resultTab === 'food' ? 'block' : 'none' }}>
               <h3 className="text-sm font-semibold text-red-600 mb-3 flex items-center gap-2">
                 <span>⚠️</span> {t('result.avoid')}
               </h3>
@@ -2729,6 +2755,26 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
                   <span key={i} className="text-xs px-3 py-1.5 bg-red-100 text-red-600 rounded-full">✕ {a}</span>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* ── Empty States ── */}
+          {resultTab === 'herbs' && result.constitution.herbs.length === 0 && (
+            <div className="rounded-2xl px-5 py-8 text-center" style={{ background: 'rgba(44,74,62,0.04)', border: '1px solid rgba(44,74,62,0.08)' }}>
+              <p className="text-sm" style={{ color: '#8B6E5A' }}>此分析未包含中藥建議</p>
+              <p className="text-xs mt-1" style={{ color: '#A3B5A0' }}>建議諮詢中醫師獲取個人化中藥方案</p>
+            </div>
+          )}
+          {resultTab === 'food' && result.constitution.diet.length === 0 && result.constitution.avoid.length === 0 && (
+            <div className="rounded-2xl px-5 py-8 text-center" style={{ background: 'rgba(44,74,62,0.04)', border: '1px solid rgba(44,74,62,0.08)' }}>
+              <p className="text-sm" style={{ color: '#8B6E5A' }}>此分析未包含食療方案</p>
+              <p className="text-xs mt-1" style={{ color: '#A3B5A0' }}>建議保持均衡飲食，諮詢中醫師獲取個人化方案</p>
+            </div>
+          )}
+          {resultTab === 'acupoints' && result.constitution.acupoints.length === 0 && (
+            <div className="rounded-2xl px-5 py-8 text-center" style={{ background: 'rgba(44,74,62,0.04)', border: '1px solid rgba(44,74,62,0.08)' }}>
+              <p className="text-sm" style={{ color: '#8B6E5A' }}>此分析未包含穴位建議</p>
+              <p className="text-xs mt-1" style={{ color: '#A3B5A0' }}>可自行按摩常見保健穴位，或諮詢中醫師</p>
             </div>
           )}
 
