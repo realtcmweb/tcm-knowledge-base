@@ -962,9 +962,7 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
             answers,
             chief: answers.chief || '',
             // Enrich with tongue/face features + demographics
-            tongue_color: tongueColor,
-            tongue_coating: tongueCoating,
-            tongue_features: { color: tongueColor, coating: tongueCoating, ...tongueGuideAnswers },
+            tongue_features: { ...tongueGuideAnswers },
             face_features: faceInfo,
             gender: answers.gender,
             age: answers.age,
