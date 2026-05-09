@@ -913,7 +913,7 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
       if (qIndex < totalQ - 1) {
         setQIndex(qIndex + 1)
       } else {
-        setStep('tongue_guide')
+        setStep('tongue')
       }
     }, 350)
   }, [answers, qIndex, currentQ, totalQ])
@@ -927,7 +927,7 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
       if (qIndex < totalQ - 1) {
         setQIndex(qIndex + 1)
       } else {
-        setStep('tongue_guide')
+        setStep('tongue')
       }
     }, 350)
   }, [answers, qIndex, customInput, currentQ, totalQ])
@@ -1608,7 +1608,7 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
                 flatAnswers.gender = answers.gender
                 flatAnswers.age = answers.age
                 setAnswers(flatAnswers)
-                setStep('tongue_guide')
+                setStep('tongue')
               }}
               disabled={Object.values(smartAnswers).flat().length === 0}
               className="w-full py-4 rounded-2xl font-medium text-base transition-all duration-300 disabled:opacity-40"
@@ -1711,95 +1711,8 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
           </div>
         </main>
       )}      {/* ── 舌象引導（選填） ── */}
-      {step === 'tongue_guide' && (
-        <main className="max-w-2xl mx-auto px-6 pt-20 pb-16 min-h-[70vh] flex flex-col justify-center">
+      {/* tongue_guide step removed — tremor question moved inline in tongue step */}
 
-          <div className="text-center mb-10">
-            <div className="flex items-center justify-center gap-3 mb-5">
-              <div style={{ width: '36px', height: '1px', background: 'linear-gradient(to right, transparent, #A3B5A0)' }} />
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                <circle cx="12" cy="12" r="9" stroke="#A3B5A0" strokeWidth="0.8" fill="none"/>
-                <path d="M12 5C12 5 8 9 8 12.5a4 4 0 008 0C16 9 12 5 12 5z" stroke="#A3B5A0" strokeWidth="0.8" fill="none"/>
-              </svg>
-              <div style={{ width: '36px', height: '1px', background: 'linear-gradient(to right, #A3B5A0, transparent)' }} />
-            </div>
-            <p className="text-xs tracking-widest mb-3" style={{ color: '#A3B5A0', letterSpacing: '0.18em' }}>選填 · 可跳過</p>
-            <h2 className="text-4xl font-light mb-3" style={{ color: '#1C2C24', letterSpacing: '-0.01em', lineHeight: 1.15 }}>觀察舌象</h2>
-            <p className="text-base" style={{ color: '#8B6E5A' }}>協助AI更精準判斷體質</p>
-          </div>
-
-          <div className="space-y-6 mb-10">
-            <div>
-              <p className="text-sm font-medium mb-3" style={{ color: '#1C2C24', letterSpacing: '0.04em' }}>舌頭有沒有抖動？</p>
-              <div className="grid grid-cols-2 gap-2">
-                {[{value:'無',label:'正常不抖動'},{value:'輕微',label:'輕微顫動'},{value:'明顯',label:'明顯顫動'},{value:'不確定',label:'不確定'}].map(opt => (
-                  <button key={opt.value}
-                    onClick={() => setTongueGuideAnswers(prev => ({...prev, tremor: opt.value}))}
-                    className="px-3 py-3 rounded-xl text-sm text-left transition-all"
-                    style={{
-                      background: tongueGuideAnswers.tremor === opt.value ? 'rgba(44,74,62,0.08)' : '#FFFFFF',
-                      border: tongueGuideAnswers.tremor === opt.value ? '1px solid #2C4A3E' : '1px solid #E5E2DA',
-                      color: tongueGuideAnswers.tremor === opt.value ? '#2C4A3E' : '#3A3A32',
-                      fontWeight: tongueGuideAnswers.tremor === opt.value ? '500' : '400',
-                    }}>
-                    {opt.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <p className="text-sm font-medium mb-3" style={{ color: '#1C2C24', letterSpacing: '0.04em' }}>舌頭邊緣有齒痕嗎？</p>
-              <div className="grid grid-cols-2 gap-2">
-                {[{value:'無',label:'無齒痕（健康）'},{value:'輕微',label:'輕微齒痕'},{value:'明顯',label:'明顯齒痕'},{value:'不確定',label:'不確定'}].map(opt => (
-                  <button key={opt.value}
-                    onClick={() => setTongueGuideAnswers(prev => ({...prev, teethMark: opt.value}))}
-                    className="px-3 py-3 rounded-xl text-sm text-left transition-all"
-                    style={{
-                      background: tongueGuideAnswers.teethMark === opt.value ? 'rgba(44,74,62,0.08)' : '#FFFFFF',
-                      border: tongueGuideAnswers.teethMark === opt.value ? '1px solid #2C4A3E' : '1px solid #E5E2DA',
-                      color: tongueGuideAnswers.teethMark === opt.value ? '#2C4A3E' : '#3A3A32',
-                      fontWeight: tongueGuideAnswers.teethMark === opt.value ? '500' : '400',
-                    }}>
-                    {opt.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <p className="text-sm font-medium mb-3" style={{ color: '#1C2C24', letterSpacing: '0.04em' }}>舌頭外觀特別之處（選填）</p>
-              <textarea
-                placeholder="例如：舌頭有裂紋、瘀點、潰瘍..."
-                value={tongueGuideAnswers.notes || ''}
-                onChange={e => setTongueGuideAnswers(prev => ({...prev, notes: e.target.value}))}
-                className="w-full px-4 py-3 rounded-2xl text-sm resize-none transition"
-                style={{ background: '#FFFFFF', border: '1px solid #E5E2DA', color: '#1C2C24', letterSpacing: '0.02em', outline: 'none' }}
-                onFocus={e => e.target.style.borderColor = '#2C4A3E'}
-                onBlur={e => e.target.style.borderColor = '#E5E2DA'}
-                rows={3}
-              />
-            </div>
-          </div>
-
-          <div className="space-y-3">
-            <button onClick={() => setStep('tongue')}
-              className="w-full py-4 rounded-2xl font-medium text-base transition-all duration-300"
-              style={{ background: '#1C2C24', color: '#FAFAF7', letterSpacing: '0.04em' }}
-              onMouseEnter={e => e.currentTarget.style.background = '#2C4A3E'}
-              onMouseLeave={e => e.currentTarget.style.background = '#1C2C24'}>
-              {Object.keys(tongueGuideAnswers).length > 0 ? '✓ 已記錄，繼續拍攝舌苔' : '直接拍攝舌苔'}
-            </button>
-            <button onClick={() => setStep('tongue')}
-              className="w-full py-3 text-sm transition-all duration-300"
-              style={{ color: '#A3B5A0' }}
-              onMouseEnter={e => e.currentTarget.style.color = '#8B6E5A'}
-              onMouseLeave={e => e.currentTarget.style.color = '#A3B5A0'}>
-              跳過，稍後再觀察
-            </button>
-          </div>
-        </main>
-      )}      {/* ── 舌苔拍攝 ── */}
       {step === 'tongue' && (
         <main className="max-w-2xl mx-auto px-6 pt-20 pb-16 min-h-[70vh] flex flex-col justify-center">
 
