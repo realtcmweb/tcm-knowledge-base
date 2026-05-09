@@ -943,7 +943,18 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
         const res = await fetch('/api/analyze', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ answers, chief: answers.chief || '' }),
+          body: JSON.stringify({
+            answers,
+            chief: answers.chief || '',
+            // Enrich with tongue/face features + demographics
+            tongue_color: tongueColor,
+            tongue_coating: tongueCoating,
+            tongue_features: { color: tongueColor, coating: tongueCoating, ...tongueGuideAnswers },
+            face_features: faceInfo,
+            gender: answers.gender,
+            age: answers.age,
+            language: locale,
+          }),
         })
         if (res.ok) {
           const data = await res.json()
@@ -2049,6 +2060,133 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
                     {s}
                   </div>
                 ))}
+              </div>
+            </div>
+          )}
+
+          {/* ── 新增：八綱辨證分析 ── */}
+          {result.constitution.eight_principles && (
+            <div className="rounded-2xl px-5 py-5 mb-4"
+              style={{ background: '#FFFFFF', border: '1px solid #E5E2DA', display: resultTab === 'detail' ? 'block' : 'none' }}>
+              <h3 className="text-sm font-medium mb-3 flex items-center gap-2"
+                style={{ color: '#1C2C24', letterSpacing: '0.04em' }}>
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ color: '#2C4A3E' }}>
+                  <circle cx="7" cy="7" r="5.5" stroke="currentColor" strokeWidth="1"/>
+                  <path d="M7 4v3l2 1.5" stroke="currentColor" strokeWidth="1" strokeLinecap="round"/>
+                </svg>
+                八綱辨證分析
+              </h3>
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { label: '陰陽', value: result.constitution.eight_principles.yin_yang },
+                  { label: '表裏', value: result.constitution.eight_principles.exterior_interior },
+                  { label: '寒熱', value: result.constitution.eight_principles.cold_heat },
+                  { label: '虛實', value: result.constitution.eight_principles.deficiency_excess },
+                ].map(item => (
+                  <div key={item.label} className="rounded-xl px-3 py-2.5"
+                    style={{ background: 'rgba(44,74,62,0.04)', border: '1px solid rgba(44,74,62,0.08)' }}>
+                    <p className="text-xs mb-0.5" style={{ color: '#A3B5A0' }}>{item.label}</p>
+                    <p className="text-sm font-medium" style={{ color: '#1C2C24' }}>{item.value || '-'}</p>
+                  </div>
+                ))}
+              </div>
+              {result.constitution.eight_principles.qi_xue_jinye && (
+                <div className="mt-3 rounded-xl px-3 py-2.5"
+                  style={{ background: 'rgba(139,110,90,0.05)', border: '1px solid rgba(139,110,90,0.10)' }}>
+                  <p className="text-xs mb-0.5" style={{ color: '#A3B5A0' }}>氣血津液</p>
+                  <p className="text-sm" style={{ color: '#4A4A42' }}>{result.constitution.eight_principles.qi_xue_jinye}</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ── 新增：經絡分析 ── */}
+          {result.constitution.meridian_analysis && (
+            <div className="rounded-2xl px-5 py-5 mb-4"
+              style={{ background: '#FFFFFF', border: '1px solid #E5E2DA', display: resultTab === 'detail' || resultTab === 'acupoints' ? 'block' : 'none' }}>
+              <h3 className="text-sm font-medium mb-3 flex items-center gap-2"
+                style={{ color: '#1C2C24', letterSpacing: '0.04em' }}>
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ color: '#2C4A3E' }}>
+                  <path d="M2 7h10M7 2v10" stroke="currentColor" strokeWidth="1" strokeLinecap="round"/>
+                </svg>
+                經絡分析
+              </h3>
+              {result.constitution.meridian_analysis.affected_meridians?.length > 0 && (
+                <div className="mb-3">
+                  <p className="text-xs mb-2" style={{ color: '#A3B5A0' }}>受影響經絡</p>
+                  <div className="flex flex-wrap gap-2">
+                    {result.constitution.meridian_analysis.affected_meridians.map((m, i) => (
+                      <span key={i} className="text-xs px-2.5 py-1 rounded-full"
+                        style={{ background: 'rgba(44,74,62,0.08)', color: '#2C4A3E', border: '1px solid rgba(44,74,62,0.12)' }}>
+                        {m}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {result.constitution.meridian_analysis.imbalance && (
+                <p className="text-sm mb-3 leading-relaxed" style={{ color: '#4A4A42' }}>
+                  {result.constitution.meridian_analysis.imbalance}
+                </p>
+              )}
+              {result.constitution.meridian_analysis.recommended_acupoints?.length > 0 && (
+                <div>
+                  <p className="text-xs mb-2" style={{ color: '#A3B5A0' }}>建議穴位</p>
+                  <div className="flex flex-wrap gap-2">
+                    {result.constitution.meridian_analysis.recommended_acupoints.map((a, i) => (
+                      <span key={i} className="text-xs px-2.5 py-1 rounded-full"
+                        style={{ background: 'rgba(139,110,90,0.08)', color: '#8B6E5A', border: '1px solid rgba(139,110,90,0.12)' }}>
+                        {a}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ── 新增：方劑加減建議 ── */}
+          {result.constitution.herbs_adjustment && (
+            <div className="rounded-2xl px-5 py-5 mb-4"
+              style={{ background: '#FFFFFF', border: '1px solid #E5E2DA', display: resultTab === 'herbs' ? 'block' : 'none' }}>
+              <h3 className="text-sm font-medium mb-3 flex items-center gap-2"
+                style={{ color: '#1C2C24', letterSpacing: '0.04em' }}>
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ color: '#2C4A3E' }}>
+                  <path d="M4 7l2 2 4-4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                方劑加減建議
+              </h3>
+              <div className="space-y-3">
+                {result.constitution.herbs_adjustment.base && (
+                  <div className="rounded-xl px-3 py-3"
+                    style={{ background: 'rgba(44,74,62,0.06)', border: '1px solid rgba(44,74,62,0.10)' }}>
+                    <p className="text-xs mb-1" style={{ color: '#A3B5A0' }}>基本方</p>
+                    <p className="text-sm font-medium" style={{ color: '#2C4A3E' }}>{result.constitution.herbs_adjustment.base}</p>
+                  </div>
+                )}
+                {result.constitution.herbs_adjustment.add?.length > 0 && (
+                  <div className="flex items-start gap-2">
+                    <span className="text-xs px-2 py-1 rounded-full flex-shrink-0 mt-0.5"
+                      style={{ background: 'rgba(44,74,62,0.08)', color: '#2C4A3E' }}>加</span>
+                    <p className="text-sm" style={{ color: '#4A4A42' }}>
+                      {result.constitution.herbs_adjustment.add.join('、')}
+                    </p>
+                  </div>
+                )}
+                {result.constitution.herbs_adjustment.reduce?.length > 0 && (
+                  <div className="flex items-start gap-2">
+                    <span className="text-xs px-2 py-1 rounded-full flex-shrink-0 mt-0.5"
+                      style={{ background: 'rgba(194,84,74,0.08)', color: '#C2544A' }}>減</span>
+                    <p className="text-sm" style={{ color: '#4A4A42' }}>
+                      {result.constitution.herbs_adjustment.reduce.join('、')}
+                    </p>
+                  </div>
+                )}
+                {result.constitution.herbs_adjustment.reason && (
+                  <p className="text-xs leading-relaxed" style={{ color: '#8B6E5A', lineHeight: 1.7 }}>
+                    {result.constitution.herbs_adjustment.reason}
+                  </p>
+                )}
               </div>
             </div>
           )}
