@@ -13,29 +13,35 @@ function NumberInputWithUnit({ value, onChange, placeholder, isHeight }: {
 }) {
   const [localUnit, setLocalUnit] = useState(isHeight ? 'cm' : 'kg')
   return (
-    <div className="flex items-center gap-2 bg-white border-2 border-stone-200 rounded-xl px-4 py-3 focus-within:border-emerald-400 transition">
+    <div className="flex items-center gap-2 bg-white rounded-xl px-4 py-3 transition"
+      style={{ border: '1px solid #E5E2DA' }}
+      onFocus={e => e.currentTarget.style.borderColor = '#2C4A3E'}
+      onBlur={e => e.currentTarget.style.borderColor = '#E5E2DA'}>
       <input type="text" inputMode="decimal" placeholder={placeholder} value={value}
         onChange={e => onChange(e.target.value)}
-        className="flex-1 outline-none text-stone-800" />
+        className="flex-1 outline-none" style={{ color: '#1C2C24', letterSpacing: '0.04em' }} />
       {isHeight ? (
         <div className="flex gap-1">
           <button type="button" onClick={() => setLocalUnit('cm')}
-            className={`px-2 py-1 rounded text-xs ${localUnit === 'cm' ? 'bg-emerald-500 text-white' : 'bg-stone-100 text-stone-500'}`}>cm</button>
+            className="px-2.5 py-1 rounded text-xs transition-colors"
+            style={{ background: localUnit === 'cm' ? '#2C4A3E' : '#F0EDE6', color: localUnit === 'cm' ? '#FAFAF7' : '#7A7A6A' }}>cm</button>
           <button type="button" onClick={() => setLocalUnit('inch')}
-            className={`px-2 py-1 rounded text-xs ${localUnit === 'inch' ? 'bg-emerald-500 text-white' : 'bg-stone-100 text-stone-500'}`}>inch</button>
+            className="px-2.5 py-1 rounded text-xs transition-colors"
+            style={{ background: localUnit === 'inch' ? '#2C4A3E' : '#F0EDE6', color: localUnit === 'inch' ? '#FAFAF7' : '#7A7A6A' }}>inch</button>
         </div>
       ) : (
         <div className="flex gap-1">
           <button type="button" onClick={() => setLocalUnit('kg')}
-            className={`px-2 py-1 rounded text-xs ${localUnit === 'kg' ? 'bg-emerald-500 text-white' : 'bg-stone-100 text-stone-500'}`}>kg</button>
+            className="px-2.5 py-1 rounded text-xs transition-colors"
+            style={{ background: localUnit === 'kg' ? '#2C4A3E' : '#F0EDE6', color: localUnit === 'kg' ? '#FAFAF7' : '#7A7A6A' }}>kg</button>
           <button type="button" onClick={() => setLocalUnit('lb')}
-            className={`px-2 py-1 rounded text-xs ${localUnit === 'lb' ? 'bg-emerald-500 text-white' : 'bg-stone-100 text-stone-500'}`}>lb</button>
+            className="px-2.5 py-1 rounded text-xs transition-colors"
+            style={{ background: localUnit === 'lb' ? '#2C4A3E' : '#F0EDE6', color: localUnit === 'lb' ? '#FAFAF7' : '#7A7A6A' }}>lb</button>
         </div>
       )}
     </div>
   )
 }
-
 // ============================================
 // 題目類型
 // ============================================
@@ -824,7 +830,13 @@ function FaqAccordion() {
     { q: '和去看中醫有什麼不同？', a: '線上分析僅供參考，不能取代中醫師面診。如有明顯症狀，建議就近諮詢中醫師。' },
   ]
   return (
-    <div className="mb-4">
+    <div className="mb-6">
+      {/* Zen section header */}
+      <div className="flex items-center gap-3 mb-4">
+        <div style={{ width: '24px', height: '1px', background: '#E5E2DA' }} />
+        <p className="text-xs tracking-widest" style={{ color: '#A3B5A0', letterSpacing: '0.15em' }}>常見問題</p>
+        <div style={{ width: '24px', height: '1px', background: '#E5E2DA' }} />
+      </div>
       {faqs.map((faq, i) => <FaqItem key={i} faq={faq} />)}
     </div>
   )
@@ -835,18 +847,26 @@ function FaqItem({ faq }: { faq: { q: string; a: string } }) {
   return (
     <div className="mb-2">
       <button onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between px-4 py-3 bg-white rounded-xl border border-stone-200 text-left text-sm text-stone-600 hover:border-emerald-300 transition">
-        <span>{faq.q}</span>
-        <span className={`text-stone-400 transition-transform ${open ? 'rotate-180' : ''}`}>▼</span>
+        className="w-full flex items-center justify-between px-4 py-3 text-left text-sm transition-all duration-200 rounded-xl"
+        style={{ background: open ? 'rgba(44,74,62,0.04)' : '#FFFFFF', border: open ? '1px solid #2C4A3E' : '1px solid #E5E2DA', color: open ? '#2C4A3E' : '#3A3A32' }}
+        onMouseEnter={e => { if (!open) { e.currentTarget.style.borderColor = '#A3B5A0' } }}
+        onMouseLeave={e => { if (!open) { e.currentTarget.style.borderColor = '#E5E2DA' } }}>
+        <span style={{ fontWeight: open ? '500' : '400', letterSpacing: '0.02em' }}>{faq.q}</span>
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
+          style={{ color: open ? '#2C4A3E' : '#A3B5A0', transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s ease' }}>
+          <path d="M3 5l4 4 4-4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
       </button>
       {open && (
-        <div className="mt-1 px-4 py-3 bg-stone-50 rounded-xl text-xs text-stone-500 leading-relaxed">
+        <div className="mt-1 px-4 py-3 rounded-xl text-sm leading-relaxed"
+          style={{ background: '#FAFAF7', border: '1px solid #E5E2DA', color: '#4A4A42', letterSpacing: '0.02em' }}>
           {faq.a}
         </div>
       )}
     </div>
   )
 }
+
 
 // ============================================
 // 主元件
@@ -1044,11 +1064,17 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
         <button
           key={opt.value}
           onClick={() => handleAnswer(opt.value)}
-          className={`w-full px-5 py-4 rounded-2xl text-left text-sm transition-all border-2 ${
-            isSelected
-              ? 'border-emerald-500 bg-emerald-50 font-medium text-emerald-800 shadow-sm'
-              : 'border-stone-200 bg-white text-stone-600 hover:border-emerald-300 active:bg-stone-50'
-          }`}
+          className="w-full px-5 py-4 rounded-xl text-left text-sm transition-all duration-200"
+          style={{
+            background: isSelected ? 'rgba(44,74,62,0.08)' : '#FFFFFF',
+            border: isSelected ? '1px solid #2C4A3E' : '1px solid #E5E2DA',
+            color: isSelected ? '#2C4A3E' : '#3A3A32',
+            fontWeight: isSelected ? '500' : '400',
+            boxShadow: isSelected ? '0 1px 6px rgba(44,74,62,0.08)' : '0 1px 3px rgba(44,74,62,0.03)',
+            letterSpacing: '0.02em',
+          }}
+          onMouseEnter={e => { if (!isSelected) { e.currentTarget.style.borderColor = '#A3B5A0'; e.currentTarget.style.background = '#FAFAF7' } }}
+          onMouseLeave={e => { if (!isSelected) { e.currentTarget.style.borderColor = '#E5E2DA'; e.currentTarget.style.background = '#FFFFFF' } }}
         >
           {opt.label}
         </button>
@@ -1057,169 +1083,238 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
   }
 
   return (
-    <div className="min-h-screen bg-stone-50 text-stone-800" style={{ fontFamily: "'Noto Serif TC', serif", fontSize: fontScale === 100 ? '17px' : fontScale === 115 ? '19px' : '21px' }}>
+    <div className="min-h-screen text-stone-800" style={{ background: '#FAFAF7', fontFamily: "'Noto Serif TC', serif", fontSize: fontScale === 100 ? '17px' : fontScale === 115 ? '19px' : '21px' }}>
       <Head><title>{t('header.title')} | TCM AI</title></Head>
 
-      {/* Header */}
-      <header className="bg-white/90 backdrop-blur-sm border-b border-stone-200 sticky top-0 z-50">
-        <div className="max-w-lg mx-auto px-4 py-3 flex items-center justify-between">
-          <div>
-            <h1 className="text-lg font-light tracking-wide text-stone-700">{t('header.title')}</h1>
-            <p className="text-xs text-stone-400 tracking-widest">{t('header.subtitle')}</p>
+      {/* Header — Zen minimal */}
+      <header className="sticky top-0 z-50" style={{ background: 'rgba(250,250,247,0.92)', backdropFilter: 'blur(12px)', borderBottom: '1px solid #E5E2DA' }}>
+        <div className="max-w-lg mx-auto px-5 py-3.5 flex items-center justify-between">
+          {/* 左：標誌 */}
+          <div className="flex items-center gap-3">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="14" cy="14" r="12" stroke="#2C4A3E" strokeWidth="1.2"/>
+              <path d="M14 2 Q20 8 14 14 Q8 20 14 26" stroke="#2C4A3E" strokeWidth="1.2" fill="none"/>
+              <path d="M14 26 Q8 20 14 14 Q20 8 14 2" stroke="#8B6E5A" strokeWidth="1.2" fill="none"/>
+              <circle cx="14" cy="8.5" r="2.5" fill="#8B6E5A"/>
+              <circle cx="14" cy="19.5" r="2.5" fill="#2C4A3E"/>
+            </svg>
+            <div>
+              <h1 className="text-base font-light tracking-wide" style={{ color: '#1C2C24', letterSpacing: '0.08em' }}>{t('header.title')}</h1>
+              <p className="text-xs tracking-widest" style={{ color: '#A3B5A0', letterSpacing: '0.15em' }}>{t('header.subtitle')}</p>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            {/* 字體縮放 */}
-            <div className="flex items-center bg-stone-100 rounded-full px-1 py-0.5 gap-1">
+          {/* 右：控制項 */}
+          <div className="flex items-center gap-3">
+            {/* 字體縮放 — Zen pill */}
+            <div className="flex items-center rounded-full px-0.5 py-0.5 gap-0.5" style={{ background: '#F0EDE6' }}>
               <button onClick={() => setFontScale(Math.max(100, fontScale - 15))}
-                className="w-7 h-7 rounded-full text-stone-500 hover:text-stone-700 hover:bg-stone-200 transition flex items-center justify-center font-bold text-lg">−</button>
-              <span className="text-xs text-stone-500 w-5 text-center font-medium">{fontScale}%</span>
+                className="w-7 h-7 rounded-full flex items-center justify-center transition-colors"
+                style={{ color: '#7A7A6A', fontSize: '18px', lineHeight: 1 }}
+                onMouseEnter={e => e.currentTarget.style.background = '#E5E2DA'}
+                onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+              >−</button>
+              <span className="text-xs w-6 text-center" style={{ color: '#7A7A6A', fontFamily: 'sans-serif' }}>{fontScale}</span>
               <button onClick={() => setFontScale(Math.min(160, fontScale + 15))}
-                className="w-7 h-7 rounded-full text-stone-500 hover:text-stone-700 hover:bg-stone-200 transition flex items-center justify-center font-bold text-lg">+</button>
+                className="w-7 h-7 rounded-full flex items-center justify-center transition-colors"
+                style={{ color: '#7A7A6A', fontSize: '18px', lineHeight: 1 }}
+                onMouseEnter={e => e.currentTarget.style.background = '#E5E2DA'}
+                onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+              >+</button>
             </div>
             <Link href="/login"
-              className="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white text-xs rounded-full transition">
+              className="px-3.5 py-1.5 text-xs rounded-full transition-colors"
+              style={{ background: '#2C4A3E', color: '#FAFAF7' }}
+              onMouseEnter={e => (e.currentTarget.style.background = '#3D5E4F')}
+              onMouseLeave={e => (e.currentTarget.style.background = '#2C4A3E')}
+            >
               登入
             </Link>
             <LanguageSelector currentLocale={locale} />
           </div>
         </div>
+        {/* 問卷進度條 — Zen thin line */}
         {(step === 'questionnaire') && (
-          <div className="h-1 bg-stone-100">
-            <div className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-500" style={{ width: `${progress}%` }} />
+          <div style={{ height: '2px', background: '#E5E2DA' }}>
+            <div style={{ height: '100%', background: '#2C4A3E', transition: 'width 0.5s ease', width: `${progress}%` }} />
           </div>
         )}
       </header>
 
       {/* ── 模式選擇 ── */}
       {step === 'mode' && (
-        <main className="max-w-lg mx-auto px-4 py-10 min-h-[75vh] flex flex-col justify-center relative overflow-hidden">
-          {/* 太極陰陽背景動畫 */}
-          <div className="absolute inset-0 pointer-events-none select-none opacity-[0.06]" aria-hidden="true">
-            <svg viewBox="0 0 400 400" className="w-full h-full animate-spin-slow">
-              <circle cx="200" cy="200" r="180" fill="none" stroke="#10b981" strokeWidth="2"/>
-              <path d="M200 20 Q260 110 200 200 Q140 290 200 380 Q300 290 300 200 Q300 110 200 20" fill="#10b981"/>
-              <path d="M200 380 Q140 290 200 200 Q260 110 200 20 Q100 110 100 200 Q100 290 200 380" fill="#065f46"/>
-              <circle cx="200" cy="110" r="35" fill="#065f46"/>
-              <circle cx="200" cy="290" r="35" fill="#10b981"/>
-              <circle cx="200" cy="110" r="12" fill="#10b981"/>
-              <circle cx="200" cy="290" r="12" fill="#065f46"/>
-            </svg>
+        <main className="max-w-lg mx-auto px-5 py-14 min-h-[80vh] flex flex-col">
+
+          {/* ── Hero ── */}
+          <div className="text-center mb-10">
+            <div className="flex items-center justify-center gap-4 mb-8">
+              <div style={{ width: '52px', height: '1px', background: 'linear-gradient(to right, transparent, #2C4A3E, transparent)' }} />
+              <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+                <circle cx="18" cy="18" r="16" stroke="#2C4A3E" strokeWidth="0.8" fill="none"/>
+                <path d="M18 2 Q26 10 18 18 Q10 26 18 34" stroke="#2C4A3E" strokeWidth="0.8" fill="none"/>
+                <path d="M18 34 Q10 26 18 18 Q26 10 18 2" stroke="#8B6E5A" strokeWidth="0.8" fill="none"/>
+                <circle cx="18" cy="10" r="3.2" fill="#8B6E5A"/>
+                <circle cx="18" cy="26" r="3.2" fill="#2C4A3E"/>
+              </svg>
+              <div style={{ width: '52px', height: '1px', background: 'linear-gradient(to right, transparent, #2C4A3E, transparent)' }} />
+            </div>
+
+            <h2 className="text-2xl font-light mb-2 tracking-widest" style={{ color: '#1C2C24', letterSpacing: '0.18em' }}>
+              {t('header.title')}
+            </h2>
+            <p className="text-sm font-light" style={{ color: '#8B6E5A', letterSpacing: '0.12em' }}>
+              中醫智慧 · 量身調理
+            </p>
           </div>
 
-          <div className="space-y-3 mb-6">
+          {/* ── 3-Step Zen Process ── */}
+          <div className="flex gap-3 mb-10">
+            {[
+              { n: '壹', title: '填寫問卷', sub: '2分鐘' },
+              { n: '貳', title: '舌象拍攝', sub: '選填' },
+              { n: '參', title: 'AI 分析', sub: '立即' },
+            ].map((item) => (
+              <div key={item.n} className="flex-1 text-center py-4 rounded-xl"
+                style={{ background: '#FFFFFF', border: '1px solid #E5E2DA', boxShadow: '0 1px 4px rgba(44,74,62,0.05)' }}>
+                <div className="text-base font-light mb-1.5" style={{ color: '#C5D4C0' }}>{item.n}</div>
+                <p className="text-sm font-medium" style={{ color: '#2C4A3E', letterSpacing: '0.04em' }}>{item.title}</p>
+                <p className="text-xs mt-0.5" style={{ color: '#B5C4B8' }}>{item.sub}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* ── Mode Cards ── */}
+          <div className="space-y-3 mb-8">
+
+            {/* 快速問診 */}
             <button onClick={() => { setMode('fast'); setStep('basic') }}
-              className="w-full py-5 px-5 bg-white border-2 border-stone-200 rounded-2xl text-left hover:border-emerald-400 transition group">
+              className="w-full rounded-xl px-5 py-4 text-left transition-all duration-200 group"
+              style={{ background: '#FFFFFF', border: '1px solid #E5E2DA', boxShadow: '0 1px 4px rgba(44,74,62,0.05)' }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = '#A3B5A0'; e.currentTarget.style.boxShadow = '0 3px 16px rgba(44,74,62,0.10)' }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = '#E5E2DA'; e.currentTarget.style.boxShadow = '0 1px 4px rgba(44,74,62,0.05)' }}>
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium text-stone-800 group-hover:text-emerald-700">⚡ {t('mode.fast')}</p>
-                  <p className="text-xs text-stone-400 mt-1">{t('mode.fastDesc')}</p>
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ background: 'rgba(44,74,62,0.06)' }}>
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                      <path d="M10 3L10 17M3 10L17 10" stroke="#2C4A3E" strokeWidth="1.4" strokeLinecap="round"/>
+                      <circle cx="10" cy="10" r="3.5" stroke="#2C4A3E" strokeWidth="1.2"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium" style={{ color: '#1C2C24' }}>{t('mode.fast')}</p>
+                    <p className="text-xs mt-0.5" style={{ color: '#8B6E5A' }}>{t('mode.fastDesc')}</p>
+                  </div>
                 </div>
-                <span className="text-stone-300 group-hover:text-emerald-400">→</span>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ color: '#A3B5A0' }}>
+                  <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
               </div>
             </button>
+
+            {/* 詳細問診 */}
             <button onClick={() => { setMode('detailed'); setStep('basic') }}
-              className="w-full py-5 px-5 bg-white border-2 border-stone-200 rounded-2xl text-left hover:border-emerald-400 transition group">
+              className="w-full rounded-xl px-5 py-4 text-left transition-all duration-200 group"
+              style={{ background: '#FFFFFF', border: '1px solid #E5E2DA', boxShadow: '0 1px 4px rgba(44,74,62,0.05)' }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = '#A3B5A0'; e.currentTarget.style.boxShadow = '0 3px 16px rgba(44,74,62,0.10)' }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = '#E5E2DA'; e.currentTarget.style.boxShadow = '0 1px 4px rgba(44,74,62,0.05)' }}>
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium text-stone-800 group-hover:text-emerald-700">🔍 {t('mode.detailed')}</p>
-                  <p className="text-xs text-stone-400 mt-1">{t('mode.detailedDesc')}</p>
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ background: 'rgba(44,74,62,0.06)' }}>
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                      <circle cx="10" cy="10" r="7.5" stroke="#2C4A3E" strokeWidth="1.2"/>
+                      <path d="M10 5.5v4.5l3 2" stroke="#2C4A3E" strokeWidth="1.2" strokeLinecap="round"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium" style={{ color: '#1C2C24' }}>{t('mode.detailed')}</p>
+                    <p className="text-xs mt-0.5" style={{ color: '#8B6E5A' }}>{t('mode.detailedDesc')}</p>
+                  </div>
                 </div>
-                <span className="text-stone-300 group-hover:text-emerald-400">→</span>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ color: '#A3B5A0' }}>
+                  <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
               </div>
             </button>
+
+            {/* 智能問診 */}
             <button onClick={() => { setMode('smart'); setStep('basic') }}
-              className="w-full py-5 px-5 bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-200 rounded-2xl text-left hover:border-amber-400 transition group">
+              className="w-full rounded-xl px-5 py-4 text-left transition-all duration-200 group"
+              style={{ background: '#FFFFFF', border: '1px solid #DDD5C8', boxShadow: '0 1px 4px rgba(139,110,90,0.05)' }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = '#8B6E5A'; e.currentTarget.style.boxShadow = '0 3px 16px rgba(139,110,90,0.10)' }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = '#DDD5C8'; e.currentTarget.style.boxShadow = '0 1px 4px rgba(139,110,90,0.05)' }}>
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium text-amber-700 group-hover:text-amber-800">🧠 智能問診</p>
-                  <p className="text-xs text-amber-500 mt-1">勾選所有症狀，AI一次性分析（實驗功能）</p>
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ background: 'rgba(139,110,90,0.08)' }}>
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                      <path d="M10 2C10 2 4 7 4 11.5a6 6 0 0012 0C16 7 10 2 10 2z" stroke="#8B6E5A" strokeWidth="1.2" fill="none"/>
+                      <circle cx="10" cy="11.5" r="2.5" stroke="#8B6E5A" strokeWidth="1.2"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-medium" style={{ color: '#1C2C24' }}>智能問診</p>
+                      <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'rgba(139,110,90,0.12)', color: '#8B6E5A' }}>實驗</span>
+                    </div>
+                    <p className="text-xs mt-0.5" style={{ color: '#8B6E5A' }}>勾選所有症狀，AI一次性分析</p>
+                  </div>
                 </div>
-                <span className="text-amber-300 group-hover:text-amber-500">→</span>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ color: '#B5A898' }}>
+                  <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
               </div>
             </button>
           </div>
 
-          {/* 三分鐘流程說明 */}
-          <div className="mb-6">
-            <div className="flex items-stretch gap-2">
-              {[
-                { step: '1', icon: '📝', title: '回答10題', sub: '2分鐘', color: 'from-amber-50 to-amber-100 border-amber-200' },
-                { step: '2', icon: '👅', title: '拍舌苔', sub: '可跳過', color: 'from-emerald-50 to-emerald-100 border-emerald-200' },
-                { step: '3', icon: '🌿', title: 'AI分析', sub: '立即出結果', color: 'from-teal-50 to-teal-100 border-teal-200' },
-              ].map(item => (
-                <div key={item.step} className={`flex-1 bg-gradient-to-b ${item.color} rounded-xl p-3 text-center border`}>
-                  <div className="text-xl mb-1">{item.icon}</div>
-                  <p className="text-xs font-medium text-stone-700">{item.title}</p>
-                  <p className="text-xs text-stone-400">{item.sub}</p>
-                </div>
+          {/* ── Testimonials ── */}
+          <div className="rounded-xl p-5 mb-6" style={{ background: '#FFFFFF', border: '1px solid #E5E2DA', boxShadow: '0 1px 6px rgba(44,74,62,0.06)' }}>
+            <div className="flex items-center gap-2 mb-3">
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+                <path d="M2 7L4.5 3L6.5 5.5L8.5 3L11 7" stroke="#8B6E5A" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+                <path d="M2 9.5h9" stroke="#8B6E5A" strokeWidth="1" strokeLinecap="round"/>
+              </svg>
+              <p className="text-xs" style={{ color: '#8B6E5A', letterSpacing: '0.10em' }}>用家回饋</p>
+              <div className="flex-1" style={{ height: '1px', background: '#E5E2DA' }} />
+            </div>
+            <p className="text-sm leading-loose" style={{ color: '#4A4A42', lineHeight: 1.9 }}>
+              「做了分析才知道自己是氣虛體質，照著建議調整了一個月，明顯覺得精神好多了。」
+            </p>
+            <p className="text-xs mt-2" style={{ color: '#A3B5A0' }}>— 台北，陳小姐，42歲</p>
+            <div className="flex gap-1.5 mt-3">
+              {[0,1,2].map(i => (
+                <div key={i} style={{ height: '3px', borderRadius: '2px', width: i === 0 ? '20px' : '6px', background: i === 0 ? '#2C4A3E' : '#E5E2DA', transition: 'all 0.3s' }}/>
               ))}
             </div>
           </div>
 
-          <div className="text-center mb-6">
-            <div className="text-5xl mb-3">🌿</div>
-            <h2 className="text-2xl font-light text-stone-700 mb-1">{t('header.title')}</h2>
-            <p className="text-sm text-stone-500">{t('home.certified')}</p>
+          {/* ── Privacy ── */}
+          <div className="rounded-xl px-4 py-3 mb-6 text-center" style={{ background: 'rgba(44,74,62,0.04)', border: '1px solid rgba(44,74,62,0.08)' }}>
+            <p className="text-xs leading-relaxed" style={{ color: '#7A7A6A' }}>
+              🔒 資料完全保密 · 僅用於健康分析
+            </p>
           </div>
 
           <FaqAccordion />
-
-          <div className="bg-stone-100 rounded-xl p-4 mb-4">
-            <p className="text-xs text-stone-500 leading-relaxed">
-              🔒 {t('home.privacy')}
-            </p>
-          </div>
-
-          {/* 用戶評價輪播 */}
-          <div className="mb-6">
-            <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl p-4 border border-emerald-100">
-              <div className="flex items-center gap-1 mb-2">
-                <span className="text-amber-400 text-sm">★★★★★</span>
-                <span className="text-xs text-stone-400 ml-1">基於真實用戶回饋</span>
-              </div>
-              <div className="overflow-hidden">
-                <p className="text-sm text-stone-600 italic leading-relaxed">
-                  「做了分析才知道自己是氣虛體質，照著建議調整了一個月，明顯覺得精神好多了！中醫師說分析很準確。」
-                </p>
-                <p className="text-xs text-stone-400 mt-1">— 台北，陳小姐，42歲</p>
-              </div>
-              <div className="flex gap-1.5 mt-3">
-                {[0,1,2].map(i => (
-                  <div key={i} className={`h-1 rounded-full transition-all ${i === 0 ? 'w-4 bg-emerald-400' : 'w-1 bg-stone-300'}`}/>
-                ))}
-              </div>
-            </div>
-          </div>
-
-
-          <div className="bg-stone-100 rounded-xl p-4 text-center">
-            <p className="text-xs text-stone-500 leading-relaxed">
-              {t('home.tenQuestions')}<br />
-              {t('home.privacy')}
-            </p>
-          </div>
         </main>
-      )}
-
-      {/* ── 基本資料 ── */}
+      )}      {/* ── 基本資料 ── */}
       {step === 'basic' && BASIC_QUESTIONS[qIndex] && (
-        <main className="max-w-lg mx-auto px-4 py-8 min-h-[70vh] flex flex-col justify-center">
-          <div className="text-center mb-6">
-            <p className="text-xs text-stone-400 tracking-widest mb-1">基本資料</p>
-            <p className="text-xs text-emerald-600">
-              {mode === 'fast' ? t('mode.fast') : mode === 'detailed' ? t('mode.detailed') : '🧠 智能問診'} · 協助精準判斷
+        <main className="max-w-lg mx-auto px-5 py-10 min-h-[70vh] flex flex-col justify-center">
+          <div className="text-center mb-7">
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <div style={{ width: '24px', height: '1px', background: '#E5E2DA' }} />
+              <p className="text-xs tracking-widest" style={{ color: '#A3B5A0', letterSpacing: '0.15em' }}>基本資料</p>
+              <div style={{ width: '24px', height: '1px', background: '#E5E2DA' }} />
+            </div>
+            <p className="text-xs" style={{ color: '#8B6E5A' }}>
+              {mode === 'fast' ? t('mode.fast') : mode === 'detailed' ? t('mode.detailed') : '智能問診'} · 協助精準判斷
             </p>
           </div>
           {(() => {
             const q = BASIC_QUESTIONS[qIndex]
-
-            // input_number 類型（身高、體重）
             if (q.type === 'input_number') {
               const isHeight = q.id === 'height'
               return (
                 <div className="space-y-3">
-                  {q.groupLabel && <p className="text-xs text-emerald-600 tracking-widest mb-1">{q.groupLabel}</p>}
-                  <h2 className="text-xl font-light text-stone-700 mb-6 text-center">{q.text}</h2>
+                  {q.groupLabel && <p className="text-xs text-center mb-1" style={{ color: '#A3B5A0', letterSpacing: '0.12em' }}>{q.groupLabel}</p>}
+                  <h2 className="text-xl font-light text-center mb-6" style={{ color: '#1C2C24', letterSpacing: '0.06em', lineHeight: 1.8 }}>{q.text}</h2>
                   <NumberInputWithUnit
                     value={answers[q.id] || ''}
                     onChange={v => setAnswers({ ...answers, [q.id]: v })}
@@ -1229,20 +1324,36 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
                   <button onClick={() => {
                     if (qIndex < BASIC_QUESTIONS.length - 1) setQIndex(qIndex + 1)
                     else (mode === 'smart' ? setStep('smart') : setStep('chief'))
-                  }} className="w-full py-4 bg-gradient-to-r from-emerald-600 to-teal-500 text-white rounded-xl font-medium">確定 →</button>
+                  }}
+                    className="w-full py-4 rounded-xl font-medium text-sm transition-all duration-200"
+                    style={{ background: '#2C4A3E', color: '#FAFAF7', letterSpacing: '0.08em' }}
+                    onMouseEnter={e => e.currentTarget.style.background = '#3D5E4F'}
+                    onMouseLeave={e => e.currentTarget.style.background = '#2C4A3E'}>
+                    確定
+                  </button>
                   <button onClick={() => {
                     if (qIndex < BASIC_QUESTIONS.length - 1) setQIndex(qIndex + 1)
                     else (mode === 'smart' ? setStep('smart') : setStep('chief'))
-                  }} className="w-full py-3 text-sm text-stone-400 hover:text-stone-600">跳過（選填）→</button>
-                  {qIndex > 0 && <button onClick={() => setQIndex(qIndex - 1)} className="text-xs text-stone-400 hover:text-stone-600">← 上一題</button>}
+                  }}
+                    className="w-full py-3 text-sm transition-all duration-200"
+                    style={{ color: '#A3B5A0' }}
+                    onMouseEnter={e => e.currentTarget.style.color = '#8B6E5A'}
+                    onMouseLeave={e => e.currentTarget.style.color = '#A3B5A0'}>
+                    跳過（選填）
+                  </button>
+                  {qIndex > 0 && <button onClick={() => setQIndex(qIndex - 1)}
+                    className="text-xs transition-all duration-200"
+                    style={{ color: '#A3B5A0' }}
+                    onMouseEnter={e => e.currentTarget.style.color = '#8B6E5A'}
+                    onMouseLeave={e => e.currentTarget.style.color = '#A3B5A0'}>
+                    ← 上一題
+                  </button>}
                 </div>
               )
             }
-
-            // 選項類型（含年齡：按鈕 + 底部自訂輸入）
             return (
               <div className="space-y-2.5">
-                <h2 className="text-xl font-light text-stone-700 mb-6 text-center">{q.text}</h2>
+                <h2 className="text-xl font-light text-center mb-6" style={{ color: '#1C2C24', letterSpacing: '0.06em', lineHeight: 1.8 }}>{q.text}</h2>
                 {q.options && q.options.map(opt => (
                   <button key={opt.value} onClick={() => {
                     const newA = { ...answers, [q.id]: opt.value }
@@ -1251,95 +1362,121 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
                       if (qIndex < BASIC_QUESTIONS.length - 1) setQIndex(qIndex + 1)
                       else (mode === 'smart' ? setStep('smart') : setStep('chief'))
                     }, 350)
-                  }} className={`w-full px-5 py-4 rounded-xl text-left text-sm transition-all border-2 ${answers[q.id] === opt.value ? 'border-emerald-500 bg-emerald-50 font-medium text-emerald-800' : 'border-stone-200 bg-white text-stone-700 hover:border-emerald-300'}`}>
+                  }}
+                    className="w-full px-5 py-4 rounded-xl text-left text-sm transition-all duration-200"
+                    style={{
+                      background: answers[q.id] === opt.value ? 'rgba(44,74,62,0.08)' : '#FFFFFF',
+                      border: answers[q.id] === opt.value ? '1px solid #2C4A3E' : '1px solid #E5E2DA',
+                      color: answers[q.id] === opt.value ? '#2C4A3E' : '#3A3A32',
+                      fontWeight: answers[q.id] === opt.value ? '500' : '400',
+                      letterSpacing: '0.02em',
+                    }}
+                    onMouseEnter={e => { if (answers[q.id] !== opt.value) { e.currentTarget.style.borderColor = '#A3B5A0'; e.currentTarget.style.background = '#FAFAF7' } }}
+                    onMouseLeave={e => { if (answers[q.id] !== opt.value) { e.currentTarget.style.borderColor = '#E5E2DA'; e.currentTarget.style.background = '#FFFFFF' } }}>
                     {opt.label}
                   </button>
                 ))}
-
-                {/* 年齡：底部數字輸入框 */}
                 {q.hasCustomAgeInput && (
-                  <div className="mt-4 pt-4 border-t border-stone-200">
-                    <p className="text-xs text-stone-400 mb-2 text-center">或直接輸入年齡：</p>
-                    <div className="flex items-center gap-3 bg-white border-2 border-stone-200 rounded-xl px-4 py-3 focus-within:border-emerald-400 transition">
+                  <div className="mt-4 pt-4" style={{ borderTop: '1px solid #E5E2DA' }}>
+                    <p className="text-xs text-center mb-2" style={{ color: '#A3B5A0' }}>或直接輸入年齡：</p>
+                    <div className="flex items-center gap-3 bg-white rounded-xl px-4 py-3 transition"
+                      style={{ border: '1px solid #E5E2DA' }}
+                      onFocus={e => e.currentTarget.style.borderColor = '#2C4A3E'}
+                      onBlur={e => e.currentTarget.style.borderColor = '#E5E2DA'}>
                       <input type="number" placeholder="例：35"
                         value={answers[q.id] || ''}
                         onChange={e => setAnswers({ ...answers, [q.id]: e.target.value })}
-                        className="flex-1 outline-none text-stone-800" />
-                      <span className="text-stone-400 text-sm">歲</span>
+                        className="flex-1 outline-none" style={{ color: '#1C2C24' }} />
+                      <span className="text-sm" style={{ color: '#A3B5A0' }}>歲</span>
                     </div>
                     <button onClick={() => {
                       if (qIndex < BASIC_QUESTIONS.length - 1) setQIndex(qIndex + 1)
                       else (mode === 'smart' ? setStep('smart') : setStep('chief'))
-                    }} className="w-full py-3 bg-stone-100 text-stone-600 rounded-xl text-sm mt-2 hover:bg-stone-200 transition">確定 →</button>
+                    }}
+                      className="w-full py-3 mt-2 rounded-xl text-sm transition-all duration-200"
+                      style={{ background: '#F0EDE6', color: '#7A7A6A' }}
+                      onMouseEnter={e => { e.currentTarget.style.background = '#E5E2DA'; e.currentTarget.style.color = '#4A4A42' }}
+                      onMouseLeave={e => { e.currentTarget.style.background = '#F0EDE6'; e.currentTarget.style.color = '#7A7A6A' }}>
+                      確定
+                    </button>
                   </div>
                 )}
-
-                <button onClick={() => setQIndex(qIndex - 1)} className="text-xs text-stone-400 hover:text-stone-600">← 上一題</button>
+                <button onClick={() => setQIndex(qIndex - 1)}
+                  className="text-xs transition-all duration-200"
+                  style={{ color: '#A3B5A0' }}
+                  onMouseEnter={e => e.currentTarget.style.color = '#8B6E5A'}
+                  onMouseLeave={e => e.currentTarget.style.color = '#A3B5A0'}>
+                  ← 上一題
+                </button>
               </div>
             )
           })()}
         </main>
-      )}
-
-      {/* ── 主訴選擇 ── */}
-      {step === 'chief' && (
-        <main className="max-w-lg mx-auto px-4 py-8 min-h-[70vh] flex flex-col">
-          <div className="text-center mb-7">
-            <p className="text-xs text-emerald-500 font-medium tracking-widest mb-2">第 1 步</p>
-            <h2 className="text-xl font-medium text-stone-700 mb-1">您今天想改善什麼？</h2>
-            <p className="text-xs text-stone-400">選一項，AI為您量身問診</p>
+      )}      {step === 'chief' && (
+        <main className="max-w-lg mx-auto px-5 py-10 min-h-[70vh] flex flex-col">
+          <div className="text-center mb-8">
+            <p className="text-xs tracking-widest mb-2" style={{ color: '#A3B5A0', letterSpacing: '0.15em' }}>第 1 步</p>
+            <h2 className="text-xl font-light mb-1" style={{ color: '#1C2C24', letterSpacing: '0.08em' }}>您今天想改善什麼？</h2>
+            <p className="text-xs" style={{ color: '#8B6E5A' }}>選一項，AI為您量身問診</p>
           </div>
+
           <div className="grid grid-cols-2 gap-3 mb-4">
             {[
-              { value: '調養', label: '調養身體', desc: '健康檢查、保養', icon: '🌱', color: 'from-emerald-50 to-teal-50', border: 'hover:border-emerald-300', active: 'border-emerald-400 bg-gradient-to-br from-emerald-50 to-teal-50' },
-              { value: '減肥', label: '減肥控重', desc: '體重管理、雕塑', icon: '⚖️', color: 'from-amber-50 to-orange-50', border: 'hover:border-amber-300', active: 'border-amber-400 bg-gradient-to-br from-amber-50 to-orange-50' },
-              { value: '失眠', label: '失眠/睡不好', desc: '入睡困難、易醒', icon: '🌙', color: 'from-violet-50 to-purple-50', border: 'hover:border-violet-300', active: 'border-violet-400 bg-gradient-to-br from-violet-50 to-purple-50' },
-              { value: '情緒', label: '情緒/壓力', desc: '焦慮、抑鬱、暴躁', icon: '💢', color: 'from-red-50 to-pink-50', border: 'hover:border-red-300', active: 'border-red-400 bg-gradient-to-br from-red-50 to-pink-50' },
-              { value: '疼痛', label: '腰酸/關節痛', desc: '各種慢性疼痛', icon: '💉', color: 'from-orange-50 to-amber-50', border: 'hover:border-orange-300', active: 'border-orange-400 bg-gradient-to-br from-orange-50 to-amber-50' },
-              { value: '過敏', label: '過敏/鼻炎', desc: '鼻過敏、皮膚、氣喘', icon: '🤧', color: 'from-blue-50 to-cyan-50', border: 'hover:border-blue-300', active: 'border-blue-400 bg-gradient-to-br from-blue-50 to-cyan-50' },
-              { value: '皮膚', label: '皮膚問題', desc: '濕疹、蕁麻疹、痘痘', icon: '🔴', color: 'from-lime-50 to-green-50', border: 'hover:border-lime-300', active: 'border-lime-400 bg-gradient-to-br from-lime-50 to-green-50' },
-              { value: '月經', label: '月經/婦科', desc: '經期問題、子宮調理', icon: '🌸', color: 'from-pink-50 to-rose-50', border: 'hover:border-pink-300', active: 'border-pink-400 bg-gradient-to-br from-pink-50 to-rose-50', femaleOnly: true },
-              { value: '備孕', label: '備孕調理', desc: '不孕調理、孕前準備', icon: '🤰', color: 'from-pink-50 to-rose-50', border: 'hover:border-pink-300', active: 'border-pink-400 bg-gradient-to-br from-pink-50 to-rose-50', femaleOnly: true },
+              { value: '調養', label: '調養身體', desc: '健康保養', icon: <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M11 3C11 3 5 7.5 5 12a6 6 0 0012 0C17 7.5 11 3 11 3z" stroke="#4A7C6A" strokeWidth="1.2" fill="none"/><path d="M11 8v4M9 13h4" stroke="#4A7C6A" strokeWidth="1.2" strokeLinecap="round"/></svg> },
+              { value: '減肥', label: '減肥控重', desc: '體重管理', icon: <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="7.5" stroke="#8B6E5A" strokeWidth="1.2"/><path d="M11 7v8M8 9.5h6" stroke="#8B6E5A" strokeWidth="1.2" strokeLinecap="round"/></svg> },
+              { value: '失眠', label: '失眠問題', desc: '入睡困難', icon: <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M13 3L13 5M5.5 5.5L7 7M3 11L5 11M5.5 16.5L7 15M17 3L15 5M16.5 5.5L15 7M19 11L17 11" stroke="#4A7C6A" strokeWidth="1.2" strokeLinecap="round"/><path d="M11 7C8.5 7 6.5 9 6.5 11.5S8.5 16 11 16s4.5-2 4.5-4.5" stroke="#4A7C6A" strokeWidth="1.2" strokeLinecap="round"/></svg> },
+              { value: '情緒', label: '情緒壓力', desc: '焦慮抑鬱', icon: <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="7.5" stroke="#8B6E5A" strokeWidth="1.2"/><path d="M8 9c.8-1 2.2-1 3 0M13.5 11.5c0 1.5-1.5 2.5-2.5 2.5" stroke="#8B6E5A" strokeWidth="1.2" strokeLinecap="round"/></svg> },
+              { value: '疼痛', label: '腰酸關節痛', desc: '慢性疼痛', icon: <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M5 11h12M11 5v12" stroke="#8B6E5A" strokeWidth="1.2" strokeLinecap="round"/><circle cx="11" cy="11" r="3" stroke="#8B6E5A" strokeWidth="1.2"/></svg> },
+              { value: '過敏', label: '過敏鼻炎', desc: '鼻皮膚', icon: <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M11 4v14M7 8l4-4 4 4M4 14h14" stroke="#4A7C6A" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/></svg> },
+              { value: '皮膚', label: '皮膚問題', desc: '濕疹痘痘', icon: <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><ellipse cx="11" cy="11" rx="7.5" ry="5.5" stroke="#4A7C6A" strokeWidth="1.2" transform="rotate(-20 11 11)"/><circle cx="8" cy="10" r="1" fill="#4A7C6A"/><circle cx="12" cy="13" r="1" fill="#4A7C6A"/></svg> },
+              { value: '月經', label: '月經婦科', desc: '經期調理', icon: <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="7.5" stroke="#B5A0A0" strokeWidth="1.2"/><circle cx="11" cy="11" r="3.5" stroke="#B5A0A0" strokeWidth="1.2"/></svg>, femaleOnly: true },
+              { value: '備孕', label: '備孕調理', desc: '不孕孕前', icon: <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M11 4C11 4 6 8 6 13a5 5 0 0010 0C16 8 11 4 11 4z" stroke="#B5A0A0" strokeWidth="1.2" fill="none"/><path d="M8 13c0 1.5 1.5 2.5 3 2.5" stroke="#B5A0A0" strokeWidth="1.2" strokeLinecap="round"/></svg>, femaleOnly: true },
             ].map(c => {
-              // 性別過濾：月經、備孕僅限女性
               if (c.femaleOnly && answers.gender === '男') return null
               const isActive = answers.chief === c.value
               return (
                 <button key={c.value}
                   onClick={() => { setAnswers({ ...answers, chief: c.value }); setStep('questionnaire'); setQIndex(0) }}
-                  className={`py-4 px-2 bg-white border-2 rounded-2xl text-center transition-all active:scale-95 ${isActive ? c.active : 'border-stone-200 ' + c.border}`}>
-                  <div className="text-2xl mb-1">{c.icon}</div>
-                  <p className={`text-sm font-medium ${isActive ? 'text-stone-800' : 'text-stone-700'}`}>{c.label}</p>
-                  <p className="text-xs text-stone-400 mt-0.5">{c.desc}</p>
+                  className="py-4 rounded-xl text-center transition-all duration-200 active:scale-95"
+                  style={{
+                    background: isActive ? 'rgba(44,74,62,0.08)' : '#FFFFFF',
+                    border: isActive ? '1.5px solid #2C4A3E' : '1px solid #E5E2DA',
+                    boxShadow: isActive ? '0 2px 12px rgba(44,74,62,0.10)' : '0 1px 4px rgba(44,74,62,0.04)',
+                  }}>
+                  <div className="mb-2 flex justify-center">{c.icon}</div>
+                  <p className="text-sm font-medium" style={{ color: isActive ? '#2C4A3E' : '#1C2C24', letterSpacing: '0.03em' }}>{c.label}</p>
+                  <p className="text-xs mt-0.5" style={{ color: '#A3B5A0' }}>{c.desc}</p>
                 </button>
               )
             })}
           </div>
+
           <button onClick={() => { setAnswers({ ...answers, chief: '其他' }); setStep('questionnaire'); setQIndex(0) }}
-            className="w-full py-3.5 text-sm text-stone-500 border-2 border-dashed border-stone-300 rounded-xl hover:border-stone-400 hover:text-stone-600 transition bg-white">
+            className="w-full py-3.5 text-sm rounded-xl transition-all duration-200"
+            style={{ color: '#8B6E5A', border: '1px dashed #C5B8A8', background: 'transparent' }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = '#8B6E5A'; e.currentTarget.style.background = 'rgba(139,110,90,0.04)' }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = '#C5B8A8'; e.currentTarget.style.background = 'transparent' }}>
             + 其他健康問題
           </button>
         </main>
-      )}
-
-      {/* ── 智能問診（實驗） ── */}
-      {step === 'smart' && (
-        <main className="max-w-lg mx-auto px-4 py-8 min-h-[70vh]">
-          <div className="text-center mb-5">
-            <div className="inline-flex items-center gap-1.5 bg-amber-100 text-amber-700 text-xs px-3 py-1 rounded-full mb-3">
-              <span>🧠</span> 實驗功能
+      )}      {step === 'smart' && (
+        <main className="max-w-lg mx-auto px-5 py-10 min-h-[70vh] pb-28">
+          <div className="text-center mb-7">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full mb-3" style={{ background: 'rgba(139,110,90,0.10)' }}>
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1C6 1 2.5 4 2.5 6.5a3.5 3.5 0 007 0C9.5 4 6 1 6 1z" stroke="#8B6E5A" strokeWidth="0.8" fill="none"/><circle cx="6" cy="6.5" r="1.5" stroke="#8B6E5A" strokeWidth="0.8"/></svg>
+              <span className="text-xs" style={{ color: '#8B6E5A', letterSpacing: '0.06em' }}>實驗功能</span>
             </div>
-            <h2 className="text-xl font-medium text-stone-700">勾選您有的所有症狀</h2>
-            <p className="text-xs text-stone-400 mt-1">可多選，越完整分析越準確</p>
+            <h2 className="text-xl font-light mb-1" style={{ color: '#1C2C24', letterSpacing: '0.06em' }}>勾選您有的所有症狀</h2>
+            <p className="text-xs" style={{ color: '#8B6E5A' }}>可多選，越完整分析越準確</p>
           </div>
 
-          <div className="space-y-4 mb-24">
+          <div className="space-y-4">
             {SMART_SECTIONS.map(section => {
               const selected = smartAnswers[section.id] || []
               return (
-                <div key={section.id} className="bg-white rounded-2xl border border-stone-200 p-4">
-                  <h3 className="text-sm font-semibold text-stone-600 mb-3 flex items-center gap-2">
-                    <span>{section.icon}</span> {section.title}
+                <div key={section.id} className="rounded-xl p-4" style={{ background: '#FFFFFF', border: '1px solid #E5E2DA', boxShadow: '0 1px 4px rgba(44,74,62,0.04)' }}>
+                  <h3 className="text-sm font-medium mb-3 flex items-center gap-2" style={{ color: '#2C4A3E', letterSpacing: '0.04em' }}>
+                    <span style={{ color: '#A3B5A0' }}>{section.icon}</span> {section.title}
                   </h3>
                   <div className="flex flex-wrap gap-2">
                     {section.symptoms.map(symptom => {
@@ -1353,18 +1490,20 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
                               : [...current, symptom.value]
                             setSmartAnswers({ ...smartAnswers, [section.id]: next })
                           }}
-                          className={`px-3 py-2 rounded-full text-xs border-2 transition-all ${
-                            isSelected
-                              ? 'border-emerald-400 bg-emerald-50 text-emerald-700 font-medium'
-                              : 'border-stone-200 bg-stone-50 text-stone-600 hover:border-emerald-300'
-                          }`}>
+                          className="px-3 py-2 rounded-full text-xs transition-all"
+                          style={{
+                            background: isSelected ? 'rgba(44,74,62,0.08)' : 'rgba(44,74,62,0.04)',
+                            border: isSelected ? '1px solid #2C4A3E' : '1px solid #E5E2DA',
+                            color: isSelected ? '#2C4A3E' : '#7A7A6A',
+                            fontWeight: isSelected ? '500' : '400',
+                          }}>
                           {symptom.label}
                         </button>
                       )
                     })}
                   </div>
                   {selected.length > 0 && (
-                    <p className="text-xs text-emerald-600 mt-2">已選：{selected.length} 項</p>
+                    <p className="text-xs mt-2" style={{ color: '#2C4A3E' }}>已選：{selected.length} 項</p>
                   )}
                 </div>
               )
@@ -1372,19 +1511,23 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
           </div>
 
           {/* 底部固定提交欄 */}
-          <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-stone-200 p-4 max-w-lg mx-auto">
+          <div className="fixed bottom-0 left-0 right-0 p-4 max-w-lg mx-auto" style={{ background: 'rgba(250,250,247,0.95)', backdropFilter: 'blur(12px)', borderTop: '1px solid #E5E2DA' }}>
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs text-stone-400">
+              <span className="text-xs" style={{ color: '#A3B5A0' }}>
                 已選擇 {Object.values(smartAnswers).flat().length} 項症狀
               </span>
               {Object.values(smartAnswers).flat().length > 0 && (
                 <button onClick={() => setSmartAnswers({})}
-                  className="text-xs text-stone-400 hover:text-stone-600">清除全部</button>
+                  className="text-xs transition-colors"
+                  style={{ color: '#A3B5A0' }}
+                  onMouseEnter={e => e.currentTarget.style.color = '#8B6E5A'}
+                  onMouseLeave={e => e.currentTarget.style.color = '#A3B5A0'}>
+                  清除全部
+                </button>
               )}
             </div>
             <button
               onClick={() => {
-                // Convert smart answers to regular answers format for analyzeCondition
                 const flatAnswers: Record<string, string> = {}
                 Object.entries(smartAnswers).forEach(([sectionId, values]) => {
                   values.forEach(v => { flatAnswers[`${sectionId}_${v}`] = v })
@@ -1396,106 +1539,137 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
                 setStep('tongue_guide')
               }}
               disabled={Object.values(smartAnswers).flat().length === 0}
-              className="w-full py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-2xl font-medium shadow-lg disabled:opacity-50 transition">
+              className="w-full py-4 rounded-xl font-medium text-sm transition-all duration-200 disabled:opacity-40"
+              style={{ background: Object.values(smartAnswers).flat().length > 0 ? '#2C4A3E' : '#C5D4C0', color: '#FAFAF7', letterSpacing: '0.08em', boxShadow: '0 2px 12px rgba(44,74,62,0.15)' }}>
               {Object.values(smartAnswers).flat().length === 0
                 ? '請先選擇症狀'
-                : `🧠 智能分析（${Object.values(smartAnswers).flat().length}項）→`}
+                : `智能分析（${Object.values(smartAnswers).flat().length}項）`}
             </button>
           </div>
         </main>
-      )}
-
-      {/* ── 動態問卷 ── */}
+      )}      {/* ── 動態問卷 ── */}
       {step === 'questionnaire' && currentQ && (
-        <main className="max-w-lg mx-auto px-4 py-8 min-h-[70vh] flex flex-col justify-center">
-          <div className="text-center mb-5">
-            <p className="text-xs text-stone-400 tracking-widest mb-2">
-              <span className="inline-block px-2 py-0.5 bg-stone-100 rounded-full">
-                {mode === 'detailed' ? '🔍 詳細問診' : '⚡ 快速問診'} · {qIndex + 1} / {totalQ}
-              </span>
-            </p>
-            <h2 className="text-xl font-medium text-stone-700 leading-relaxed mt-3 px-2">{currentQ.text}</h2>
-            {/* 答題導航指示器 */}
-            <div className="flex justify-center gap-1.5 mt-4">
+        <main className="max-w-lg mx-auto px-5 py-10 min-h-[70vh] flex flex-col justify-center">
+          <div className="text-center mb-6">
+            {/* Zen progress dots */}
+            <div className="flex justify-center gap-1.5 mb-4">
               {currentQuestions.slice(0, 16).map((_, i) => (
                 <button key={i} onClick={() => setQIndex(i)}
-                  className={`w-2 h-2 rounded-full transition-all ${
-                    i === qIndex
-                      ? 'w-4 bg-emerald-500'
-                      : i < qIndex
-                        ? 'bg-emerald-300'
-                        : 'bg-stone-200'
-                  }`} />
+                  className="rounded-full transition-all duration-300"
+                  style={{
+                    width: i === qIndex ? '20px' : '6px',
+                    height: '6px',
+                    background: i === qIndex ? '#2C4A3E' : i < qIndex ? '#A3B5A0' : '#E5E2DA',
+                  }} />
               ))}
-              {totalQ > 12 && <span className="text-xs text-stone-400">+{totalQ - 12}</span>}
+              {totalQ > 16 && <span className="text-xs self-center ml-1" style={{ color: '#B5C4B8' }}>+{totalQ - 16}</span>}
             </div>
+
+            <p className="text-xs tracking-widest mb-3" style={{ color: '#A3B5A0', letterSpacing: '0.15em' }}>
+              {mode === 'detailed' ? '詳細問診' : '快速問診'} · {qIndex + 1} / {totalQ}
+            </p>
+
+            <h2 className="text-xl font-light leading-relaxed px-2" style={{ color: '#1C2C24', letterSpacing: '0.04em', lineHeight: 1.8 }}>
+              {currentQ.text}
+            </h2>
           </div>
 
           {currentQ.type === 'input_text' ? (
             <div className="space-y-3">
               <textarea value={customInput} onChange={e => setCustomInput(e.target.value)}
                 placeholder={currentQ.placeholder} rows={3}
-                className="w-full px-4 py-3 bg-white border-2 border-stone-200 rounded-xl text-sm outline-none focus:border-emerald-400 resize-none" />
+                className="w-full px-4 py-3 rounded-xl text-sm outline-none resize-none transition-colors"
+                style={{ background: '#FFFFFF', border: '1px solid #E5E2DA', color: '#1C2C24', letterSpacing: '0.03em' }}
+                onFocus={e => e.target.style.borderColor = '#2C4A3E'}
+                onBlur={e => e.target.style.borderColor = '#E5E2DA'} />
               <button onClick={handleInputSubmit} disabled={!customInput.trim()}
-                className="w-full py-4 bg-gradient-to-r from-emerald-600 to-teal-500 text-white rounded-xl font-medium disabled:opacity-50">
-                確定 →
+                className="w-full py-4 rounded-xl font-medium text-sm transition-all duration-200 disabled:opacity-40"
+                style={{ background: '#2C4A3E', color: '#FAFAF7', letterSpacing: '0.06em' }}
+                onMouseEnter={e => !customInput.trim() || (e.currentTarget.style.background = '#3D5E4F')}
+                onMouseLeave={e => e.currentTarget.style.background = '#2C4A3E'}>
+                確定
               </button>
             </div>
           ) : (
             <div className="space-y-2.5">
               {renderOptions(currentQ)}
-              {/* 其他選項 */}
               <button onClick={() => handleAnswer('其他')}
-                className={`w-full px-5 py-4 rounded-2xl text-left text-sm transition-all border-2 ${
-                  answers[currentQ.id] === '其他'
-                    ? 'border-emerald-500 bg-emerald-50 font-medium text-emerald-800 shadow-sm'
-                    : 'border-stone-200 bg-white text-stone-500 hover:border-emerald-300'
-                }`}>
-                其他（自行描述）→
+                className="w-full px-5 py-4 rounded-xl text-left text-sm transition-all duration-200"
+                style={{
+                  background: answers[currentQ.id] === '其他' ? 'rgba(44,74,62,0.08)' : 'transparent',
+                  border: answers[currentQ.id] === '其他' ? '1px solid #2C4A3E' : '1px solid #E5E2DA',
+                  color: answers[currentQ.id] === '其他' ? '#2C4A3E' : '#8B6E5A',
+                  letterSpacing: '0.03em',
+                }}>
+                其他（自行描述）
               </button>
             </div>
           )}
 
-          <div className="mt-5 flex items-center justify-between px-1">
+          <div className="mt-6 flex items-center justify-between px-1">
             {qIndex > 0 ? (
               <button onClick={() => setQIndex(qIndex - 1)}
-                className="flex items-center gap-1 text-sm text-stone-400 hover:text-stone-600 transition px-3 py-2 rounded-lg hover:bg-stone-100">
-                ← 上一題
+                className="flex items-center gap-1.5 text-sm px-3 py-2 rounded-lg transition-all duration-200"
+                style={{ color: '#8B6E5A' }}
+                onMouseEnter={e => e.currentTarget.style.background = 'rgba(139,110,90,0.06)'}
+                onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 3L5 7l4 4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                上一題
               </button>
             ) : (
               <button onClick={() => { setStep('chief'); setQIndex(0) }}
-                className="flex items-center gap-1 text-sm text-stone-400 hover:text-stone-600 transition px-3 py-2 rounded-lg hover:bg-stone-100">
-                ← 重選主訴
+                className="flex items-center gap-1.5 text-sm px-3 py-2 rounded-lg transition-all duration-200"
+                style={{ color: '#8B6E5A' }}
+                onMouseEnter={e => e.currentTarget.style.background = 'rgba(139,110,90,0.06)'}
+                onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 3L5 7l4 4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                重選主訴
               </button>
             )}
             {isLastQ && (
               <button onClick={() => setStep('tongue')}
-                className="flex items-center gap-1 text-sm text-emerald-600 hover:text-emerald-700 font-medium transition px-3 py-2 rounded-lg hover:bg-emerald-50">
-                跳過 →
+                className="flex items-center gap-1.5 text-sm px-3 py-2 rounded-lg font-medium transition-all duration-200"
+                style={{ color: '#2C4A3E' }}
+                onMouseEnter={e => e.currentTarget.style.background = 'rgba(44,74,62,0.06)'}
+                onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                跳過
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5 3l4 4-4 4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
               </button>
             )}
           </div>
         </main>
-      )}
-
-      {/* ── 舌象引導（選填） ── */}
+      )}      {/* ── 舌象引導（選填） ── */}
       {step === 'tongue_guide' && (
-        <main className="max-w-lg mx-auto px-4 py-8 min-h-[70vh] flex flex-col justify-center">
-          <div className="text-center mb-5">
-            <p className="text-xs text-amber-600 tracking-widest mb-1 font-medium">選填 · 可跳過</p>
-            <h2 className="text-xl font-light text-stone-700">觀察舌象</h2>
-            <p className="text-xs text-stone-500 mt-1">協助AI更精準判斷體質，拍照前可先自我觀察</p>
+        <main className="max-w-lg mx-auto px-5 py-10 min-h-[70vh] flex flex-col justify-center">
+          <div className="text-center mb-8">
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <div style={{ width: '32px', height: '1px', background: 'linear-gradient(to right, transparent, #A3B5A0)' }} />
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="9" stroke="#A3B5A0" strokeWidth="0.8" fill="none"/>
+                <path d="M12 5C12 5 8 9 8 12.5a4 4 0 008 0C16 9 12 5 12 5z" stroke="#A3B5A0" strokeWidth="0.8" fill="none"/>
+              </svg>
+              <div style={{ width: '32px', height: '1px', background: 'linear-gradient(to right, #A3B5A0, transparent)' }} />
+            </div>
+            <p className="text-xs tracking-widest mb-2" style={{ color: '#A3B5A0', letterSpacing: '0.18em' }}>選填 · 可跳過</p>
+            <h2 className="text-xl font-light mb-1" style={{ color: '#1C2C24', letterSpacing: '0.06em' }}>觀察舌象</h2>
+            <p className="text-xs" style={{ color: '#8B6E5A' }}>協助AI更精準判斷體質</p>
           </div>
 
-          <div className="space-y-5">
+          <div className="space-y-5 mb-8">
             {/* 舌頭抖動 */}
             <div>
-              <p className="text-sm font-medium text-stone-700 mb-2">1️⃣ 舌頭有沒有抖動？</p>
+              <p className="text-sm font-medium mb-2" style={{ color: '#1C2C24', letterSpacing: '0.04em' }}>舌頭有沒有抖動？</p>
               <div className="grid grid-cols-2 gap-2">
                 {[{value:'無',label:'正常不抖動'},{value:'輕微',label:'輕微顫動'},{value:'明顯',label:'明顯顫動'},{value:'不確定',label:'不確定'}].map(opt => (
                   <button key={opt.value}
                     onClick={() => setTongueGuideAnswers(prev => ({...prev, tremor: opt.value}))}
-                    className={`px-3 py-2.5 rounded-xl text-xs text-left transition-all border-2 ${tongueGuideAnswers.tremor === opt.value ? 'border-amber-400 bg-amber-50 font-medium text-amber-800' : 'border-stone-200 bg-white text-stone-600 hover:border-amber-300'}`}>
+                    className="px-3 py-2.5 rounded-xl text-xs text-left transition-all"
+                    style={{
+                      background: tongueGuideAnswers.tremor === opt.value ? 'rgba(44,74,62,0.08)' : '#FFFFFF',
+                      border: tongueGuideAnswers.tremor === opt.value ? '1px solid #2C4A3E' : '1px solid #E5E2DA',
+                      color: tongueGuideAnswers.tremor === opt.value ? '#2C4A3E' : '#4A4A42',
+                      fontWeight: tongueGuideAnswers.tremor === opt.value ? '500' : '400',
+                    }}>
                     {opt.label}
                   </button>
                 ))}
@@ -1504,12 +1678,18 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
 
             {/* 齒痕情況 */}
             <div>
-              <p className="text-sm font-medium text-stone-700 mb-2">2️⃣ 舌頭邊緣有齒痕嗎？</p>
+              <p className="text-sm font-medium mb-2" style={{ color: '#1C2C24', letterSpacing: '0.04em' }}>舌頭邊緣有齒痕嗎？</p>
               <div className="grid grid-cols-2 gap-2">
                 {[{value:'無',label:'無齒痕（健康）'},{value:'輕微',label:'輕微齒痕'},{value:'明顯',label:'明顯齒痕'},{value:'不確定',label:'不確定'}].map(opt => (
                   <button key={opt.value}
                     onClick={() => setTongueGuideAnswers(prev => ({...prev, teethMark: opt.value}))}
-                    className={`px-3 py-2.5 rounded-xl text-xs text-left transition-all border-2 ${tongueGuideAnswers.teethMark === opt.value ? 'border-amber-400 bg-amber-50 font-medium text-amber-800' : 'border-stone-200 bg-white text-stone-600 hover:border-amber-300'}`}>
+                    className="px-3 py-2.5 rounded-xl text-xs text-left transition-all"
+                    style={{
+                      background: tongueGuideAnswers.teethMark === opt.value ? 'rgba(44,74,62,0.08)' : '#FFFFFF',
+                      border: tongueGuideAnswers.teethMark === opt.value ? '1px solid #2C4A3E' : '1px solid #E5E2DA',
+                      color: tongueGuideAnswers.teethMark === opt.value ? '#2C4A3E' : '#4A4A42',
+                      fontWeight: tongueGuideAnswers.teethMark === opt.value ? '500' : '400',
+                    }}>
                     {opt.label}
                   </button>
                 ))}
@@ -1518,186 +1698,178 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
 
             {/* 特殊標記文字輸入 */}
             <div>
-              <p className="text-sm font-medium text-stone-700 mb-2">3️⃣ 舌頭外觀有什麼特別之處？（選填）</p>
+              <p className="text-sm font-medium mb-2" style={{ color: '#1C2C24', letterSpacing: '0.04em' }}>舌頭外觀特別之處（選填）</p>
               <textarea
-                placeholder="例如：舌頭有裂紋、瘀點、潰瘍、顏色特別深..."
+                placeholder="例如：舌頭有裂紋、瘀點、潰瘍..."
                 value={tongueGuideAnswers.notes || ''}
                 onChange={e => setTongueGuideAnswers(prev => ({...prev, notes: e.target.value}))}
-                className="w-full px-4 py-3 border-2 border-stone-200 rounded-xl text-sm resize-none focus:outline-none focus:border-amber-400 transition"
+                className="w-full px-4 py-3 rounded-xl text-sm resize-none transition"
+                style={{ background: '#FFFFFF', border: '1px solid #E5E2DA', color: '#1C2C24', letterSpacing: '0.03em', outline: 'none' }}
+                onFocus={e => e.target.style.borderColor = '#2C4A3E'}
+                onBlur={e => e.target.style.borderColor = '#E5E2DA'}
                 rows={3}
               />
             </div>
           </div>
 
-          <div className="mt-6 space-y-3">
+          <div className="space-y-3">
             <button onClick={() => setStep('tongue')}
-              className="w-full py-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-2xl font-medium shadow-lg">
-              {Object.keys(tongueGuideAnswers).length > 0 ? '✓ 已記錄，繼續拍攝舌苔 →' : '直接拍攝舌苔 →'}
+              className="w-full py-4 rounded-xl font-medium text-sm transition-all duration-200"
+              style={{ background: '#2C4A3E', color: '#FAFAF7', letterSpacing: '0.08em' }}
+              onMouseEnter={e => e.currentTarget.style.background = '#3D5E4F'}
+              onMouseLeave={e => e.currentTarget.style.background = '#2C4A3E'}>
+              {Object.keys(tongueGuideAnswers).length > 0 ? '✓ 已記錄，繼續拍攝舌苔' : '直接拍攝舌苔'}
             </button>
-            <button onClick={() => setStep('tongue')} className="w-full py-3 text-stone-400 text-sm hover:text-stone-600 transition">
+            <button onClick={() => setStep('tongue')}
+              className="w-full py-3 text-sm transition-all duration-200"
+              style={{ color: '#A3B5A0' }}
+              onMouseEnter={e => e.currentTarget.style.color = '#8B6E5A'}
+              onMouseLeave={e => e.currentTarget.style.color = '#A3B5A0'}>
               跳過，稍後再觀察
             </button>
           </div>
         </main>
-      )}
-
-      {/* ── 舌苔拍攝 ── */}
+      )}      {/* ── 舌苔拍攝 ── */}
       {step === 'tongue' && (
-        <main className="max-w-lg mx-auto px-4 py-8 min-h-[70vh] flex flex-col justify-center">
-          <div className="text-center mb-5">
-            <p className="text-xs text-emerald-600 tracking-widest mb-1 font-medium">最後一步</p>
-            <h2 className="text-xl font-light text-stone-700">拍攝舌苔</h2>
-            <p className="text-xs text-stone-500 mt-1">舌苔能反映體內寒熱濕燥，協助AI更精準判斷</p>
+        <main className="max-w-lg mx-auto px-5 py-10 min-h-[70vh] flex flex-col justify-center">
+          <div className="text-center mb-8">
+            <div className="flex items-center justify-center gap-2 mb-3">
+              <div style={{ width: '24px', height: '1px', background: '#E5E2DA' }} />
+              <p className="text-xs tracking-widest" style={{ color: '#A3B5A0', letterSpacing: '0.15em' }}>最後一步</p>
+              <div style={{ width: '24px', height: '1px', background: '#E5E2DA' }} />
+            </div>
+            <h2 className="text-xl font-light mb-1" style={{ color: '#1C2C24', letterSpacing: '0.06em' }}>拍攝舌苔</h2>
+            <p className="text-xs" style={{ color: '#8B6E5A' }}>舌苔能反映體內寒熱濕燥，協助AI更精準判斷</p>
           </div>
 
           {/* 舌苔上傳區域 */}
-          <div className="relative bg-white rounded-2xl border-2 border-dashed border-stone-300 overflow-hidden mb-4">
+          <div className="relative rounded-xl overflow-hidden mb-4"
+            style={{ border: tonguePreview ? 'none' : '1px dashed #C5B8A8', background: '#FFFFFF' }}>
             {tonguePreview ? (
               <div className="relative">
-                <img src={tonguePreview} alt="舌苔預覽" className="w-full object-cover aspect-[4/3]" />
-                {/* 成功標記 */}
-                <div className="absolute top-3 left-3 bg-emerald-500 text-white rounded-full w-8 h-8 flex items-center justify-center shadow-lg">
-                  <span className="text-sm">✓</span>
+                <img src={tonguePreview} alt="舌苔預覽" className="w-full object-cover" style={{ aspectRatio: '4/3' }} />
+                <div className="absolute top-3 left-3 w-8 h-8 rounded-full flex items-center justify-center"
+                  style={{ background: '#2C4A3E', color: '#FAFAF7' }}>
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7l3 3 5-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
                 </div>
-                {/* 刪除按鈕 */}
                 <button onClick={() => { setTonguePreview(null); setTongueFile(null) }}
-                  className="absolute top-3 right-3 w-8 h-8 bg-black/50 hover:bg-black/70 rounded-full text-white text-xs flex items-center justify-center transition">
-                  ✕
+                  className="absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center transition"
+                  style={{ background: 'rgba(0,0,0,0.45)', color: '#FAFAF7' }}
+                  onMouseEnter={e => e.currentTarget.style.background = 'rgba(0,0,0,0.65)'}
+                  onMouseLeave={e => e.currentTarget.style.background = 'rgba(0,0,0,0.45)'}>
+                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 2l6 6M8 2l-6 6" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/></svg>
                 </button>
-                {/* 已上傳標籤 */}
-                <div className="absolute bottom-3 right-3 bg-black/50 text-white text-xs px-2 py-1 rounded-full">
-                  已選擇
-                </div>
               </div>
             ) : (
-              <div className="aspect-[4/3] flex flex-col items-center justify-center text-stone-400 cursor-pointer hover:bg-stone-50 transition">
-                <div className="text-5xl mb-3">👅</div>
-                <p className="text-sm font-medium">點擊拍攝 / 選擇檔案</p>
-                <p className="text-xs mt-1 text-stone-400">可使用相機或從相簿挑選</p>
-                <p className="text-xs mt-3 text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-full">
-                  💡 自然光、張嘴伸舌、舌頭放鬆
-                </p>
+              <div className="aspect-[4/3] flex flex-col items-center justify-center cursor-pointer transition"
+                style={{ background: '#FAFAF7' }}
+                onMouseEnter={e => e.currentTarget.style.background = '#F5F3EE'}
+                onMouseLeave={e => e.currentTarget.style.background = '#FAFAF7'}>
+                <svg width="40" height="40" viewBox="0 0 40 40" fill="none" className="mb-3" style={{ color: '#A3B5A0' }}>
+                  <circle cx="20" cy="20" r="15" stroke="currentColor" strokeWidth="0.8" fill="none"/>
+                  <path d="M20 9C20 9 13 14.5 13 20a7 7 0 0014 0C27 14.5 20 9 20 9z" stroke="currentColor" strokeWidth="0.8" fill="none"/>
+                </svg>
+                <p className="text-sm font-medium mb-1" style={{ color: '#4A4A42' }}>點擊拍攝 / 選擇檔案</p>
+                <p className="text-xs" style={{ color: '#A3B5A0' }}>自然光 · 張嘴伸舌 · 舌頭放鬆</p>
               </div>
             )}
-            {/* 隱藏的檔案 input - 移除 capture 屬性，支援相機和檔案 */}
             <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleTongueUpload} />
             {!tonguePreview && (
               <div onClick={() => fileRef.current?.click()} className="absolute inset-0" />
             )}
           </div>
-          <div className="bg-stone-100 rounded-xl p-4 mb-4">
-            <p className="text-xs text-stone-500 leading-relaxed">
-              <span className="font-medium text-stone-700">拍攝技巧：</span>自然光或室內光 · 張嘴伸舌自然下垂 · 舌頭佔據畫面主體
+
+          {/* 拍攝技巧 */}
+          <div className="rounded-xl px-4 py-3 mb-4" style={{ background: 'rgba(44,74,62,0.04)', border: '1px solid rgba(44,74,62,0.08)' }}>
+            <p className="text-xs leading-relaxed" style={{ color: '#7A7A6A' }}>
+              <span style={{ color: '#4A4A42', fontWeight: '500' }}>拍攝技巧：</span>自然光或室內光 · 張嘴伸舌自然下垂 · 舌頭佔據畫面主體
             </p>
           </div>
-          <div className="bg-amber-50 rounded-xl p-4 mb-4 border border-amber-100">
-            <p className="text-xs text-amber-700 leading-relaxed">
-              🔒 <span className="font-medium">隱私聲明：</span>您的舌苔照片僅用於本次AI分析，系統不會保存、分享或用於任何其他用途。
+
+          {/* 隱私聲明 */}
+          <div className="rounded-xl px-4 py-3 mb-4" style={{ background: 'rgba(139,110,90,0.05)', border: '1px solid rgba(139,110,90,0.10)' }}>
+            <p className="text-xs leading-relaxed" style={{ color: '#8B6E5A' }}>
+              🔒 您的舌苔照片僅用於本次AI分析，不會保存或分享
             </p>
           </div>
 
           {/* 面色拍攝（Beta，可跳過） */}
           {!showFaceCapture ? (
             <button onClick={() => setShowFaceCapture(true)}
-              className="w-full py-3 border-2 border-dashed border-stone-300 rounded-xl text-sm text-stone-400 hover:border-amber-300 hover:text-amber-600 transition mb-3">
-              🌡️ 拍攝面容（面色分析 Beta）— 選填
+              className="w-full py-3 rounded-xl text-sm mb-3 transition-all duration-200"
+              style={{ color: '#A3B5A0', border: '1px dashed #C5B8A8', background: 'transparent' }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = '#8B6E5A'; e.currentTarget.style.color = '#8B6E5A' }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = '#C5B8A8'; e.currentTarget.style.color = '#A3B5A0' }}>
+              + 拍攝面容（面色分析 Beta）
             </button>
           ) : (
-            <div className="mb-3">
-              <p className="text-xs text-amber-600 mb-2 font-medium">🌡️ 面色分析（Beta）</p>
-              <div className="relative bg-white rounded-2xl border-2 border-dashed border-amber-200 overflow-hidden">
+            <div className="mb-4">
+              <p className="text-xs mb-2" style={{ color: '#8B6E5A', letterSpacing: '0.04em' }}>面色分析（Beta）</p>
+              <div className="relative rounded-xl overflow-hidden"
+                style={{ border: facePreview ? 'none' : '1px dashed #C5B8A8', background: '#FFFFFF' }}>
                 {facePreview ? (
                   <div className="relative">
-                    <img src={facePreview} alt="面容預覽" className="w-full object-cover aspect-[4/3]" />
-                    {/* 成功標記 */}
-                    <div className="absolute top-3 left-3 bg-amber-500 text-white rounded-full w-8 h-8 flex items-center justify-center shadow-lg">
-                      <span className="text-sm">✓</span>
+                    <img src={facePreview} alt="面容預覽" className="w-full object-cover" style={{ aspectRatio: '4/3' }} />
+                    <div className="absolute top-3 left-3 w-8 h-8 rounded-full flex items-center justify-center"
+                      style={{ background: '#8B6E5A', color: '#FAFAF7' }}>
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7l3 3 5-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
                     </div>
-                    {/* 刪除按鈕 */}
                     <button onClick={() => { setFacePreview(null); setFaceFile(null) }}
-                      className="absolute top-3 right-3 w-8 h-8 bg-black/50 hover:bg-black/70 rounded-full text-white text-xs flex items-center justify-center transition">
-                      ✕
+                      className="absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center transition"
+                      style={{ background: 'rgba(0,0,0,0.45)', color: '#FAFAF7' }}>
+                      <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 2l6 6M8 2l-6 6" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/></svg>
                     </button>
-                    <div className="absolute bottom-3 right-3 bg-black/50 text-white text-xs px-2 py-1 rounded-full">
-                      已選擇
-                    </div>
                   </div>
                 ) : (
-                  <div className="aspect-[4/3] flex flex-col items-center justify-center text-stone-400 cursor-pointer hover:bg-stone-50 transition">
-                    <div className="text-4xl mb-2">😊</div>
-                    <p className="text-sm font-medium">點擊拍攝 / 選擇檔案</p>
-                    <p className="text-xs mt-1 text-stone-400">請保持正面、自然光</p>
+                  <div className="aspect-[4/3] flex flex-col items-center justify-center cursor-pointer transition"
+                    style={{ background: '#FAFAF7' }}
+                    onMouseEnter={e => e.currentTarget.style.background = '#F5F3EE'}
+                    onMouseLeave={e => e.currentTarget.style.background = '#FAFAF7'}>
+                    <svg width="36" height="36" viewBox="0 0 36 36" fill="none" className="mb-2" style={{ color: '#A3B5A0' }}>
+                      <circle cx="18" cy="18" r="12" stroke="currentColor" strokeWidth="0.8" fill="none"/>
+                      <circle cx="18" cy="18" r="5" stroke="currentColor" strokeWidth="0.8" fill="none"/>
+                    </svg>
+                    <p className="text-sm font-medium mb-1" style={{ color: '#4A4A42' }}>點擊拍攝 / 選擇檔案</p>
+                    <p className="text-xs" style={{ color: '#A3B5A0' }}>正面、自然光拍攝</p>
                   </div>
                 )}
-                {/* 隱藏的檔案 input */}
                 <input ref={faceFileRef} type="file" accept="image/*" className="hidden" onChange={handleFaceUpload} />
                 {!facePreview && (
                   <div onClick={() => faceFileRef.current?.click()} className="absolute inset-0" />
                 )}
               </div>
-              <div className="bg-amber-50 rounded-xl p-3 mt-2">
-                <p className="text-xs text-amber-700 leading-relaxed">
-                  🔒 隱私：面容照片僅用於本次分析，不會保存或分享
-                </p>
-              </div>
               <button onClick={() => { setShowFaceCapture(false); setFacePreview(null); setFaceFile(null) }}
-                className="w-full py-2 text-xs text-stone-400 hover:text-stone-600 mt-1">
+                className="w-full py-2 text-xs mt-1 transition-all duration-200"
+                style={{ color: '#A3B5A0' }}
+                onMouseEnter={e => e.currentTarget.style.color = '#8B6E5A'}
+                onMouseLeave={e => e.currentTarget.style.color = '#A3B5A0'}>
                 取消面容分析
               </button>
             </div>
           )}
 
-          {/* 體檢報告上傳（Beta） */}
-          <div className="mt-4">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-sm font-medium text-stone-600">📄 上傳體檢報告（Beta，選填）</span>
-              <span className="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full">Beta</span>
-            </div>
-            <div
-              onClick={() => reportFileRef.current?.click()}
-              className="border-2 border-dashed border-stone-300 rounded-xl p-4 text-center cursor-pointer hover:border-emerald-300 transition"
-            >
-              <input ref={reportFileRef} type="file" accept="image/*,.pdf" className="hidden"
-                onChange={e => {
-                  const file = e.target.files?.[0]
-                  if (file) {
-                    setReportFile(file)
-                    const reader = new FileReader()
-                    reader.onload = ev => setReportPreview(ev.target?.result as string)
-                    reader.readAsDataURL(file)
-                  }
-                }} />
-              {reportPreview ? (
-                <div className="relative">
-                  <img src={reportPreview} alt="體檢報告預覽" className="w-full object-contain max-h-32 rounded-lg" />
-                  <div className="absolute top-2 left-2 bg-emerald-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs">✓</div>
-                </div>
-              ) : (
-                <div className="flex flex-col items-center text-stone-400">
-                  <div className="text-3xl mb-1">📄</div>
-                  <p className="text-xs">點擊上傳體檢報告圖片或PDF</p>
-                  <p className="text-xs text-stone-300 mt-1">可輔助AI更全面了解您的健康狀況</p>
-                </div>
-              )}
-            </div>
-          </div>
-
+          {/* 提交按鈕 */}
           <button onClick={handleSubmit} disabled={loading}
-            className="w-full py-4 bg-gradient-to-r from-emerald-600 to-teal-500 text-white rounded-2xl font-medium shadow-lg shadow-emerald-200 disabled:opacity-60 transition">
-            {loading ? '分析中...' : tongueFile ? '✨ 分析舌苔 + 送出' : '✨ 略過舌苔，直接分析'}
+            className="w-full py-4 rounded-xl font-medium text-sm transition-all duration-200 disabled:opacity-40"
+            style={{ background: loading ? '#3D5E4F' : '#2C4A3E', color: '#FAFAF7', letterSpacing: '0.08em', boxShadow: '0 2px 12px rgba(44,74,62,0.15)' }}
+            onMouseEnter={e => { if (!loading) e.currentTarget.style.background = '#3D5E4F' }}
+            onMouseLeave={e => { if (!loading) e.currentTarget.style.background = '#2C4A3E' }}>
+            {loading ? '分析中...' : tongueFile ? '分析舌苔並送出' : '略過舌苔，直接分析'}
           </button>
           {!tongueFile && (
             <button onClick={() => {
               setResult({ constitution: analyzeCondition(answers), questionnaire_answers: answers, savedAt: new Date().toISOString() })
               setStep('result')
-            }} className="w-full py-3 text-sm text-stone-400 hover:text-stone-600 transition mt-2">
+            }}
+              className="w-full py-3 text-sm mt-2 transition-all duration-200"
+              style={{ color: '#A3B5A0' }}
+              onMouseEnter={e => e.currentTarget.style.color = '#8B6E5A'}
+              onMouseLeave={e => e.currentTarget.style.color = '#A3B5A0'}>
               跳過舌苔分析
             </button>
           )}
         </main>
-      )}
-
-      {/* ── 結果 ── */}
+      )}      {/* ── 結果 ── */}
       {step === 'result' && result && (
         <main className="max-w-lg mx-auto px-4 py-8">
           <div className="text-center mb-5">
