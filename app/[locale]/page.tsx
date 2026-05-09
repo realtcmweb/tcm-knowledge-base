@@ -1347,15 +1347,18 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
             </div>
           </div>
 
-          {/* ── Privacy + CTA ── */}
-          <div className="text-center mb-8">
-            <p className="text-xs" style={{ color: '#A3B5A0', letterSpacing: '0.03em' }}>
-              <svg width="10" height="12" viewBox="0 0 10 12" fill="none" style={{ display: 'inline', marginRight: '4px', verticalAlign: 'middle' }}>
-                <rect x="1.5" y="5" width="7" height="6" rx="1" stroke="#A3B5A0" strokeWidth="1" fill="none"/>
-                <path d="M3 5V3.5a2 2 0 014 0V5" stroke="#A3B5A0" strokeWidth="1" strokeLinecap="round"/>
+          {/* ── Privacy + Medical Disclaimer ── */}
+          <div className="rounded-2xl px-4 py-3.5 mb-6"
+            style={{ background: 'rgba(44,74,62,0.04)', border: '1px solid rgba(44,74,62,0.08)' }}>
+            <div className="flex items-start gap-2">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ color: '#2C4A3E', marginTop: '1px', flexShrink: 0 }}>
+                <circle cx="7" cy="7" r="5.5" stroke="currentColor" strokeWidth="1"/>
+                <path d="M7 4.5v2.5M7 9v.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
               </svg>
-              資料完全保密 · 僅用於健康分析
-            </p>
+              <p className="text-xs leading-relaxed" style={{ color: '#4A4A42', lineHeight: 1.7 }}>
+                本系統內容僅供健康參考，不構成醫療建議、診斷或治療。AI 分析結果可能與專業中醫師判斷有所不同。如有健康疑慮，請諮詢合資格的中醫師或醫療專業人員。
+              </p>
+            </div>
           </div>
 
           <FaqAccordion />
@@ -1855,10 +1858,17 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
             </p>
           </div>
 
-          <div className="rounded-2xl px-4 py-3.5 mb-6" style={{ background: 'rgba(139,110,90,0.05)', border: '1px solid rgba(139,110,90,0.10)' }}>
-            <p className="text-sm leading-relaxed" style={{ color: '#8B6E5A' }}>
-              🔒 您的舌苔照片僅用於本次AI分析，不會保存或分享
-            </p>
+          <div className="rounded-2xl px-4 py-3.5 mb-6"
+            style={{ background: 'rgba(44,74,62,0.04)', border: '1px solid rgba(44,74,62,0.08)' }}>
+            <div className="flex items-center gap-2">
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none" style={{ color: '#2C4A3E', flexShrink: 0 }}>
+                <rect x="2" y="6" width="8" height="6" rx="1" stroke="currentColor" strokeWidth="1" fill="none"/>
+                <path d="M4 6V4.5a2.5 2.5 0 015 0V6" stroke="currentColor" strokeWidth="1" strokeLinecap="round"/>
+              </svg>
+              <p className="text-sm leading-relaxed" style={{ color: '#4A4A42' }}>
+                您的舌苔照片僅用於本次AI分析，不會保存或分享
+              </p>
+            </div>
           </div>
 
           {!showFaceCapture ? (
@@ -1937,27 +1947,63 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
         </main>
       )}      {/* ── 結果 ── */}
       {step === 'result' && result && (
-        <main className="max-w-lg mx-auto px-4 py-8">
-          <div className="text-center mb-5">
-            <div className="text-4xl mb-2">🎉</div>
-            <p className="text-xs text-emerald-600 tracking-widest">{t('result.title')}</p>
-            <h2 className="text-2xl font-light text-stone-700 mt-1">{result.constitution.type}</h2>
-            <p className="text-sm text-emerald-600">{result.constitution.sub}</p>
-            <span className="inline-block mt-2 text-xs bg-stone-100 text-stone-500 px-3 py-1 rounded-full">
+        <main className="max-w-2xl mx-auto px-6 pt-16 pb-12">
+          {/* ── Medical Disclaimer (P0) ── */}
+          <div className="rounded-2xl px-4 py-3.5 mb-6 text-left"
+            style={{ background: 'rgba(44,74,62,0.04)', border: '1px solid rgba(44,74,62,0.10)' }}>
+            <div className="flex items-start gap-2.5">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ color: '#2C4A3E', marginTop: '1px', flexShrink: 0 }}>
+                <circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1"/>
+                <path d="M8 5v3M8 10.5v.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
+              </svg>
+              <div>
+                <p className="text-xs font-medium mb-0.5" style={{ color: '#2C4A3E', letterSpacing: '0.04em' }}>
+                  ⚠️ 醫療免責聲明
+                </p>
+                <p className="text-xs leading-relaxed" style={{ color: '#4A4A42', lineHeight: 1.7 }}>
+                  本系統內容僅供健康參考，不構成醫療建議、診斷或治療。AI 分析結果可能與專業中醫師判斷有所不同，請勿取代醫師診療。如有健康疑慮，請諮詢合資格的中醫師或醫療專業人員。
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* ── Result Header ── */}
+          <div className="text-center mb-6">
+            <div className="flex justify-center mb-4">
+              <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                <circle cx="16" cy="16" r="14" stroke="#2C4A3E" strokeWidth="0.8" fill="none"/>
+                <path d="M16 2 Q23 9 16 16 Q9 23 16 30" stroke="#2C4A3E" strokeWidth="0.8" fill="none"/>
+                <path d="M16 30 Q9 23 16 16 Q23 9 16 2" stroke="#8B6E5A" strokeWidth="0.8" fill="none"/>
+                <circle cx="16" cy="9" r="3" fill="#8B6E5A"/>
+                <circle cx="16" cy="23" r="3" fill="#2C4A3E"/>
+              </svg>
+            </div>
+            <p className="text-xs tracking-widest mb-2" style={{ color: '#A3B5A0', letterSpacing: '0.14em' }}>{t('result.title')}</p>
+            <h2 className="text-4xl font-light" style={{ color: '#1C2C24', letterSpacing: '-0.01em', lineHeight: 1.1 }}>
+              {result.constitution.type}
+            </h2>
+            <p className="text-sm mt-1" style={{ color: '#8B6E5A' }}>{result.constitution.sub}</p>
+            <span className="inline-block mt-3 text-xs px-3 py-1 rounded-full"
+              style={{ background: 'rgba(44,74,62,0.06)', color: '#2C4A3E', letterSpacing: '0.04em', border: '1px solid rgba(44,74,62,0.10)' }}>
               {t('result.pattern')}：{result.constitution.pattern}
             </span>
           </div>
 
-          {/* 身體狀況摘要（來自中醫AI分析） */}
+          {/* 身體狀況摘要 */}
           {(() => {
             const plain = result.constitution.plaintext_summary
             if (plain) {
               return (
-                <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl p-5 border border-emerald-100 mb-5">
-                  <h3 className="text-sm font-semibold text-emerald-700 mb-2 flex items-center gap-2">
-                    <span>📋</span> 身體狀況摘要
+                <div className="rounded-2xl px-5 py-5 mb-5"
+                  style={{ background: '#FFFFFF', border: '1px solid #E5E2DA' }}>
+                  <h3 className="text-sm font-medium mb-2 flex items-center gap-2"
+                    style={{ color: '#1C2C24', letterSpacing: '0.04em' }}>
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ color: '#2C4A3E' }}>
+                      <path d="M2 4h10M2 7h7M2 10h5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+                    </svg>
+                    身體狀況摘要
                   </h3>
-                  <p className="text-sm text-stone-600 leading-relaxed whitespace-pre-line">{plain}</p>
+                  <p className="text-sm leading-relaxed whitespace-pre-line" style={{ color: '#4A4A42', lineHeight: 1.8 }}>{plain}</p>
                 </div>
               )
             }

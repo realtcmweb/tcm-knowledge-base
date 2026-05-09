@@ -163,6 +163,23 @@ export default function LoginPage() {
           </div>
 
           {/* Privacy note */}
+          {/* ── Medical Disclaimer ── */}
+          <div className="rounded-2xl px-4 py-3.5 mt-6"
+            style={{ background: 'rgba(44,74,62,0.04)', border: '1px solid rgba(44,74,62,0.08)' }}>
+            <div className="flex items-start gap-2">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ color: '#2C4A3E', marginTop: '1px', flexShrink: 0 }}>
+                <circle cx="7" cy="7" r="5.5" stroke="currentColor" strokeWidth="1"/>
+                <path d="M7 4.5v2.5M7 9v.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+              </svg>
+              <div>
+                <p className="text-xs font-medium mb-0.5" style={{ color: '#2C4A3E', letterSpacing: '0.04em' }}>⚠️ 醫療免責聲明</p>
+                <p className="text-xs leading-relaxed" style={{ color: '#4A4A42', lineHeight: 1.7 }}>
+                  本系統內容僅供健康參考，不構成醫療建議、診斷或治療。AI 分析結果可能與專業中醫師判斷有所不同，請勿取代醫師診療。如有健康疑慮，請諮詢合資格的中醫師。
+                </p>
+              </div>
+            </div>
+          </div>
+
           <p className="text-xs text-stone-400 text-center mt-4 leading-relaxed">
             登入即表示您同意我們的隱私政策。<br />
             您的資料僅用於個人健康記錄，不會分享給第三方。
