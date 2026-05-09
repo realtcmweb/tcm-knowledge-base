@@ -1881,6 +1881,26 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
             </div>
           </div>
 
+          {/* 舌頭抖動選項 */}
+          <div className="mb-5">
+            <p className="text-sm font-medium mb-3" style={{ color: '#1C2C24', letterSpacing: '0.04em' }}>舌頭有沒有抖動？</p>
+            <div className="grid grid-cols-2 gap-2">
+              {[{value:'無',label:'正常不抖動'},{value:'輕微',label:'輕微顫動'},{value:'明顯',label:'明顯顫動'},{value:'不確定',label:'不確定'}].map(opt => (
+                <button key={opt.value}
+                  onClick={() => setTongueGuideAnswers(prev => ({...prev, tremor: opt.value}))}
+                  className="px-3 py-3 rounded-xl text-sm text-left transition-all"
+                  style={{
+                    background: tongueGuideAnswers.tremor === opt.value ? 'rgba(44,74,62,0.08)' : '#FFFFFF',
+                    border: tongueGuideAnswers.tremor === opt.value ? '1px solid #2C4A3E' : '1px solid #E5E2DA',
+                    color: tongueGuideAnswers.tremor === opt.value ? '#2C4A3E' : '#3A3A32',
+                    fontWeight: tongueGuideAnswers.tremor === opt.value ? '500' : '400',
+                  }}>
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
           {!showFaceCapture ? (
             <button onClick={() => setShowFaceCapture(true)}
               className="w-full py-3.5 rounded-2xl text-sm mb-5 transition-all duration-300"
