@@ -977,7 +977,27 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
   const handleSubmit = async () => {
     setLoading(true)
     try {
-      const constitution = analyzeCondition(answers)
+      // Call backend API for TCM analysis (uses 54-syndrome knowledge base)
+      let backendResult: ReturnType<typeof analyzeCondition> | null = null
+      try {
+        const res = await fetch('/api/analyze', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ answers, chief: answers.chief || '' }),
+        })
+        if (res.ok) {
+          const data = await res.json()
+          if (data.ok && data.result) {
+            backendResult = data.result
+          }
+        }
+      } catch (e) {
+        console.warn('Backend API unavailable, using local analysis:', e)
+      }
+
+      // Fall back to local analysis if backend unavailable
+      const constitution = backendResult || analyzeCondition(answers)
+
       let tongueInfo: Record<string, unknown> | undefined
       if (tongueFile) {
         const formData = new FormData()
@@ -1690,33 +1710,44 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
             </span>
           </div>
 
-          {/* 身體狀況摘要 */}
+          {/* 身體狀況摘要（來自中醫AI分析） */}
           {(() => {
+            const plain = result.constitution.plaintext_summary
+            if (plain) {
+              return (
+                <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl p-5 border border-emerald-100 mb-5">
+                  <h3 className="text-sm font-semibold text-emerald-700 mb-2 flex items-center gap-2">
+                    <span>📋</span> 身體狀況摘要
+                  </h3>
+                  <p className="text-sm text-stone-600 leading-relaxed whitespace-pre-line">{plain}</p>
+                </div>
+              )
+            }
+            // Fallback for local analysis: short summary
             const s = result.constitution
-            const summaries: Record<string, string> = {
-              '氣虛': `您屬於「氣虛」體質，主要表現為元氣不足、臟腑功能減退。常見症狀包括說話無力、容易疲倦、稍動即喘、免疫力較弱。舌質偏淡，邊緣有齒痕，脈象虛弱。建議以健脾益氣為主，避免過度勞累，保持充足睡眠，適度進行太極拳、八段錦等柔和運動。`,
-              '陰虛': `您屬於「陰虛」體質，特點是陰液不足、虛火內生。常見症狀包括怕熱、手腳心燙、口乾舌燥、盜汗、睡眠不佳。舌色偏紅，少苔或無苔，舌面可見裂紋，脈象細數。建議滋陰清熱為主，少熬夜，多食百合、銀耳、麥冬等滋陰食材。`,
-              '陽虛': `您屬於「陽虛」體質，特點是陽氣不足、虛寒內盛。常見症狀包括怕冷、手腳冰涼、精神倦怠、腰膝酸軟、夜尿頻繁。舌質淡胖，舌苔白滑，脈象遲緩或沉細。建議溫陽補腎為主，忌食生冷冰品，堅持熱水泡腳、曬背等溫陽療法。`,
-              '痰濕': `您屬於「痰濕」體質，特點是濕濁內生、痰濕困脾。常見症狀包括身體沉重、胃口不佳、大便黏膩、口中黏膩、頭髮臉部容易出油。舌苔厚膩，脈象滑緩。建議燥濕化痰為主，晚餐在7點前吃完，避免甜食油炸，配合快走、游泳等運動。`,
-              '氣鬱': `您屬於「氣鬱」體質，特點是肝氣不舒、情緒壓抑。常見症狀包括易怒焦慮、胸悶脅痛、嘆氣多、月經前乳房脹痛、睡眠不佳。舌邊偏紅，脈象弦。建議疏肝解鬱為主，保持情緒平穩，每天快走6000步，按摩太衝穴。`,
-              '濕熱': `您屬於「濕熱」體質，特點是濕熱內蘊、肝膽濕熱。常見症狀包括口苦、口乾、脇痛、小便黃、陰囊潮濕、白帶多。舌苔黃厚膩，脈象滑數。建議清熱利濕為主，忌辛辣油炸，晚上11點前入睡（肝膽排毒時間）。`,
-              '血瘀': `您屬於「血瘀」體質，特點是血液運行不暢、瘀阻脈絡。常見症狀包括身體特定部位刺痛、面色黯沉、唇色暗紫、瘀青不易消散、月經有血塊。舌有瘀點或瘀斑，舌下靜脈曲張，脈象澀。建議活血化瘀為主，多做促進血液循環的運動，避免寒涼。`,
-              '脾虛': `您屬於「脾虛」體質，特點是脾胃運化失常、食慾不佳。常見症狀包括飯後腹脹、吃很少就飽、大便稀軟、疲倦乏力、面色萎黃。舌淡胖有齒痕，脈象緩弱。建議健脾益氣為主，定時定量用餐（每餐7-8分飽），飯後散步30分鐘。`,
-              '胃熱': `您屬於「胃熱」體質，特點是胃火熾盛、腐熟過度。常見症狀包括胃部灼熱感、胃酸過多、口臭、牙齦腫痛、想吃冰、大便乾硬。舌紅苔黃乾，脈象滑數。建議清胃瀉火為主，忌辛辣油炸咖啡，保持大便通暢。`,
+            const fallbackSummaries: Record<string, string> = {
+              '氣虛': `您屬於「氣虛」體質，元氣不足、臟腑功能減退。常見說話無力、容易疲倦、稍動即喘、免疫力較弱。建議健脾益氣，避免過度勞累，適度太極拳、八段錦。`,
+              '陰虛': `您屬於「陰虛」體質，陰液不足、虛火內生。常見怕熱、手腳心燙、口乾、盜汗、失眠。建議滋陰清熱，少熬夜，多食百合、銀耳、麥冬。`,
+              '陽虛': `您屬於「陽虛」體質，陽氣不足、虛寒內盛。常見怕冷、手腳冰涼、精神倦怠、腰膝酸軟、夜尿頻繁。建議溫陽補腎，忌生冷，熱水泡腳。`,
+              '痰濕': `您屬於「痰濕」體質，濕濁內生、痰濕困脾。常見身體沉重、胃口不佳、大便黏膩、口黏。建議燥濕化痰，晚餐7點前，避免甜食油炸。`,
+              '氣鬱': `您屬於「氣鬱」體質，肝氣不舒、情緒壓抑。常見易怒焦慮、胸悶、嘆氣多、睡眠不佳。建議疏肝解鬱，保持情緒平穩，每天快走6000步。`,
+              '濕熱': `您屬於「濕熱」體質，濕熱內蘊。常見口苦、口乾、小便黃、易長痘。建議清熱利濕，忌辛辣油炸，晚上11點前入睡。`,
+              '血瘀': `您屬於「血瘀」體質，血液運行不暢。常見身體刺痛、面色黯沉、唇色暗紫、月經有血塊。建議活血化瘀，多做促進血液循環的運動。`,
+              '平和質': `恭喜！您屬於「平和質」，陰陽氣血調和，身體機能平衡。請继续保持規律作息、均衡飲食和適度運動。`,
             }
             const type = s.type || ''
-            const summary = summaries[type] || `您的體質屬於「${type}」範疇，建議结合中醫師建議進行個人化調理，平時注意飲食均衡、情緒穩定、充足睡眠。`
+            const fallback = fallbackSummaries[type] || `您的體質屬於「${type}」範疇，建議結合中醫師建議進行個人化調理，平時注意飲食均衡、情緒穩定、充足睡眠。`
             return (
               <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl p-5 border border-emerald-100 mb-5">
                 <h3 className="text-sm font-semibold text-emerald-700 mb-2 flex items-center gap-2">
                   <span>📋</span> 身體狀況摘要
                 </h3>
-                <p className="text-sm text-stone-600 leading-relaxed">{summary}</p>
+                <p className="text-sm text-stone-600 leading-relaxed">{fallback}</p>
               </div>
             )
           })()}
 
-          {result.constitution.suggestions.length > 0 && (
+          {result.constitution.suggestions?.length > 0 && (
             <div className="bg-white rounded-2xl p-5 shadow-sm border border-stone-100 mb-5">
               <h3 className="text-sm font-semibold text-emerald-700 mb-3 flex items-center gap-2">
                 <span>✅</span> {t('result.suggestions')}
@@ -2194,6 +2225,38 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
             </div>
           )}
 
+          {/* 中成藥（中成藥） */}
+          {Array.isArray(result.constitution.chinese_patent_medicines) && result.constitution.chinese_patent_medicines.length > 0 && (
+            <div className="bg-purple-50 rounded-2xl p-5 border border-purple-100 mb-4">
+              <h3 className="text-sm font-semibold text-purple-700 mb-3 flex items-center gap-2">
+                <span>💊</span> 中成藥建議
+              </h3>
+              <div className="space-y-3">
+                {result.constitution.chinese_patent_medicines.slice(0, 3).map((cpm: any, i: number) => (
+                  <div key={i} className="bg-white rounded-xl p-3 border border-purple-100">
+                    <div className="flex items-start gap-2">
+                      <span className="text-purple-400 flex-shrink-0 mt-0.5">◆</span>
+                      <div>
+                        <span className="font-medium text-stone-800">{typeof cpm === 'string' ? cpm : cpm.name}</span>
+                        {typeof cpm === 'object' && cpm.effect && (
+                          <span className="ml-2 text-xs bg-purple-50 text-purple-700 px-2 py-0.5 rounded-full border border-purple-200">
+                            {cpm.effect}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    {typeof cpm === 'object' && cpm.indications && (
+                      <p className="text-xs text-stone-500 ml-6 mt-1">適應症：{cpm.indications}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs text-purple-500 mt-3">
+                參考來源：中醫教材 vector DB + GraphDB（SymMap v2.0）
+              </p>
+            </div>
+          )}
+
           {/* 中成藥用藥禁忌 */}
           {result.constitution.herbs.length > 0 && getHerbCautions(result.constitution.herbs).length > 0 && (
             <div className="bg-red-50 rounded-2xl p-5 border border-red-100 mb-4">
@@ -2220,6 +2283,35 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
                 {result.constitution.diet.map((d, i) => (
                   <div key={i} className="border-l-2 border-emerald-300 pl-3">
                     <p className="text-sm text-stone-700 leading-relaxed">{d}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* 經方（古典方劑） */}
+          {Array.isArray(result.constitution.classical_formulas) && result.constitution.classical_formulas.length > 0 && (
+            <div className="bg-blue-50 rounded-2xl p-5 border border-blue-100 mb-4">
+              <h3 className="text-sm font-semibold text-blue-700 mb-3 flex items-center gap-2">
+                <span>🏛️</span> 經方建議
+              </h3>
+              <div className="space-y-3">
+                {result.constitution.classical_formulas.slice(0, 3).map((cf: any, i: number) => (
+                  <div key={i} className="bg-white rounded-xl p-3 border border-blue-100">
+                    <div className="flex items-start gap-2">
+                      <span className="text-blue-400 flex-shrink-0 mt-0.5">◆</span>
+                      <div>
+                        <span className="font-medium text-stone-800">{typeof cf === 'string' ? cf : cf.name}</span>
+                        {typeof cf === 'object' && cf.effect && (
+                          <span className="ml-2 text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full border border-blue-200">
+                            {cf.effect}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    {typeof cf === 'object' && cf.ingredients && (
+                      <p className="text-xs text-stone-500 ml-6 mt-1">組成：{cf.ingredients}</p>
+                    )}
                   </div>
                 ))}
               </div>
