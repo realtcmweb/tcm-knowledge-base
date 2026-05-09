@@ -1122,16 +1122,14 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
       {/* Header — Apple Zen Navigation Bar */}
       <header className="sticky top-0 z-50" style={{ background: 'rgba(255,255,255,0.80)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
         <div style={{ maxWidth: '1024px', margin: '0 auto', height: '44px', padding: '0 22px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          {/* Left — YinYang Logo */}
+          {/* Left — TCMAI Logo */}
           <a href="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none' }}>
-            <svg width="20" height="20" viewBox="0 0 28 28" fill="none">
-              <circle cx="14" cy="14" r="12" stroke="#000" strokeWidth="1.2" fill="none"/>
-              <path d="M14 2 Q20 8 14 14 Q8 20 14 26" stroke="#000" strokeWidth="1.2" fill="none"/>
-              <path d="M14 26 Q8 20 14 14 Q20 8 14 2" stroke="#555" strokeWidth="1.2" fill="none"/>
-              <circle cx="14" cy="8.5" r="2.5" fill="#555"/>
-              <circle cx="14" cy="19.5" r="2.5" fill="#000"/>
-            </svg>
-            <span style={{ fontSize: '15px', fontWeight: 500, color: '#000', letterSpacing: '-0.01em' }}>
+            <img
+              src="/tcmai-logo.jpg"
+              alt="TCMAI"
+              style={{ width: '32px', height: 'auto', display: 'block' }}
+            />
+            <span style={{ fontSize: '15px', fontWeight: 500, color: '#1C2C24', letterSpacing: '-0.01em' }}>
               {t('header.title')}
             </span>
           </a>
