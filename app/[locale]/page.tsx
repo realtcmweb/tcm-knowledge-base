@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useCallback, useEffect } from 'react'
+import { useSession } from 'next-auth/react'
 import { useTranslations, useLocale } from 'next-intl'
 import Head from 'next/head'
 import Link from 'next/link'
@@ -928,6 +929,34 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
   const [imageLoaded, setImageLoaded] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
   const faceFileRef = useRef<HTMLInputElement>(null)
+
+  // 雲端同步狀態
+  const { data: session } = useSession()
+  const [savedRemotely, setSavedRemotely] = useState(false)
+  const [saving, setSaving] = useState(false)
+
+  async function saveToCloud() {
+    if (!result) return
+    setSaving(true)
+    try {
+      const res = await fetch('/api/diagnoses', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          tongue_image: '',
+          questionnaire: answers,
+          tongue_features: { color: (result.tongue as any)?.tongue_color, coating: (result.tongue as any)?.coating_color },
+          syndrome: { type: result.constitution.type },
+          result: result,
+        })
+      })
+      if (res.ok) setSavedRemotely(true)
+    } catch (e) {
+      console.error('Failed to save to cloud:', e)
+    } finally {
+      setSaving(false)
+    }
+  }
 
   // 當前問卷題目列表
   const chief = answers.chief || '其他'
@@ -2580,6 +2609,37 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
           }} className="w-full py-3 text-sm text-emerald-600 hover:text-emerald-700 mt-2">
             📤 分享給家人朋友
           </button>
+          {/* 雲端同步 UI */}
+          <div className="mt-4 text-center">
+            {session?.user ? (
+              <div>
+                {savedRemotely ? (
+                  <p className="text-sm" style={{ color: '#4A7C6A' }}>
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ display: 'inline', verticalAlign: 'middle' }}>
+                      <path d="M3 7l3 3 5-5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                    已保存到雲端
+                  </p>
+                ) : (
+                  <button
+                    onClick={saveToCloud}
+                    disabled={saving}
+                    className="text-sm px-4 py-2 rounded-full transition-all"
+                    style={{
+                      background: saving ? '#A3B5A0' : '#2C4A3E',
+                      color: '#FAFAF7',
+                      border: 'none',
+                    }}>
+                    {saving ? '儲存中...' : '💾 儲存到雲端'}
+                  </button>
+                )}
+              </div>
+            ) : (
+              <Link href="/login" className="text-sm" style={{ color: '#8B6E5A' }}>
+                登入會員解鎖雲端歷史 →
+              </Link>
+            )}
+          </div>
           {/* 結果保存/對比提示 */}
           <div className="mt-6 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl p-5 border border-emerald-100">
             <div className="text-center mb-4">
