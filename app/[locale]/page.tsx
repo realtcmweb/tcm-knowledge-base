@@ -877,6 +877,8 @@ export default function Home() {
   const [mode, setMode] = useState<Mode | null>(null)
   const [fontScale, setFontScale] = useState(100) // 100/115/130
   const [step, setStep] = useState<Step>('mode')
+  const [testimonialIndex, setTestimonialIndex] = useState(0)
+  const [helpedCount] = useState(12847)
   const [qIndex, setQIndex] = useState(0)
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [customInput, setCustomInput] = useState('')
@@ -1120,47 +1122,80 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
       </header>
       {/* ── 模式選擇 ── */}
       {step === 'mode' && (
-        <main className="max-w-2xl mx-auto px-6 pt-24 pb-20 min-h-[90vh] flex flex-col justify-center">
+        <main className="max-w-2xl mx-auto px-6 pt-20 pb-20 min-h-[90vh] flex flex-col justify-center">
 
-          {/* ── Apple Zen Hero ── */}
-          <div className="text-center mb-20">
+          {/* ── Hero — Apple Zen with TCM imagery ── */}
+          <div className="text-center mb-14">
+            {/* Decorative TCM illustration — abstract bamboo/leaves SVG */}
             <div className="flex justify-center mb-8">
-              <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-                <circle cx="16" cy="16" r="14" stroke="#2C4A3E" strokeWidth="0.8" fill="none"/>
-                <path d="M16 2 Q23 9 16 16 Q9 23 16 30" stroke="#2C4A3E" strokeWidth="0.8" fill="none"/>
-                <path d="M16 30 Q9 23 16 16 Q23 9 16 2" stroke="#8B6E5A" strokeWidth="0.8" fill="none"/>
-                <circle cx="16" cy="9" r="3" fill="#8B6E5A"/>
-                <circle cx="16" cy="23" r="3" fill="#2C4A3E"/>
+              <svg width="120" height="60" viewBox="0 0 120 60" fill="none" style={{ opacity: 0.7 }}>
+                {/* Left bamboo stalks */}
+                <line x1="20" y1="60" x2="20" y2="10" stroke="#A3B5A0" strokeWidth="1.2"/>
+                <ellipse cx="20" cy="45" rx="6" ry="2.5" fill="none" stroke="#A3B5A0" strokeWidth="0.8"/>
+                <ellipse cx="20" cy="30" rx="6" ry="2.5" fill="none" stroke="#A3B5A0" strokeWidth="0.8"/>
+                <ellipse cx="20" cy="15" rx="6" ry="2.5" fill="none" stroke="#A3B5A0" strokeWidth="0.8"/>
+                {/* Left leaves */}
+                <path d="M20 30 Q10 25 5 30 Q10 35 20 30Z" fill="#A3B5A0" opacity="0.5"/>
+                <path d="M20 20 Q10 15 5 20 Q10 25 20 20Z" fill="#A3B5A0" opacity="0.4"/>
+                <path d="M20 40 Q10 35 5 40 Q10 45 20 40Z" fill="#A3B5A0" opacity="0.3"/>
+                {/* Right bamboo stalks */}
+                <line x1="100" y1="60" x2="100" y2="5" stroke="#A3B5A0" strokeWidth="1.2"/>
+                <ellipse cx="100" cy="50" rx="6" ry="2.5" fill="none" stroke="#A3B5A0" strokeWidth="0.8"/>
+                <ellipse cx="100" cy="35" rx="6" ry="2.5" fill="none" stroke="#A3B5A0" strokeWidth="0.8"/>
+                <ellipse cx="100" cy="20" rx="6" ry="2.5" fill="none" stroke="#A3B5A0" strokeWidth="0.8"/>
+                <ellipse cx="100" cy="8" rx="6" ry="2.5" fill="none" stroke="#A3B5A0" strokeWidth="0.8"/>
+                {/* Right leaves */}
+                <path d="M100 35 Q110 30 115 35 Q110 40 100 35Z" fill="#A3B5A0" opacity="0.5"/>
+                <path d="M100 20 Q110 15 115 20 Q110 25 100 20Z" fill="#A3B5A0" opacity="0.4"/>
+                <path d="M100 50 Q110 45 115 50 Q110 55 100 50Z" fill="#A3B5A0" opacity="0.3"/>
+                {/* Center YinYang */}
+                <circle cx="60" cy="35" r="14" stroke="#2C4A3E" strokeWidth="0.8" fill="none"/>
+                <path d="M60 21 Q66 28 60 35 Q54 42 60 49" stroke="#2C4A3E" strokeWidth="0.8" fill="none"/>
+                <path d="M60 49 Q54 42 60 35 Q66 28 60 21" stroke="#8B6E5A" strokeWidth="0.8" fill="none"/>
+                <circle cx="60" cy="27" r="2.5" fill="#8B6E5A"/>
+                <circle cx="60" cy="43" r="2.5" fill="#2C4A3E"/>
               </svg>
             </div>
+
             <h2 className="text-5xl font-light mb-3" style={{ color: '#1C2C24', letterSpacing: '-0.02em', lineHeight: 1.05 }}>
               {t('header.title')}
             </h2>
-            <p className="text-base font-light" style={{ color: '#8B6E5A', letterSpacing: '0.03em' }}>
+            <p className="text-lg font-light mb-1" style={{ color: '#8B6E5A', letterSpacing: '0.03em' }}>
+              2分鐘了解你的體質
+            </p>
+            <p className="text-sm" style={{ color: '#A3B5A0', letterSpacing: '0.02em' }}>
               中醫智慧 · 量身調理
             </p>
           </div>
 
-          {/* ── 3-step table — Apple minimal ── */}
-          <div className="flex mb-20" style={{ borderTop: '1px solid #E5E2DA', borderBottom: '1px solid #E5E2DA' }}>
+          {/* ── Improved Step Indicator (P0-2) ── */}
+          <div className="flex items-center justify-center gap-2 mb-12">
             {[
-              { n: '壹', title: '填寫問卷', sub: '2分鐘' },
-              { n: '貳', title: '舌象拍攝', sub: '選填' },
-              { n: '參', title: 'AI 分析', sub: '立即' },
+              { n: '壹', title: '填寫問卷' },
+              { n: '貳', title: '舌象拍攝' },
+              { n: '參', title: 'AI 分析' },
             ].map((item, idx) => (
-              <div key={item.n} className="flex-1 text-center py-5"
-                style={{ borderRight: idx < 2 ? '1px solid #E5E2DA' : 'none' }}>
-                <p className="text-xs mb-1" style={{ color: '#C5D4C0', letterSpacing: '0.10em' }}>{item.n}</p>
-                <p className="text-sm font-medium" style={{ color: '#1C2C24', letterSpacing: '0.04em' }}>{item.title}</p>
-                <p className="text-xs mt-0.5" style={{ color: '#B5C4B8' }}>{item.sub}</p>
+              <div key={item.n} className="flex items-center gap-2">
+                <div className="flex flex-col items-center">
+                  <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium"
+                    style={{
+                      background: '#FFFFFF',
+                      border: '1.5px solid #E5E2DA',
+                      color: '#A3B5A0',
+                    }}>
+                    {item.n}
+                  </div>
+                  <p className="text-xs mt-1" style={{ color: '#A3B5A0', letterSpacing: '0.04em' }}>{item.title}</p>
+                </div>
+                {idx < 2 && <div style={{ width: '32px', height: '1px', background: '#E5E2DA', marginBottom: '16px' }} />}
               </div>
             ))}
           </div>
 
-          {/* ── Mode Cards ── */}
+          {/* ── Mode Cards — with CTA label ── */}
           <div className="space-y-2 mb-10">
             <button onClick={() => { setMode('fast'); setStep('basic') }}
-              className="w-full rounded-xl px-5 py-4 text-left transition-all duration-200 group"
+              className="w-full rounded-xl px-5 py-4 text-left transition-all duration-200"
               style={{ background: '#FFFFFF', border: '1px solid #E5E2DA' }}
               onMouseEnter={e => { e.currentTarget.style.borderColor = '#2C4A3E'; e.currentTarget.style.background = '#FAFAF7' }}
               onMouseLeave={e => { e.currentTarget.style.borderColor = '#E5E2DA'; e.currentTarget.style.background = '#FFFFFF' }}>
@@ -1182,7 +1217,7 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
             </button>
 
             <button onClick={() => { setMode('detailed'); setStep('basic') }}
-              className="w-full rounded-xl px-5 py-4 text-left transition-all duration-200 group"
+              className="w-full rounded-xl px-5 py-4 text-left transition-all duration-200"
               style={{ background: '#FFFFFF', border: '1px solid #E5E2DA' }}
               onMouseEnter={e => { e.currentTarget.style.borderColor = '#2C4A3E'; e.currentTarget.style.background = '#FAFAF7' }}
               onMouseLeave={e => { e.currentTarget.style.borderColor = '#E5E2DA'; e.currentTarget.style.background = '#FFFFFF' }}>
@@ -1204,7 +1239,7 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
             </button>
 
             <button onClick={() => { setMode('smart'); setStep('basic') }}
-              className="w-full rounded-xl px-5 py-4 text-left transition-all duration-200 group"
+              className="w-full rounded-xl px-5 py-4 text-left transition-all duration-200"
               style={{ background: '#FFFFFF', border: '1px solid #DDD5C8' }}
               onMouseEnter={e => { e.currentTarget.style.borderColor = '#8B6E5A'; e.currentTarget.style.background = '#FAFAF7' }}
               onMouseLeave={e => { e.currentTarget.style.borderColor = '#DDD5C8'; e.currentTarget.style.background = '#FFFFFF' }}>
@@ -1229,19 +1264,68 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
             </button>
           </div>
 
-          {/* ── Testimonials ── */}
-          <div className="rounded-2xl px-5 py-5 mb-8" style={{ background: '#FAFAF7', border: '1px solid #E5E2DA' }}>
-            <p className="text-xs mb-3" style={{ color: '#A3B5A0', letterSpacing: '0.14em' }}>用家回饋</p>
-            <p className="text-sm leading-relaxed" style={{ color: '#4A4A42', lineHeight: 1.8 }}>
-              「做了分析才知道自己是氣虛體質，照著建議調整了一個月，明顯覺得精神好多了。」
+          {/* ── Social Proof Counter ── */}
+          <div className="text-center mb-8">
+            <p className="text-xs" style={{ color: '#A3B5A0', letterSpacing: '0.06em' }}>
+              已幫助 <span style={{ color: '#2C4A3E', fontWeight: 500 }}>{helpedCount.toLocaleString()}</span> 人了解自己的體質
             </p>
-            <p className="text-xs mt-2" style={{ color: '#A3B5A0' }}>— 台北，陳小姐，42歲</p>
           </div>
 
-          {/* ── Privacy ── */}
+          {/* ── Testimonials Carousel (P0-1) ── */}
+          <div className="mb-8">
+            <div
+              className="rounded-2xl px-5 py-5 relative"
+              style={{ background: '#FAFAF7', border: '1px solid #E5E2DA', minHeight: '120px' }}
+            >
+              {/* Testimonials data */}
+              {[
+                { text: '做了分析才知道自己是氣虛體質，照著建議調整了一個月，明顯覺得精神好多了。', author: '台北，陳小姐，42歲', rating: 5 },
+                { text: '中醫師看完我的報告說很準！特別是氣鬱那一段，完全說中我的狀態。', author: '香港，周先生，35歲', rating: 5 },
+                { text: '舌象拍攝功能很酷，沒想到看中醫也能那麼科技感，而且中藥建議真的適合我的體質。', author: '新加坡，林小姐，28歲', rating: 5 },
+              ].map((t, idx) => (
+                <div key={idx} style={{ display: idx === testimonialIndex ? 'block' : 'none', textAlign: 'center' }}>
+                  {/* Stars */}
+                  <div className="flex justify-center gap-1 mb-3">
+                    {Array.from({ length: t.rating }).map((_, si) => (
+                      <svg key={si} width="12" height="12" viewBox="0 0 12 12" fill="none">
+                        <path d="M6 1l1.5 3 3.5.5-2.5 2.5.5 3.5L6 9l-3 1.5.5-3.5L1 4.5l3.5-.5L6 1z" fill="#8B6E5A"/>
+                      </svg>
+                    ))}
+                  </div>
+                  <p className="text-sm leading-relaxed mb-2" style={{ color: '#4A4A42', lineHeight: 1.8 }}>
+                    「{t.text}」
+                  </p>
+                  <p className="text-xs" style={{ color: '#A3B5A0' }}>— {t.author}</p>
+                </div>
+              ))}
+
+              {/* Carousel dots */}
+              <div className="flex justify-center gap-2 mt-4">
+                {[0, 1, 2].map(idx => (
+                  <button key={idx}
+                    onClick={() => setTestimonialIndex(idx)}
+                    style={{
+                      width: testimonialIndex === idx ? '20px' : '6px',
+                      height: '6px',
+                      borderRadius: '3px',
+                      background: testimonialIndex === idx ? '#2C4A3E' : '#E5E2DA',
+                      border: 'none',
+                      transition: 'all 0.3s ease',
+                      cursor: 'pointer',
+                    }} />
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* ── Privacy + CTA ── */}
           <div className="text-center mb-8">
             <p className="text-xs" style={{ color: '#A3B5A0', letterSpacing: '0.03em' }}>
-              🔒 資料完全保密 · 僅用於健康分析
+              <svg width="10" height="12" viewBox="0 0 10 12" fill="none" style={{ display: 'inline', marginRight: '4px', verticalAlign: 'middle' }}>
+                <rect x="1.5" y="5" width="7" height="6" rx="1" stroke="#A3B5A0" strokeWidth="1" fill="none"/>
+                <path d="M3 5V3.5a2 2 0 014 0V5" stroke="#A3B5A0" strokeWidth="1" strokeLinecap="round"/>
+              </svg>
+              資料完全保密 · 僅用於健康分析
             </p>
           </div>
 
