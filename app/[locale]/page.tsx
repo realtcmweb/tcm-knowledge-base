@@ -972,7 +972,7 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
         if (res.ok) {
           const data = await res.json()
           if (data.ok && data.result) {
-            backendResult = data.result
+            backendResult = data.result.constitution
           }
         }
       } catch (e) {
