@@ -2608,6 +2608,33 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
                   </div>
                 ))}
               </div>
+              {/* 中醫舌象解讀 */}
+              {(result.tongue.tongue_color || result.tongue.coating_color) && (
+                <div className="mt-3 pt-3 border-t border-stone-100">
+                  <p className="text-xs text-stone-400 mb-1">中醫解讀</p>
+                  <p className="text-sm text-stone-600 leading-relaxed">
+                    {(() => {
+                      const tc = (result.tongue.tongue_color as string) || '';
+                      const cc = (result.tongue.coating_color as string) || '';
+                      const tm = (result.tongue.teeth_mark as number) || 0;
+                      const ck = (result.tongue.cracks as number) || 0;
+                      const parts: string[] = [];
+                      if (tc.includes('淡紅') || tc === '淡紅') parts.push('舌色淡紅為正常或偏虛（氣血不足）。');
+                      if (tc.includes('紅') && !tc.includes('淡紅')) parts.push('舌紅主熱，可能有內熱或陰虛火旺。');
+                      if (tc.includes('深紅')) parts.push('舌深紅主熱盛，可能有實熱或陰虛火旺。');
+                      if (tc.includes('淡白')) parts.push('舌淡白主血虛或陽虛，氣血不足。');
+                      if (tc.includes('紫暗')) parts.push('舌紫暗主血瘀，血液循環不暢。');
+                      if (cc.includes('薄白')) parts.push('苔薄白為正常或偏虛。');
+                      if (cc.includes('黃')) parts.push('苔黃主熱證，常見濕熱或實熱。');
+                      if (cc.includes('白厚') || cc === '白厚苔') parts.push('苔白厚主寒濕或痰濕內盛。');
+                      if (cc.includes('少苔') || cc.includes('剝苔')) parts.push('少苔或剝苔主胃氣虛或陰虛。');
+                      if (tm >= 2) parts.push('齒痕明顯常見於脾虛濕盛、運化失常。');
+                      if (ck >= 2) parts.push('舌裂紋明顯常見於陰虛或血虛，津液不足。');
+                      return parts.length > 0 ? parts.join(' ') : null;
+                    })()}
+                  </p>
+                </div>
+              )}
             </div>
           )}
 
