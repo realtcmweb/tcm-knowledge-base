@@ -841,6 +841,7 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
   const [imageLoaded, setImageLoaded] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
   const faceFileRef = useRef<HTMLInputElement>(null)
+  const confirmBtnRef = useRef<HTMLButtonElement>(null)
 
   // 雲端同步狀態
   const { data: session } = useSession()
@@ -1642,14 +1643,22 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
                 placeholder={currentQ.placeholder} rows={3}
                 className="w-full px-5 py-4 rounded-2xl text-base outline-none resize-none transition-colors"
                 style={{ background: '#FFFFFF', border: '1px solid #E5E2DA', color: '#1C2C24', letterSpacing: '0.02em' }}
-                onFocus={e => { e.target.style.borderColor = '#2C4A3E'; e.target.scrollIntoView({ behavior: 'smooth', block: 'center' }) }}
-                onBlur={e => e.target.style.borderColor = '#E5E2DA'} />
-              <button onClick={handleInputSubmit} disabled={!customInput.trim()}
+                onFocus={e => { e.target.style.borderColor = '#2C4A3E'; confirmBtnRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }) }}
+                onBlur={e => e.target.style.borderColor = '#E5E2DA'}
+                onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey && customInput.trim()) { e.preventDefault(); handleInputSubmit() }}} />
+              <button ref={confirmBtnRef} onClick={handleInputSubmit} disabled={!customInput.trim()}
                 className="w-full py-4 rounded-2xl font-medium text-base transition-all duration-300 disabled:opacity-40"
                 style={{ background: '#1C2C24', color: '#FAFAF7', letterSpacing: '0.04em' }}
                 onMouseEnter={e => !customInput.trim() || (e.currentTarget.style.background = '#2C4A3E')}
                 onMouseLeave={e => e.currentTarget.style.background = '#1C2C24'}>
                 確定
+              </button>
+              <button onClick={() => { setCustomInput(''); if (qIndex < totalQ - 1) setQIndex(qIndex + 1); else setStep('tongue') }}
+                className="w-full py-3 rounded-2xl text-sm transition-all duration-300"
+                style={{ background: 'transparent', color: '#A3B5A0', border: '1px solid #E5E2DA' }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = '#A3B5A0'; e.currentTarget.style.color = '#7A7A6A' }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = '#E5E2DA'; e.currentTarget.style.color = '#A3B5A0' }}>
+                跳過（不填）
               </button>
             </div>
           ) : (
