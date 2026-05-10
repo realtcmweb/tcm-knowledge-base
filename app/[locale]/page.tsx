@@ -1024,9 +1024,11 @@ interface FreeSearchResult {
         setFreeSearchResult({ error: data.error || '搜尋失敗，請稍後再試' })
       } else {
         setFreeSearchResult(data)
-        if (data.done) {
+        if (data.done && data.result) {
           setStep('result')
           setResult(data.result as ResultData)
+        } else if (!data.ok && !data.answer) {
+          setFreeSearchMode('input')
         } else {
           setFreeSearchMode(data.followup_questions?.length > 0 ? 'questionnaire' : 'input')
         }
