@@ -2872,14 +2872,7 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
             </div>
           )}
 
-          <div className="text-center py-4">
-            <p className="text-xs text-stone-400 leading-relaxed">
-              {t('disclaimer.line1')}<br />
-              {t('disclaimer.line2')}<br />
-              {t('disclaimer.line3')}
-            </p>
-          </div>
-
+          {/* ── 結果操作區 ── */}
           <button onClick={reset}
             className="w-full py-3 border-2 border-stone-200 rounded-xl text-sm text-stone-500 hover:border-emerald-400 hover:text-emerald-600 transition">
             {t('result.retake')}
@@ -2938,12 +2931,20 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
 
             <ResultSaveSection result={result} />
           </div>
+
+          {/* ── 醫療免責聲明（顯眼位置）── */}
+          <div className="mt-6 rounded-2xl px-4 py-4 text-center" style={{ background: 'rgba(139,110,90,0.06)', border: '1px solid rgba(139,110,90,0.15)' }}>
+            <p className="text-xs leading-relaxed" style={{ color: '#8B6E5A' }}>
+              {t('disclaimer.line1')}<br/>
+              {t('disclaimer.line2')}<br/>
+              {t('disclaimer.line3')}
+            </p>
+          </div>
         </main>
       )}
 
       <footer className="text-center py-6 text-xs text-stone-400 border-t border-stone-200 mt-4">
-        <p>{t('disclaimer.line2')}</p>
-        <p className="mt-1">{t('footer.copyright')}</p>
+        <p>{t('footer.copyright')}</p>
       </footer>
     </div>
   )
