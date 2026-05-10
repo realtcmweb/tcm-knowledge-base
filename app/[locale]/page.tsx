@@ -74,6 +74,20 @@ interface SavedResult {
   savedAt: string
 }
 
+interface FreeSearchResult {
+  loading?: string
+  ok?: boolean
+  answer?: string
+  findings?: Array<{ source: string; text: string }>
+  suggested_syndromes?: string[]
+  suggested_herbs?: string[]
+  need_followup?: boolean
+  followup_questions?: string[]
+  from_graphdb?: { herbs: Array<{ name: string } | string>; acupoints: string[] }
+  treatment?: { syndrome: string; suggested_herbs: string[]; suggested_formulas: string[] }
+  error?: string
+}
+
 function ResultSaveSection({ result }: { result: ResultData }) {
   const [history, setHistory] = useState<SavedResult[]>([])
   const [showHistory, setShowHistory] = useState(false)
@@ -716,7 +730,7 @@ function analyzeCondition(answers: Record<string, string>): {
 // ============================================
 // 類型
 // ============================================
-type Step = 'mode' | 'basic' | 'chief' | 'smart' | 'questionnaire' | 'tongue_guide' | 'tongue' | 'result'
+type Step = 'mode' | 'basic' | 'chief' | 'smart' | 'freesearch' | 'questionnaire' | 'tongue_guide' | 'tongue' | 'result'
 type Mode = 'fast' | 'detailed' | 'smart'
 
 interface ResultData {
@@ -791,11 +805,27 @@ export default function Home() {
   const [resultTab, setResultTab] = useState<'detail'|'herbs'|'food'|'acupoints'|'lifestyle'>('detail')
   const [testimonialIndex, setTestimonialIndex] = useState(0)
   const [helpedCount] = useState(12847)
+  const [freeText, setFreeText] = useState('')
+  const [freeSearchLoading, setFreeSearchLoading] = useState(false)
+  const [freeSearchResult, setFreeSearchResult] = useState<FreeSearchResult | null>(null)
+  const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, string>>({})
   const [qIndex, setQIndex] = useState(0)
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [customInput, setCustomInput] = useState('')
   const [smartAnswers, setSmartAnswers] = useState<Record<string, string[]>>({})
-const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, string>>({})
+interface FreeSearchResult {
+  loading?: string
+  ok?: boolean
+  answer?: string
+  findings?: Array<{ source: string; text: string }>
+  suggested_syndromes?: string[]
+  suggested_herbs?: string[]
+  need_followup?: boolean
+  followup_questions?: string[]
+  from_graphdb?: { herbs: Array<{ name: string } | string>; acupoints: string[] }
+  treatment?: { syndrome: string; suggested_herbs: string[]; suggested_formulas: string[] }
+  error?: string
+}
   const [tongueGuideOpen, setTongueGuideOpen] = useState(false)
   const [reportFile, setReportFile] = useState<File | null>(null)
   const [reportPreview, setReportPreview] = useState<string | null>(null)
@@ -936,6 +966,29 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
     setFaceFile(file)
     const reader = new FileReader()
     reader.onload = (ev) => setFacePreview(ev.target?.result as string)
+  }
+
+  const handleFreeSearch = async () => {
+    if (!freeText.trim()) return
+    setFreeSearchLoading(true)
+    setFreeSearchResult({ loading: '正在搜尋中醫資料庫...' })
+    try {
+      const res = await fetch('/api/ask', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question: freeText.trim() }),
+      })
+      const data = await res.json()
+      if (!data.ok && !data.answer) {
+        setFreeSearchResult({ error: data.error || '搜尋失敗，請稍後再試' })
+      } else {
+        setFreeSearchResult(data)
+      }
+    } catch (e) {
+      setFreeSearchResult({ error: '網路錯誤，請檢查連線後再試' })
+    } finally {
+      setFreeSearchLoading(false)
+    }
   }
 
   const handleSubmit = async () => {
@@ -1208,6 +1261,126 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
                 {idx < 2 && <div style={{ width: '32px', height: '1px', background: '#E5E2DA', marginBottom: '16px' }} />}
               </div>
             ))}
+          </div>
+
+          {/* ── Free Text Search Input (快速輸入) ── */}
+          <div className="mb-8 p-5 rounded-2xl" style={{ background: 'rgba(44,74,62,0.04)', border: '1px solid rgba(44,74,62,0.15)' }}>
+            <p className="text-xs mb-3" style={{ color: '#4A7C6A', letterSpacing: '0.08em' }}>自由輸入·AI 智能搜尋</p>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={freeText}
+                onChange={e => setFreeText(e.target.value)}
+                placeholder="例如：容易疲勞、晚上睡不好、胃口差"
+                className="flex-1 px-4 py-3 rounded-xl text-sm"
+                style={{ 
+                  border: '1px solid #D4E0D6',
+                  background: '#FFFFFF',
+                  color: '#1C2C24',
+                  outline: 'none',
+                  letterSpacing: '0.02em',
+                }}
+                onFocus={e => e.currentTarget.style.borderColor = '#2C4A3E'}
+                onBlur={e => e.currentTarget.style.borderColor = '#D4E0D6'}
+                onKeyDown={e => { if (e.key === 'Enter') handleFreeSearch() }}
+              />
+              <button
+                onClick={handleFreeSearch}
+                className="px-5 py-3 rounded-xl text-sm font-medium transition-all duration-200"
+                style={{ 
+                  background: freeText.trim() ? '#2C4A3E' : '#E5E2DA',
+                  color: freeText.trim() ? '#FFFFFF' : '#A3B5A0',
+                }}
+                disabled={!freeText.trim() || freeSearchLoading}
+              >
+                {freeSearchLoading ? '分析中...' : '搜尋'}
+              </button>
+            </div>
+            {freeSearchResult && (
+              <div className="mt-4 p-4 rounded-xl" style={{ background: '#FFFFFF', border: '1px solid #E5E2DA' }}>
+                {freeSearchResult.loading ? (
+                  <div className="flex items-center gap-2 text-sm" style={{ color: '#8B6E5A' }}>
+                    <span>🔍</span> {freeSearchResult.loading}
+                  </div>
+                ) : (
+                  <>
+                    {freeSearchResult.need_followup ? (
+                      <div>
+                        <p className="text-sm font-medium mb-2" style={{ color: '#2C4A3E' }}>{freeSearchResult.answer}</p>
+                        <div className="space-y-2">
+                          {freeSearchResult.followup_questions?.map((q, i) => (
+                            <button key={i}
+                              onClick={() => { setFreeText(q.replace('？', '').replace('（', '/').replace('）', '')); handleFreeSearch() }}
+                              className="w-full text-left px-4 py-2.5 rounded-lg text-sm transition-all duration-200"
+                              style={{ background: 'rgba(44,74,62,0.06)', border: '1px solid #D4E0D6', color: '#3A3A32' }}
+                            >
+                              {q}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    ) : (
+                      <div>
+                        <p className="text-sm font-medium mb-2" style={{ color: '#2C4A3E' }}>{freeSearchResult.answer}</p>
+                        {freeSearchResult.findings?.length > 0 && (
+                          <div className="mt-3 space-y-2">
+                            <p className="text-xs" style={{ color: '#A3B5A0', letterSpacing: '0.06em' }}>📚 相關內容</p>
+                            {freeSearchResult.findings.slice(0, 3).map((f, i) => (
+                              <div key={i} className="text-xs p-2.5 rounded-lg" style={{ background: '#FAFAF7', color: '#4A4A42', lineHeight: 1.6 }}>{f.text?.slice(0, 200)}</div>
+                            ))}
+                          </div>
+                        )}
+                        {freeSearchResult.suggested_syndromes?.length > 0 && (
+                          <div className="mt-2 flex flex-wrap gap-1">
+                            {freeSearchResult.suggested_syndromes.map(s => (
+                              <span key={s} className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'rgba(139,110,90,0.10)', color: '#8B6E5A' }}>{s}</span>
+                            ))}
+                          </div>
+                        )}
+                        {freeSearchResult.from_graphdb?.herbs?.length > 0 && (
+                          <div className="mt-2">
+                            <p className="text-xs mb-1" style={{ color: '#A3B5A0' }}>🌿 建議中藥</p>
+                            <div className="flex flex-wrap gap-1">
+                              {freeSearchResult.from_graphdb.herbs.map(h => (
+                                <span key={h.name || h} className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'rgba(74,124,106,0.10)', color: '#4A7C6A' }}>{h.name || h}</span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        {freeSearchResult.treatment && (
+                          <div className="mt-3 p-3 rounded-lg" style={{ background: 'rgba(74,124,106,0.05)', border: '1px solid #D4E0D6' }}>
+                            <p className="text-xs font-medium" style={{ color: '#2C4A3E' }}>💊 治療建議</p>
+                            <p className="text-xs mt-1" style={{ color: '#4A4A42' }}>證型：{freeSearchResult.treatment.syndrome}</p>
+                            {freeSearchResult.treatment.suggested_formulas?.length > 0 && (
+                              <p className="text-xs mt-1" style={{ color: '#8B6E5A' }}>建議方劑：{freeSearchResult.treatment.suggested_formulas.join(' / ')}</p>
+                            )}
+                          </div>
+                        )}
+                        <div className="mt-3 flex gap-2">
+                          <button
+                            onClick={() => { setMode('fast'); setStep('questionnaire'); setQIndex(0) }}
+                            className="text-xs px-3 py-1.5 rounded-lg transition-all duration-200"
+                            style={{ background: '#2C4A3E', color: '#FFFFFF' }}
+                          >
+                            開始完整問卷
+                          </button>
+                          <button
+                            onClick={() => { setFreeText(''); setFreeSearchResult(null) }}
+                            className="text-xs px-3 py-1.5 rounded-lg"
+                            style={{ border: '1px solid #E5E2DA', color: '#A3B5A0' }}
+                          >
+                            清除
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            )}
+            <p className="text-xs mt-2" style={{ color: '#A3B5A0' }}>
+              直接描述您的症狀，AI 會搜尋中醫資料庫為您分析
+            </p>
           </div>
 
           {/* ── Mode Cards — with CTA label ── */}
