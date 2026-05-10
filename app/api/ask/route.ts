@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
     const res = await fetch(`${API_URL}/api/ask`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ question, context }),
+      body: JSON.stringify(body),  // passthrough: question + answers + suspected_syndromes
     })
     
     const data = await res.json()
