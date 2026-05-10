@@ -1361,7 +1361,7 @@ interface FreeSearchResult {
                             <div key={i} className="mt-3">
                               <p className="text-sm font-medium mb-3" style={{ color: '#2C4A3E' }}>{q.text}</p>
                               <div className="space-y-2">
-                                {q.options.map(opt => (
+                                {q.options?.map(opt => (
                                   <button key={opt.value}
                                     onClick={() => {
                                       const newAnswers = { ...freeSearchAnswers, [q.id]: opt.value }
@@ -1382,7 +1382,7 @@ interface FreeSearchResult {
                               </div>
                               {freeSearchResult.context?.suspected_syndromes && freeSearchResult.context.suspected_syndromes.length > 0 && (
                                 <div className="mt-3 flex flex-wrap gap-1">
-                                  {freeSearchResult.context.suspected_syndromes.map(s => (
+                                  {freeSearchResult.context?.suspected_syndromes?.map(s => (
                                     <span key={s} className="text-xs px-2 py-0.5 rounded-full"
                                       style={{ background: 'rgba(139,110,90,0.10)', color: '#8B6E5A' }}>
                                       {s}
