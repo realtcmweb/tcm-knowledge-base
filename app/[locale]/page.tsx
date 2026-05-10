@@ -1337,10 +1337,10 @@ interface FreeSearchResult {
                 onClick={handleFreeSearch}
                 className="px-5 py-3 rounded-xl text-sm font-medium transition-all duration-200"
                 style={{ 
-                  background: freeText.trim() ? '#2C4A3E' : '#E5E2DA',
-                  color: freeText.trim() ? '#FFFFFF' : '#A3B5A0',
+                  background: freeSearchLoading ? '#E5E2DA' : (freeText.trim() ? '#2C4A3E' : '#E5E2DA'),
+                  color: freeText.trim() && !freeSearchLoading ? '#FFFFFF' : '#A3B5A0',
                 }}
-                disabled={!freeText.trim() || freeSearchLoading}
+                disabled={freeSearchLoading}
               >
                 {freeSearchLoading ? '分析中...' : '搜尋'}
               </button>
@@ -1370,7 +1370,9 @@ interface FreeSearchResult {
                                         onClick={() => {
                                           const newAnswers = { ...freeSearchAnswers, [q.id]: opt.value }
                                           setFreeSearchAnswers(newAnswers)
-                                          setFreeText(opt.label)
+                                          // Keep original symptom text for API calls, just update answers
+                                          const originalSymptom = freeText || localStorage.getItem('lastSymptom') || ''
+                                          setFreeText(originalSymptom)
                                           handleFreeSearch()
                                         }}
                                         className="w-full text-left px-4 py-3 rounded-xl text-sm transition-all duration-200"
