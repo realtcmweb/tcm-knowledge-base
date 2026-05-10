@@ -841,7 +841,7 @@ interface FreeSearchResult {
   suggested_herbs?: string[]
   need_followup?: boolean
   done?: boolean
-  followup_questions?: FollowupQuestion[]
+  followup_questions?: (FollowupQuestion | string)[]
   from_graphdb?: { herbs: Array<{ name: string } | string>; acupoints: string[] }
   treatment?: { syndrome: string; suggested_herbs: string[]; suggested_formulas: string[] }
   context?: {
@@ -1359,36 +1359,42 @@ interface FreeSearchResult {
                         <div className="space-y-2">
                           {(freeSearchMode === 'questionnaire' || freeSearchResult.need_followup) && freeSearchResult.followup_questions?.map((q, i) => (
                             <div key={i} className="mt-3">
-                              <p className="text-sm font-medium mb-3" style={{ color: '#2C4A3E' }}>{q.text}</p>
-                              <div className="space-y-2">
-                                {q.options?.map(opt => (
-                                  <button key={opt.value}
-                                    onClick={() => {
-                                      const newAnswers = { ...freeSearchAnswers, [q.id]: opt.value }
-                                      setFreeSearchAnswers(newAnswers)
-                                      setFreeText(opt.label)
-                                      handleFreeSearch()
-                                    }}
-                                    className="w-full text-left px-4 py-3 rounded-xl text-sm transition-all duration-200"
-                                    style={{
-                                      background: freeSearchAnswers[q.id] === opt.value ? 'rgba(44,74,62,0.10)' : 'rgba(44,74,62,0.04)',
-                                      border: freeSearchAnswers[q.id] === opt.value ? '1px solid #2C4A3E' : '1px solid #E5E2DA',
-                                      color: freeSearchAnswers[q.id] === opt.value ? '#2C4A3E' : '#3A3A32',
-                                    }}
-                                  >
-                                    {opt.label}
-                                  </button>
-                                ))}
-                              </div>
-                              {freeSearchResult.context?.suspected_syndromes && freeSearchResult.context.suspected_syndromes.length > 0 && (
-                                <div className="mt-3 flex flex-wrap gap-1">
-                                  {freeSearchResult.context?.suspected_syndromes?.map(s => (
-                                    <span key={s} className="text-xs px-2 py-0.5 rounded-full"
-                                      style={{ background: 'rgba(139,110,90,0.10)', color: '#8B6E5A' }}>
-                                      {s}
-                                    </span>
-                                  ))}
-                                </div>
+                              {typeof q === 'string' ? (
+                                <p className="text-sm" style={{ color: '#4A4A42' }}>{q}</p>
+                              ) : (
+                                <>
+                                  <p className="text-sm font-medium mb-3" style={{ color: '#2C4A3E' }}>{q.text}</p>
+                                  <div className="space-y-2">
+                                    {q.options?.map(opt => (
+                                      <button key={opt.value}
+                                        onClick={() => {
+                                          const newAnswers = { ...freeSearchAnswers, [q.id]: opt.value }
+                                          setFreeSearchAnswers(newAnswers)
+                                          setFreeText(opt.label)
+                                          handleFreeSearch()
+                                        }}
+                                        className="w-full text-left px-4 py-3 rounded-xl text-sm transition-all duration-200"
+                                        style={{
+                                          background: freeSearchAnswers[q.id] === opt.value ? 'rgba(44,74,62,0.10)' : 'rgba(44,74,62,0.04)',
+                                          border: freeSearchAnswers[q.id] === opt.value ? '1px solid #2C4A3E' : '1px solid #E5E2DA',
+                                          color: freeSearchAnswers[q.id] === opt.value ? '#2C4A3E' : '#3A3A32',
+                                        }}
+                                      >
+                                        {opt.label}
+                                      </button>
+                                    ))}
+                                  </div>
+                                  {freeSearchResult.context?.suspected_syndromes && freeSearchResult.context.suspected_syndromes.length > 0 && (
+                                    <div className="mt-3 flex flex-wrap gap-1">
+                                      {freeSearchResult.context?.suspected_syndromes?.map(s => (
+                                        <span key={s} className="text-xs px-2 py-0.5 rounded-full"
+                                          style={{ background: 'rgba(139,110,90,0.10)', color: '#8B6E5A' }}>
+                                          {s}
+                                        </span>
+                                      ))}
+                                    </div>
+                                  )}
+                                </>
                               )}
                             </div>
                           ))}
