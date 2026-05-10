@@ -1369,11 +1369,36 @@ interface FreeSearchResult {
                                       <button key={opt.value}
                                         onClick={() => {
                                           const newAnswers = { ...freeSearchAnswers, [q.id]: opt.value }
+                                          // Directly call API with merged answers to avoid stale closure
+                                          const symptomText = freeText || localStorage.getItem('lastSymptom') || ''
                                           setFreeSearchAnswers(newAnswers)
-                                          // Keep original symptom text for API calls, just update answers
-                                          const originalSymptom = freeText || localStorage.getItem('lastSymptom') || ''
-                                          setFreeText(originalSymptom)
-                                          handleFreeSearch()
+                                          setFreeText(symptomText)
+                                          setFreeSearchLoading(true)
+                                          setFreeSearchResult({ loading: '正在搜尋中醫資料庫...' })
+                                          fetch('/api/ask', {
+                                            method: 'POST',
+                                            headers: { 'Content-Type': 'application/json' },
+                                            body: JSON.stringify({
+                                              question: symptomText,
+                                              answers: newAnswers,
+                                            }),
+                                          }).then(res => res.json()).then(data => {
+                                            if (!data.ok && !data.answer) {
+                                              setFreeSearchResult({ error: data.error || '搜尋失敗，請稍後再試' })
+                                            } else {
+                                              setFreeSearchResult(data)
+                                              if (data.done && data.result) {
+                                                setStep('result')
+                                                setResult(data.result)
+                                              } else {
+                                                setFreeSearchMode(data.followup_questions?.length > 0 ? 'questionnaire' : 'input')
+                                              }
+                                            }
+                                            setFreeSearchLoading(false)
+                                          }).catch(() => {
+                                            setFreeSearchResult({ error: '網路錯誤，請檢查連線後再試' })
+                                            setFreeSearchLoading(false)
+                                          })
                                         }}
                                         className="w-full text-left px-4 py-3 rounded-xl text-sm transition-all duration-200"
                                         style={{
