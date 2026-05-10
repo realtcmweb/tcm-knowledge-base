@@ -20,7 +20,7 @@ export default function LoginPage() {
     setError('')
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/${mode}`, {
+      const res = await fetch(`${process.env.AUTH_API_URL || process.env.NEXT_PUBLIC_API_URL?.replace(':8000',':8001')}/auth/${mode}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password, name: mode === 'register' ? name : undefined }),
