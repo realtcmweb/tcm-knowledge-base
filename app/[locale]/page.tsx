@@ -74,6 +74,12 @@ interface SavedResult {
   savedAt: string
 }
 
+interface FollowupQuestion {
+  id: string
+  text: string
+  options: Array<{ value: string; label: string }>
+}
+
 interface FreeSearchResult {
   loading?: string
   ok?: boolean
@@ -82,9 +88,16 @@ interface FreeSearchResult {
   suggested_syndromes?: string[]
   suggested_herbs?: string[]
   need_followup?: boolean
-  followup_questions?: string[]
+  done?: boolean
+  followup_questions?: FollowupQuestion[]
   from_graphdb?: { herbs: Array<{ name: string } | string>; acupoints: string[] }
   treatment?: { syndrome: string; suggested_herbs: string[]; suggested_formulas: string[] }
+  context?: {
+    suspected_syndromes: string[]
+    confidence: number
+    answered_count: number
+  }
+  result?: ResultData
   error?: string
 }
 
@@ -813,6 +826,12 @@ export default function Home() {
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [customInput, setCustomInput] = useState('')
   const [smartAnswers, setSmartAnswers] = useState<Record<string, string[]>>({})
+interface FollowupQuestion {
+  id: string
+  text: string
+  options: Array<{ value: string; label: string }>
+}
+
 interface FreeSearchResult {
   loading?: string
   ok?: boolean
@@ -821,14 +840,33 @@ interface FreeSearchResult {
   suggested_syndromes?: string[]
   suggested_herbs?: string[]
   need_followup?: boolean
-  followup_questions?: string[]
+  done?: boolean
+  followup_questions?: FollowupQuestion[]
   from_graphdb?: { herbs: Array<{ name: string } | string>; acupoints: string[] }
   treatment?: { syndrome: string; suggested_herbs: string[]; suggested_formulas: string[] }
+  context?: {
+    suspected_syndromes: string[]
+    confidence: number
+    answered_count: number
+  }
+  result?: ResultData
   error?: string
 }
   const [tongueGuideOpen, setTongueGuideOpen] = useState(false)
+  const [freeSearchMode, setFreeSearchMode] = useState<'input' | 'questionnaire' | 'result'>('input')
+  const [freeSearchAnswers, setFreeSearchAnswers] = useState<Record<string, string>>({})
   const [reportFile, setReportFile] = useState<File | null>(null)
   const [reportPreview, setReportPreview] = useState<string | null>(null)
+
+  // Reset free search when input becomes empty
+  useEffect(() => {
+    if (freeText.trim() === '' && freeSearchMode !== 'input') {
+      setFreeSearchMode('input')
+      setFreeSearchAnswers({})
+      setFreeSearchResult(null)
+    }
+  }, [freeText, freeSearchMode])
+
   const reportFileRef = useRef<HTMLInputElement>(null)
 
   const TONGUE_COLOR_OPTIONS = [
@@ -976,13 +1014,22 @@ interface FreeSearchResult {
       const res = await fetch('/api/ask', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question: freeText.trim() }),
+        body: JSON.stringify({
+          question: freeText.trim(),
+          answers: freeSearchAnswers,
+        }),
       })
       const data = await res.json()
       if (!data.ok && !data.answer) {
         setFreeSearchResult({ error: data.error || '搜尋失敗，請稍後再試' })
       } else {
         setFreeSearchResult(data)
+        if (data.done) {
+          setStep('result')
+          setResult(data.result as ResultData)
+        } else {
+          setFreeSearchMode(data.followup_questions?.length > 0 ? 'questionnaire' : 'input')
+        }
       }
     } catch (e) {
       setFreeSearchResult({ error: '網路錯誤，請檢查連線後再試' })
@@ -1308,14 +1355,40 @@ interface FreeSearchResult {
                       <div>
                         <p className="text-sm font-medium mb-2" style={{ color: '#2C4A3E' }}>{freeSearchResult.answer}</p>
                         <div className="space-y-2">
-                          {freeSearchResult.followup_questions?.map((q, i) => (
-                            <button key={i}
-                              onClick={() => { setFreeText(q.replace('？', '').replace('（', '/').replace('）', '')); handleFreeSearch() }}
-                              className="w-full text-left px-4 py-2.5 rounded-lg text-sm transition-all duration-200"
-                              style={{ background: 'rgba(44,74,62,0.06)', border: '1px solid #D4E0D6', color: '#3A3A32' }}
-                            >
-                              {q}
-                            </button>
+                          {freeSearchMode === 'questionnaire' && freeSearchResult.followup_questions?.map((q, i) => (
+                            <div key={i} className="mt-3">
+                              <p className="text-sm font-medium mb-3" style={{ color: '#2C4A3E' }}>{q.text}</p>
+                              <div className="space-y-2">
+                                {q.options.map(opt => (
+                                  <button key={opt.value}
+                                    onClick={() => {
+                                      const newAnswers = { ...freeSearchAnswers, [q.id]: opt.value }
+                                      setFreeSearchAnswers(newAnswers)
+                                      setFreeText(opt.label)
+                                      handleFreeSearch()
+                                    }}
+                                    className="w-full text-left px-4 py-3 rounded-xl text-sm transition-all duration-200"
+                                    style={{
+                                      background: freeSearchAnswers[q.id] === opt.value ? 'rgba(44,74,62,0.10)' : 'rgba(44,74,62,0.04)',
+                                      border: freeSearchAnswers[q.id] === opt.value ? '1px solid #2C4A3E' : '1px solid #E5E2DA',
+                                      color: freeSearchAnswers[q.id] === opt.value ? '#2C4A3E' : '#3A3A32',
+                                    }}
+                                  >
+                                    {opt.label}
+                                  </button>
+                                ))}
+                              </div>
+                              {freeSearchResult.context?.suspected_syndromes && freeSearchResult.context.suspected_syndromes.length > 0 && (
+                                <div className="mt-3 flex flex-wrap gap-1">
+                                  {freeSearchResult.context.suspected_syndromes.map(s => (
+                                    <span key={s} className="text-xs px-2 py-0.5 rounded-full"
+                                      style={{ background: 'rgba(139,110,90,0.10)', color: '#8B6E5A' }}>
+                                      {s}
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
                           ))}
                         </div>
                       </div>
