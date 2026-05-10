@@ -4,6 +4,7 @@ export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData()
     const image = formData.get('image')
+    const underside = formData.get('underside')
 
     if (!image || typeof image === 'string') {
       return NextResponse.json({ error: 'No image provided' }, { status: 400 })
@@ -12,6 +13,11 @@ export async function POST(req: NextRequest) {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
     const backendFormData = new FormData()
     backendFormData.append('image', image)
+
+    // Phase 1: 附加舌下靜脈圖片
+    if (underside && typeof underside !== 'string') {
+      backendFormData.append('underside', underside)
+    }
 
     const res = await fetch(`${apiUrl}/api/tongue`, {
       method: 'POST',

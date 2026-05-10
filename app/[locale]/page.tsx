@@ -1094,6 +1094,10 @@ interface FreeSearchResult {
       if (tongueFile) {
         const formData = new FormData()
         formData.append('image', tongueFile)
+        // Phase 1: 附加舌下靜脈圖片
+        if (tongueUndersideFile) {
+          formData.append('underside', tongueUndersideFile)
+        }
         try {
           const res = await fetch('/api/tongue', { method: 'POST', body: formData })
           if (res.ok) tongueInfo = await res.json()
@@ -2119,49 +2123,159 @@ interface FreeSearchResult {
             )}
           </div>
 
-          {/* 舌苔上傳區域 */}
-          <div className="relative rounded-2xl overflow-hidden mb-5"
-            style={{ border: tonguePreview ? 'none' : '1.5px dashed #C5B8A8', background: '#FFFFFF' }}>
-            {tonguePreview ? (
-              <div className="relative">
-                <img src={tonguePreview} alt="舌苔預覽" className="w-full object-cover" style={{ aspectRatio: '4/3' }} />
-                <div className="absolute top-4 left-4 w-9 h-9 rounded-full flex items-center justify-center"
-                  style={{ background: '#2C4A3E', color: '#FAFAF7' }}>
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7l3 3 5-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                </div>
-                <button onClick={() => { setTonguePreview(null); setTongueFile(null) }}
-                  className="absolute top-4 right-4 w-9 h-9 rounded-full flex items-center justify-center transition"
-                  style={{ background: 'rgba(0,0,0,0.45)', color: '#FAFAF7' }}
-                  onMouseEnter={e => e.currentTarget.style.background = 'rgba(0,0,0,0.65)'}
-                  onMouseLeave={e => e.currentTarget.style.background = 'rgba(0,0,0,0.45)'}>
-                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 2l6 6M8 2l-6 6" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/></svg>
+          {/* ── Phase 1: 雙舌面 Step 指示器 ── */}
+          {tongueStep === 'underside' && (
+            <div className="mb-4 flex items-center gap-2">
+              <div className="flex items-center gap-1.5">
+                <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium" style={{ background: '#2C4A3E', color: '#FAFAF7' }}>✓</div>
+                <span className="text-xs" style={{ color: '#4A4A42' }}>舌面已完成</span>
+              </div>
+              <div style={{ width: '24px', height: '1px', background: '#E5E2DA' }} />
+              <div className="flex items-center gap-1.5">
+                <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium" style={{ background: '#8B6E5A', color: '#FAFAF7' }}>2</div>
+                <span className="text-xs font-medium" style={{ color: '#8B6E5A' }}>舌下靜脈</span>
+              </div>
+            </div>
+          )}
+
+          {/* ── Step 1: 舌面 ── */}
+          {tongueStep === 'front' && (
+            <>
+              {/* 舌面 Step Label */}
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium" style={{ background: '#8B6E5A', color: '#FAFAF7' }}>1</div>
+                <span className="text-sm font-medium" style={{ color: '#8B6E5A', letterSpacing: '0.04em' }}>舌面拍攝</span>
+              </div>
+
+              {/* 舌面提示 */}
+              <div className="rounded-2xl px-4 py-3 mb-4" style={{ background: 'rgba(139,110,90,0.06)', border: '1px solid rgba(139,110,90,0.12)' }}>
+                <p className="text-sm leading-relaxed" style={{ color: '#8B6E5A' }}>
+                  張嘴伸舌，舌頭自然下垂放鬆，舌頭佔據畫面主體
+                </p>
+              </div>
+
+              {/* 舌面上傳區域 */}
+              <div className="relative rounded-2xl overflow-hidden mb-4"
+                style={{ border: tonguePreview ? 'none' : '1.5px dashed #C5B8A8', background: '#FFFFFF' }}>
+                {tonguePreview ? (
+                  <div className="relative">
+                    <img src={tonguePreview} alt="舌面預覽" className="w-full object-cover" style={{ aspectRatio: '4/3' }} />
+                    <div className="absolute top-4 left-4 w-9 h-9 rounded-full flex items-center justify-center"
+                      style={{ background: '#2C4A3E', color: '#FAFAF7' }}>
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7l3 3 5-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    </div>
+                    <button onClick={() => { setTonguePreview(null); setTongueFile(null) }}
+                      className="absolute top-4 right-4 w-9 h-9 rounded-full flex items-center justify-center transition"
+                      style={{ background: 'rgba(0,0,0,0.45)', color: '#FAFAF7' }}
+                      onMouseEnter={e => e.currentTarget.style.background = 'rgba(0,0,0,0.65)'}
+                      onMouseLeave={e => e.currentTarget.style.background = 'rgba(0,0,0,0.45)'}>
+                      <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 2l6 6M8 2l-6 6" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/></svg>
+                    </button>
+                  </div>
+                ) : (
+                  <div className="aspect-[4/3] flex flex-col items-center justify-center cursor-pointer transition"
+                    style={{ background: '#FAFAF7' }}
+                    onMouseEnter={e => e.currentTarget.style.background = '#F5F3EE'}
+                    onMouseLeave={e => e.currentTarget.style.background = '#FAFAF7'}>
+                    <svg width="44" height="44" viewBox="0 0 44 44" fill="none" className="mb-3" style={{ color: '#A3B5A0' }}>
+                      <circle cx="22" cy="22" r="17" stroke="currentColor" strokeWidth="0.8" fill="none"/>
+                      <path d="M22 9C22 9 14 15.5 14 22a8 8 0 0016 0C30 15.5 22 9 22 9z" stroke="currentColor" strokeWidth="0.8" fill="none"/>
+                    </svg>
+                    <p className="text-base font-medium mb-1" style={{ color: '#4A4A42' }}>點擊拍攝 / 選擇檔案</p>
+                    <p className="text-sm" style={{ color: '#A3B5A0' }}>自然光 · 張嘴伸舌 · 舌頭放鬆</p>
+                  </div>
+                )}
+                <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleTongueUpload} />
+                {!tonguePreview && (
+                  <div onClick={() => fileRef.current?.click()} className="absolute inset-0" />
+                )}
+              </div>
+
+              {/* 前進到舌下按鈕 */}
+              {tonguePreview && (
+                <button onClick={() => setTongueStep('underside')}
+                  className="w-full py-3.5 rounded-2xl text-sm mb-4 flex items-center justify-center gap-2 transition-all duration-300"
+                  style={{ background: 'rgba(139,110,90,0.08)', border: '1px solid #8B6E5A', color: '#8B6E5A' }}
+                  onMouseEnter={e => { e.currentTarget.style.background = 'rgba(139,110,90,0.15)' }}
+                  onMouseLeave={e => { e.currentTarget.style.background = 'rgba(139,110,90,0.08)' }}>
+                  下一步：拍攝舌下靜脈
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M4 7h6M8 4l3 3-3 3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                 </button>
-              </div>
-            ) : (
-              <div className="aspect-[4/3] flex flex-col items-center justify-center cursor-pointer transition"
-                style={{ background: '#FAFAF7' }}
-                onMouseEnter={e => e.currentTarget.style.background = '#F5F3EE'}
-                onMouseLeave={e => e.currentTarget.style.background = '#FAFAF7'}>
-                <svg width="44" height="44" viewBox="0 0 44 44" fill="none" className="mb-3" style={{ color: '#A3B5A0' }}>
-                  <circle cx="22" cy="22" r="17" stroke="currentColor" strokeWidth="0.8" fill="none"/>
-                  <path d="M22 9C22 9 14 15.5 14 22a8 8 0 0016 0C30 15.5 22 9 22 9z" stroke="currentColor" strokeWidth="0.8" fill="none"/>
-                </svg>
-                <p className="text-base font-medium mb-1" style={{ color: '#4A4A42' }}>點擊拍攝 / 選擇檔案</p>
-                <p className="text-sm" style={{ color: '#A3B5A0' }}>自然光 · 張嘴伸舌 · 舌頭放鬆</p>
-              </div>
-            )}
-            <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleTongueUpload} />
-            {!tonguePreview && (
-              <div onClick={() => fileRef.current?.click()} className="absolute inset-0" />
-            )}
-          </div>
+              )}
+            </>
+          )}
 
-          <div className="rounded-2xl px-4 py-3.5 mb-5" style={{ background: 'rgba(44,74,62,0.04)', border: '1px solid rgba(44,74,62,0.08)' }}>
-            <p className="text-sm leading-relaxed" style={{ color: '#4A4A42' }}>
-              <span style={{ color: '#1C2C24', fontWeight: '500' }}>拍攝技巧：</span>自然光或室內光 · 張嘴伸舌自然下垂 · 舌頭佔據畫面主體
-            </p>
-          </div>
+          {/* ── Step 2: 舌下靜脈 ── */}
+          {tongueStep === 'underside' && (
+            <>
+              {/* 舌下提示 */}
+              <div className="rounded-2xl px-4 py-3 mb-4" style={{ background: 'rgba(139,110,90,0.06)', border: '1px solid rgba(139,110,90,0.12)' }}>
+                <p className="text-sm leading-relaxed" style={{ color: '#8B6E5A' }}>
+                  <span style={{ fontWeight: 500 }}>舌頭上翹向上顎</span>，露出舌下靜脈，輕輕向上卷舌拍攝
+                </p>
+              </div>
 
+              {/* 舌下上傳區域 */}
+              <div className="relative rounded-2xl overflow-hidden mb-4"
+                style={{ border: tongueUndersidePreview ? 'none' : '1.5px dashed #C5B8A8', background: '#FFFFFF' }}>
+                {tongueUndersidePreview ? (
+                  <div className="relative">
+                    <img src={tongueUndersidePreview} alt="舌下預覽" className="w-full object-cover" style={{ aspectRatio: '4/3' }} />
+                    <div className="absolute top-4 left-4 w-9 h-9 rounded-full flex items-center justify-center"
+                      style={{ background: '#8B6E5A', color: '#FAFAF7' }}>
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7l3 3 5-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    </div>
+                    <button onClick={() => { setTongueUndersidePreview(null); setTongueUndersideFile(null) }}
+                      className="absolute top-4 right-4 w-9 h-9 rounded-full flex items-center justify-center transition"
+                      style={{ background: 'rgba(0,0,0,0.45)', color: '#FAFAF7' }}
+                      onMouseEnter={e => e.currentTarget.style.background = 'rgba(0,0,0,0.65)'}
+                      onMouseLeave={e => e.currentTarget.style.background = 'rgba(0,0,0,0.45)'}>
+                      <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 2l6 6M8 2l-6 6" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/></svg>
+                    </button>
+                  </div>
+                ) : (
+                  <div className="aspect-[4/3] flex flex-col items-center justify-center cursor-pointer transition"
+                    style={{ background: '#FAFAF7' }}
+                    onMouseEnter={e => e.currentTarget.style.background = '#F5F3EE'}
+                    onMouseLeave={e => e.currentTarget.style.background = '#FAFAF7'}>
+                    <svg width="44" height="44" viewBox="0 0 44 44" fill="none" className="mb-3" style={{ color: '#A3B5A0' }}>
+                      <circle cx="22" cy="22" r="17" stroke="currentColor" strokeWidth="0.8" fill="none"/>
+                      <path d="M22 28 Q15 22 22 16 Q29 22 22 28z" stroke="currentColor" strokeWidth="0.8" fill="none"/>
+                      <path d="M16 22 Q22 18 28 22" stroke="currentColor" strokeWidth="0.8" fill="none"/>
+                    </svg>
+                    <p className="text-base font-medium mb-1" style={{ color: '#4A4A42' }}>點擊拍攝 / 選擇檔案</p>
+                    <p className="text-sm" style={{ color: '#A3B5A0' }}>舌頭上翹 · 顯示舌下靜脈</p>
+                  </div>
+                )}
+                <input ref={tongueUndersideRef} type="file" accept="image/*" className="hidden" onChange={handleTongueUndersideUpload} />
+                {!tongueUndersidePreview && (
+                  <div onClick={() => tongueUndersideRef.current?.click()} className="absolute inset-0" />
+                )}
+              </div>
+
+              {/* 跳過舌下 & 返回按鈕 */}
+              <div className="flex gap-2 mb-4">
+                <button onClick={() => setTongueStep('front')}
+                  className="flex-1 py-3 rounded-2xl text-sm transition-all duration-300"
+                  style={{ background: 'transparent', border: '1px solid #E5E2DA', color: '#A3B5A0' }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = '#2C4A3E'; e.currentTarget.style.color = '#2C4A3E' }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = '#E5E2DA'; e.currentTarget.style.color = '#A3B5A0' }}>
+                  ← 返回
+                </button>
+                {!tongueUndersidePreview && (
+                  <button onClick={() => setTongueStep('front')}
+                    className="flex-1 py-3 rounded-2xl text-sm transition-all duration-300"
+                    style={{ background: 'transparent', border: '1px dashed #C5B8A8', color: '#A3B5A0' }}
+                    onMouseEnter={e => { e.currentTarget.style.color = '#8B6E5A'; e.currentTarget.style.borderColor = '#8B6E5A' }}
+                    onMouseLeave={e => { e.currentTarget.style.color = '#A3B5A0'; e.currentTarget.style.borderColor = '#C5B8A8' }}>
+                    跳過舌下（可稍後補拍）
+                  </button>
+                )}
+              </div>
+            </>
+          )}
+
+          {/* 隱私聲明 */}
           <div className="rounded-2xl px-4 py-3.5 mb-6"
             style={{ background: 'rgba(44,74,62,0.04)', border: '1px solid rgba(44,74,62,0.08)' }}>
             <div className="flex items-center gap-2">
@@ -2254,9 +2368,9 @@ interface FreeSearchResult {
             style={{ background: loading ? '#2C4A3E' : '#1C2C24', color: '#FAFAF7', letterSpacing: '0.04em', boxShadow: '0 4px 20px rgba(44,74,62,0.15)' }}
             onMouseEnter={e => { if (!loading) e.currentTarget.style.background = '#2C4A3E' }}
             onMouseLeave={e => { if (!loading) e.currentTarget.style.background = '#1C2C24' }}>
-            {loading ? '分析中...' : tongueFile ? '分析舌苔並送出' : '略過舌苔，直接分析'}
+            {loading ? '分析中...' : (tonguePreview && tongueStep === 'underside') ? '分析舌苔並送出' : tonguePreview ? '繼續拍舌下' : '略過舌苔，直接分析'}
           </button>
-          {!tongueFile && (
+          {!tonguePreview && (
             <button onClick={() => {
               setResult({ constitution: analyzeCondition(answers), questionnaire_answers: answers, savedAt: new Date().toISOString() })
               setStep('result')
@@ -2939,6 +3053,43 @@ interface FreeSearchResult {
                   </p>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* Phase 1: 舌下靜脈結果（與舌面一併顯示） */}
+          {result.tongue && (result.tongue as any).underside && (
+            <div className="bg-stone-50 rounded-2xl p-5 border border-stone-200 mb-4">
+              <h3 className="text-sm font-semibold mb-3 flex items-center gap-2" style={{ color: '#8B6E5A' }}>
+                <span>🩸</span> 舌下靜脈分析
+              </h3>
+              <div className="grid grid-cols-2 gap-3 text-sm mb-3">
+                {[
+                  { label: '靜脈顏色', value: ((result.tongue as any).underside as any).vein_color || '—' },
+                  { label: '靜脈形態', value: ((result.tongue as any).underside as any).vein_morphology || '—' },
+                  { label: '曲張程度', value: ['正常', '輕度曲張', '重度曲張'][((result.tongue as any).underside as any).tortuosity || 0] },
+                  { label: '瘀阻程度', value: ((result.tongue as any).underside as any).vein_color?.includes('明顯') ? '明顯瘀阻' : ((result.tongue as any).underside as any).vein_color?.includes('輕度') ? '輕度瘀阻' : '無明顯瘀阻' },
+                ].map(item => (
+                  <div key={item.label} className="bg-white rounded-xl p-3">
+                    <p className="text-xs text-stone-400 mb-1">{item.label}</p>
+                    <p className="text-stone-700 font-medium">{item.value}</p>
+                  </div>
+                ))}
+              </div>
+              {/* 舌下靜脈中醫解讀 */}
+              {(() => {
+                const us = (result.tongue as any).underside as any
+                const parts: string[] = []
+                if (us?.vein_morphology === '正常') parts.push('舌下靜脈形態正常，血行通暢，無明顯瘀阻表現。')
+                if (us?.vein_morphology === '輕度曲張') parts.push('舌下靜脈輕度曲張提示輕度血行不暢，可能有輕微血瘀傾向，建議適度運動促進血液循環。')
+                if (us?.vein_morphology === '重度曲張') parts.push('舌下靜脈重度曲張是中醫血瘀的重要指徵，常見於氣滞血瘀、寒凝血瘀或痰瘀互結體質，建議進一步中醫辨證論治。')
+                if (us?.tortuosity >= 2) parts.push('靜脈彎曲明顯（中度以上曲張）中醫視為「筋結」或「血瘀絡阻」，需活血化瘀調理。')
+                return parts.length > 0 ? (
+                  <div className="pt-3 border-t border-stone-200">
+                    <p className="text-xs text-stone-400 mb-1">中醫解讀</p>
+                    <p className="text-sm text-stone-600 leading-relaxed">{parts.join(' ')}</p>
+                  </div>
+                ) : null
+              })()}
             </div>
           )}
 
