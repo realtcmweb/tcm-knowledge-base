@@ -1357,7 +1357,7 @@ interface FreeSearchResult {
                       <div>
                         <p className="text-sm font-medium mb-2" style={{ color: '#2C4A3E' }}>{freeSearchResult.answer}</p>
                         <div className="space-y-2">
-                          {freeSearchMode === 'questionnaire' && freeSearchResult.followup_questions?.map((q, i) => (
+                          {(freeSearchMode === 'questionnaire' || freeSearchResult.need_followup) && freeSearchResult.followup_questions?.map((q, i) => (
                             <div key={i} className="mt-3">
                               <p className="text-sm font-medium mb-3" style={{ color: '#2C4A3E' }}>{q.text}</p>
                               <div className="space-y-2">
