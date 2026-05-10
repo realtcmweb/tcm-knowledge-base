@@ -1642,7 +1642,7 @@ const [tongueGuideAnswers, setTongueGuideAnswers] = useState<Record<string, stri
                 placeholder={currentQ.placeholder} rows={3}
                 className="w-full px-5 py-4 rounded-2xl text-base outline-none resize-none transition-colors"
                 style={{ background: '#FFFFFF', border: '1px solid #E5E2DA', color: '#1C2C24', letterSpacing: '0.02em' }}
-                onFocus={e => e.target.style.borderColor = '#2C4A3E'}
+                onFocus={e => { e.target.style.borderColor = '#2C4A3E'; e.target.scrollIntoView({ behavior: 'smooth', block: 'center' }) }}
                 onBlur={e => e.target.style.borderColor = '#E5E2DA'} />
               <button onClick={handleInputSubmit} disabled={!customInput.trim()}
                 className="w-full py-4 rounded-2xl font-medium text-base transition-all duration-300 disabled:opacity-40"
