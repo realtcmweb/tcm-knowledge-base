@@ -900,6 +900,11 @@ interface FreeSearchResult {
   ]
   const [tongueFile, setTongueFile] = useState<File | null>(null)
   const [tonguePreview, setTonguePreview] = useState<string | null>(null)
+  // 舌下靜脈（Phase 1 升級）
+  const [tongueUndersideFile, setTongueUndersideFile] = useState<File | null>(null)
+  const [tongueUndersidePreview, setTongueUndersidePreview] = useState<string | null>(null)
+  const [tongueStep, setTongueStep] = useState<'front' | 'underside'>('front')
+  const tongueUndersideRef = useRef<HTMLInputElement>(null)
   const [faceFile, setFaceFile] = useState<File | null>(null)
   const [facePreview, setFacePreview] = useState<string | null>(null)
   const [faceInfo, setFaceInfo] = useState<Record<string, unknown> | null>(null)
@@ -993,9 +998,17 @@ interface FreeSearchResult {
     const file = e.target.files?.[0]
     if (!file) return
     setTongueFile(file)
-    setImageLoaded(true) // createObjectURL is synchronous, preview always works
+    setImageLoaded(true)
     const preview = URL.createObjectURL(file)
     setTonguePreview(preview)
+  }
+
+  // 舌下靜脈上傳（Phase 1）
+  const handleTongueUndersideUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setTongueUndersideFile(file)
+    setTongueUndersidePreview(URL.createObjectURL(file))
   }
 
   const handleFaceUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -1107,6 +1120,7 @@ interface FreeSearchResult {
   const reset = () => {
     setMode(null); setStep('mode'); setQIndex(0); setAnswers({})
     setCustomInput(''); setTongueFile(null); setTonguePreview(null)
+    setTongueUndersideFile(null); setTongueUndersidePreview(null); setTongueStep('front')
     setFaceFile(null); setFacePreview(null); setFaceInfo(null); setShowFaceCapture(false)
     setResult(null); setImageLoaded(false)
     setReportFile(null); setReportPreview(null)
