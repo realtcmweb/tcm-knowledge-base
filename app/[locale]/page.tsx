@@ -841,7 +841,7 @@ interface FreeSearchResult {
   suggested_herbs?: string[]
   need_followup?: boolean
   done?: boolean
-  followup_questions?: (FollowupQuestion | string)[]
+  followup_questions?: (FollowupQuestion | string)[]  // string[] = old fallback, FollowupQuestion[] = new multi-turn
   from_graphdb?: { herbs: Array<{ name: string } | string>; acupoints: string[] }
   treatment?: { syndrome: string; suggested_herbs: string[]; suggested_formulas: string[] }
   context?: {
