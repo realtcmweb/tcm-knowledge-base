@@ -743,7 +743,7 @@ function analyzeCondition(answers: Record<string, string>): {
 // ============================================
 // 類型
 // ============================================
-type Step = 'mode' | 'basic' | 'chief' | 'smart' | 'freesearch' | 'questionnaire' | 'tongue_guide' | 'tongue' | 'result'
+type Step = 'mode' | 'basic' | 'chief' | 'smart' | 'freesearch' | 'questionnaire' | 'tongue_guide' | 'tongue' | 'result' | 'free_basic' | 'symptom_priority'
 type Mode = 'fast' | 'detailed' | 'smart'
 
 interface ResultData {
@@ -889,6 +889,8 @@ interface FreeSearchResult {
   const [tongueGuideOpen, setTongueGuideOpen] = useState(false)
   const [freeSearchMode, setFreeSearchMode] = useState<'input' | 'questionnaire' | 'result'>('input')
   const [freeSearchAnswers, setFreeSearchAnswers] = useState<Record<string, string>>({})
+  const [extractedSymptoms, setExtractedSymptoms] = useState<string[]>([])
+  const [selectedPrioritySymptom, setSelectedPrioritySymptom] = useState<string>('')
   const [reportFile, setReportFile] = useState<File | null>(null)
   const [reportPreview, setReportPreview] = useState<string | null>(null)
 
@@ -1055,6 +1057,26 @@ interface FreeSearchResult {
 
   const handleFreeSearch = async () => {
     if (!freeText.trim()) return
+    const symptomText = freeText.trim()
+    localStorage.setItem('lastSymptom', symptomText)
+    
+    // Auto-detect gender from symptom keywords
+    const femaleKeywords = ['月經', '經期', '經痛', '痛經', '月經不順', '月經失調', '經前', '經後', '婦科', '陰道', '子宫', '卵巢', '排卵', '懷孕', '備孕', '不孕', '流產', '產後', '月子', '母乳', '乳量', '經血']
+    const maleKeywords = ['前列腺', '攝護腺', '陽痿', '早洩', '性功能障礙', '男性功能', '睪丸', '陰囊', '陽物', '精子', '無精子', '少精子']
+    
+    let autoGender = ''
+    if (femaleKeywords.some(k => symptomText.includes(k))) autoGender = 'F'
+    else if (maleKeywords.some(k => symptomText.includes(k))) autoGender = 'M'
+    
+    // If gender or age not provided, ask for them first (unless auto-detected)
+    if (!freeSearchAnswers['gender'] && !autoGender || !freeSearchAnswers['age']) {
+      // Apply auto-detected gender if user didn't specify
+      if (!freeSearchAnswers['gender'] && autoGender) {
+        setFreeSearchAnswers(prev => ({ ...prev, gender: autoGender }))
+      }
+      setStep('free_basic')
+      return
+    }
     setFreeSearchLoading(true)
     setFreeSearchResult({ loading: '正在搜尋中醫資料庫...' })
     try {
@@ -1898,7 +1920,213 @@ interface FreeSearchResult {
             + 其他健康問題
           </button>
         </main>
-      )}      {step === 'smart' && (
+      )}
+      {/* ════ Direction A: Free Text Flow ════ */}
+      {step === 'free_basic' && (
+        <main className="max-w-2xl mx-auto px-6 pt-20 pb-20 min-h-[80vh] flex flex-col justify-center">
+          <button
+            onClick={() => setStep('freesearch')}
+            className="flex items-center gap-2 text-sm mb-8"
+            style={{ color: '#8B6E5A' }}>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="#8B6E5A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            Back
+          </button>
+
+          <div className="text-center mb-10">
+            <h2 className="text-4xl font-light mb-3" style={{ color: '#1C2C24' }}>Please tell us your basic info</h2>
+            <p className="text-base" style={{ color: '#8B6E5A' }}>This helps AI give more accurate analysis</p>
+          </div>
+
+          <div className="space-y-5 mb-8">
+            {(!freeSearchAnswers['gender'] || freeSearchAnswers['gender'] === '') && (
+              <div className="rounded-2xl p-5" style={{ background: '#FFFFFF', border: '1px solid #E5E2DA' }}>
+                <p className="text-sm font-medium mb-3" style={{ color: '#2C4A3E' }}>性別 Gender <span className="text-xs" style={{ color: '#A3B5A0' }}>(已從症狀自動偵測)</span></p>
+                <div className="flex gap-3">
+                  {['M', 'F'].map(g => (
+                    <button key={g}
+                      onClick={() => setFreeSearchAnswers(prev => ({ ...prev, gender: g }))}
+                      className="flex-1 py-3 rounded-xl text-sm font-medium transition-all"
+                      style={{
+                        background: freeSearchAnswers['gender'] === g ? '#2C4A3E' : 'rgba(44,74,62,0.06)',
+                        color: freeSearchAnswers['gender'] === g ? '#FAFAF7' : '#4A4A42',
+                      }}>
+                      {g === 'M' ? '男 Male' : '女 Female'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+            {freeSearchAnswers['gender'] && freeSearchAnswers['gender'] !== '' && (
+              <div className="rounded-2xl p-4 flex items-center justify-between" style={{ background: 'rgba(44,74,62,0.06)', border: '1px solid rgba(44,74,62,0.15)' }}>
+                <div>
+                  <p className="text-sm font-medium" style={{ color: '#2C4A3E' }}>性別 Gender</p>
+                  <p className="text-sm" style={{ color: '#4A4A42' }}>已自動偵測</p>
+                </div>
+                <span className="text-sm font-medium" style={{ color: '#2C4A3E' }}>
+                  {freeSearchAnswers['gender'] === 'M' ? '男 Male' : '女 Female'}
+                </span>
+              </div>
+            )}
+
+            <div className="rounded-2xl p-5" style={{ background: '#FFFFFF', border: '1px solid #E5E2DA' }}>
+              <p className="text-sm font-medium mb-3" style={{ color: '#2C4A3E' }}>Age range</p>
+              <div className="flex gap-2 flex-wrap">
+                {['20-30', '31-40', '41-50', '51-60', '61-70', '70+'].map(a => (
+                  <button key={a}
+                    onClick={() => setFreeSearchAnswers(prev => ({ ...prev, age: a }))}
+                    className="px-4 py-2.5 rounded-xl text-sm font-medium transition-all"
+                    style={{
+                      background: freeSearchAnswers['age'] === a ? '#2C4A3E' : 'rgba(44,74,62,0.06)',
+                      color: freeSearchAnswers['age'] === a ? '#FAFAF7' : '#4A4A42',
+                    }}>
+                    {a}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="fixed bottom-0 left-0 right-0 px-6 py-5 max-w-2xl mx-auto" style={{ background: 'rgba(250,250,247,0.95)', backdropFilter: 'blur(20px)', borderTop: '1px solid rgba(229,226,218,0.6)' }}>
+            <button
+              onClick={() => {
+                if (!freeSearchAnswers['gender'] || !freeSearchAnswers['age']) return
+                const symptomText = localStorage.getItem('lastSymptom') || freeText.trim()
+                const raw = symptomText.split(/[，。；,;、\s]+/).filter((s: string) => s.trim().length > 1)
+                const seen = new Set<string>()
+                const unique: string[] = []
+                for (const s of raw) {
+                  const norm = s.trim()
+                  if (!seen.has(norm)) { seen.add(norm); unique.push(norm) }
+                }
+                const extracted = unique.slice(0, 3)
+                setExtractedSymptoms(extracted.length > 0 ? extracted : [symptomText])
+                setSelectedPrioritySymptom('')
+                setStep('symptom_priority')
+              }}
+              disabled={!freeSearchAnswers['gender'] || !freeSearchAnswers['age']}
+              className="w-full py-4 rounded-2xl font-medium text-base transition-all"
+              style={{
+                background: (freeSearchAnswers['gender'] && freeSearchAnswers['age']) ? '#2C4A3E' : '#C5D4C0',
+                color: '#FAFAF7',
+              }}>
+              Start Analysis
+            </button>
+          </div>
+        </main>
+      )}
+
+      {step === 'symptom_priority' && (
+        <main className="max-w-2xl mx-auto px-6 pt-20 pb-28 min-h-[80vh] flex flex-col justify-center">
+          <button
+            onClick={() => setStep('free_basic')}
+            className="flex items-center gap-2 text-sm mb-8"
+            style={{ color: '#8B6E5A' }}>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="#8B6E5A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            Back
+          </button>
+
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-light mb-3" style={{ color: '#1C2C24', lineHeight: 1.2 }}>
+              Which symptom bothers you most?
+            </h2>
+            <p className="text-base" style={{ color: '#8B6E5A' }}>
+              AI will focus on this symptom to ask follow-up questions
+            </p>
+          </div>
+
+          <div className="space-y-4 mb-24">
+            {extractedSymptoms.map((symptom, i) => (
+              <button key={i}
+                onClick={() => setSelectedPrioritySymptom(symptom)}
+                className="w-full py-5 px-6 rounded-2xl text-left transition-all"
+                style={{
+                  background: selectedPrioritySymptom === symptom ? 'rgba(44,74,62,0.08)' : '#FFFFFF',
+                  border: selectedPrioritySymptom === symptom ? '1.5px solid #2C4A3E' : '1px solid #E5E2DA',
+                  boxShadow: selectedPrioritySymptom === symptom ? '0 4px 20px rgba(44,74,62,0.10)' : 'none',
+                }}>
+                <p className="text-base font-medium" style={{ color: selectedPrioritySymptom === symptom ? '#2C4A3E' : '#1C2C24' }}>
+                  {symptom}
+                </p>
+              </button>
+            ))}
+          </div>
+
+          <div className="fixed bottom-0 left-0 right-0 px-6 py-5 max-w-2xl mx-auto" style={{ background: 'rgba(250,250,247,0.95)', backdropFilter: 'blur(20px)', borderTop: '1px solid rgba(229,226,218,0.6)' }}>
+            <button
+              onClick={() => {
+                if (!selectedPrioritySymptom) return
+                setFreeSearchLoading(true)
+                setFreeSearchResult({ loading: 'Searching TCM database...' })
+                if (controllerRef.current) controllerRef.current.abort()
+                const controller = new AbortController()
+                controllerRef.current = controller
+                const timeoutId = setTimeout(() => controller.abort(), 15000)
+                const symptomText = selectedPrioritySymptom + ' ' + (localStorage.getItem('lastSymptom') || '')
+                fetch('/api/ask', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    question: symptomText.trim(),
+                    answers: { ...freeSearchAnswers, chief_complaint: selectedPrioritySymptom },
+                  }),
+                  signal: controller.signal,
+                })
+                .then(res => { clearTimeout(timeoutId); if (!res.ok) throw new Error('HTTP ' + res.status); return res.json() })
+                .then(data => {
+                  setFreeSearchLoading(false)
+                  if (!data.ok && !data.answer) {
+                    setFreeSearchResult({ error: data.error || 'Search failed' })
+                  } else {
+                    setFreeSearchResult(data)
+                    if (data.done && data.result && !data.followup_questions?.length) {
+                      let normOk = false
+                      try {
+                        const rawResult = data.result as Record<string, unknown>
+                        const syns = (rawResult as any).syndromes
+                        const first = Array.isArray(syns) ? syns[0] as Record<string, unknown> : null
+                        if (first) {
+                          const base = analyzeCondition(freeSearchAnswers)
+                          const safe: ResultData = {
+                            ...base,
+                            questionnaire_answers: { ...freeSearchAnswers, chief_complaint: selectedPrioritySymptom },
+                            constitution: {
+                              ...base,
+                              type: String(first['syndrome'] || base.type),
+                              sub: String(first['syndrome'] || base.sub),
+                              pattern: String(first['pattern'] || base.pattern),
+                              description: String(first['description'] || base.description),
+                              suggestions: Array.isArray(first['suggestions']) ? first['suggestions'] as string[] : base.suggestions,
+                            },
+                          }
+                          setResult(safe)
+                          normOk = true
+                        }
+                      } catch (e) { console.error('symptom_priority error:', e) }
+                      if (normOk) setStep('result')
+                    } else {
+                      setFreeSearchMode(data.followup_questions?.length > 0 ? 'questionnaire' : 'input')
+                    }
+                  }
+                })
+                .catch(e => {
+                  console.error('SymptomPriority error:', e)
+                  setFreeSearchLoading(false)
+                  setFreeSearchResult({ error: 'Network error' })
+                })
+              }}
+              disabled={!selectedPrioritySymptom}
+              className="w-full py-4 rounded-2xl font-medium text-base transition-all"
+              style={{
+                background: selectedPrioritySymptom ? '#2C4A3E' : '#C5D4C0',
+                color: '#FAFAF7',
+              }}>
+              Continue with this symptom
+            </button>
+          </div>
+        </main>
+      )}
+
+      {step === 'smart' && (
         <main className="max-w-2xl mx-auto px-6 pt-20 pb-28 min-h-[80vh]">
 
           <div className="text-center mb-10">
