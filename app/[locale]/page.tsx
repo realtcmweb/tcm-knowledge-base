@@ -1417,25 +1417,31 @@ interface FreeSearchResult {
                                             } else {
                                               setFreeSearchResult(data)
                                               if (data.done && data.result) {
+                                                let normOk = false
                                                 try {
-                                                  // Normalize result: syndromes[{...}] → single syndrome object
                                                   const rawResult = data.result as Record<string, unknown>
-                                                  if (Array.isArray(rawResult.syndromes)) {
-                                                    const syns = rawResult.syndromes as Record<string, unknown>[]
-                                                    if (syns.length === 1) {
-                                                      setResult({ constitution: analyzeCondition({}), ...syns[0] } as unknown as ResultData)
-                                                    } else {
-                                                      // Multiple syndromes: use first one as primary
-                                                      setResult({ constitution: analyzeCondition({}), ...syns[0] } as unknown as ResultData)
+                                                  const syns = (rawResult as any).syndromes
+                                                  const first = Array.isArray(syns) ? syns[0] as Record<string, unknown> : null
+                                                  if (first) {
+                                                    const constitution = analyzeCondition({})
+                                                    // Ensure required fields exist
+                                                    const safe: ResultData = {
+                                                      constitution: {
+                                                        ...constitution,
+                                                        type: String(first['syndrome'] || constitution.type),
+                                                        sub: String(first['syndrome'] || constitution.sub),
+                                                        pattern: String(first['pattern'] || constitution.pattern),
+                                                        description: String(first['description'] || constitution.description),
+                                                        suggestions: Array.isArray(first['suggestions']) ? first['suggestions'] as string[] : constitution.suggestions,
+                                                      },
                                                     }
-                                                  } else {
-                                                    setResult({ constitution: analyzeCondition({}), ...rawResult } as unknown as ResultData)
+                                                    setResult(safe)
+                                                    normOk = true
                                                   }
-                                                  setStep('result')
                                                 } catch (e) {
-                                                  console.error('setResult failed:', e)
-                                                  setFreeSearchResult({ error: '結果顯示失敗，請重新嘗試' })
+                                                  console.error('setResult norm failed:', e)
                                                 }
+                                                if (normOk) setStep('result')
                                               } else {
                                                 setFreeSearchMode(data.followup_questions?.length > 0 ? 'questionnaire' : 'input')
                                               }
