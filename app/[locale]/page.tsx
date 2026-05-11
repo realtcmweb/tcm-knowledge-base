@@ -857,6 +857,9 @@ export default function Home() {
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [customInput, setCustomInput] = useState('')
   const [smartAnswers, setSmartAnswers] = useState<Record<string, string[]>>({})
+  const controllerRef = useRef<AbortController | null>(null)
+  const freeSearchRequestIdRef = useRef(0)
+
 interface FollowupQuestion {
   id: string
   text: string
@@ -1055,7 +1058,12 @@ interface FreeSearchResult {
     setFreeSearchLoading(true)
     setFreeSearchResult({ loading: '正在搜尋中醫資料庫...' })
     try {
+      // Save original symptom text for followup questions
+      localStorage.setItem('lastSymptom', freeText.trim())
+      // Cancel any in-flight request
+      if (controllerRef.current) controllerRef.current.abort()
       const controller = new AbortController()
+      controllerRef.current = controller
       const timeoutId = setTimeout(() => controller.abort(), 15000)
       const res = await fetch('/api/ask', {
         method: 'POST',
@@ -1067,38 +1075,43 @@ interface FreeSearchResult {
         signal: controller.signal,
       })
       clearTimeout(timeoutId)
+      if (!res.ok) throw new Error('HTTP ' + res.status)
       const data = await res.json()
       if (!data.ok && !data.answer) {
         setFreeSearchResult({ error: data.error || '搜尋失敗，請稍後再試' })
       } else {
         setFreeSearchResult(data)
-        if (data.done && data.result) {
+        // Only jump to result if done AND has result AND no followup questions
+        if (data.done && data.result && !data.followup_questions?.length) {
           let normOk = false
           try {
             const rawResult = data.result as Record<string, unknown>
             const syns = (rawResult as any).syndromes
             const first = Array.isArray(syns) ? syns[0] as Record<string, unknown> : null
             if (first) {
-              const constitution = analyzeCondition({})
+              const base = analyzeCondition(freeSearchAnswers)
               const safe: ResultData = {
+                ...base,
+                questionnaire_answers: freeSearchAnswers,
                 constitution: {
-                  ...constitution,
-                  type: String(first['syndrome'] || constitution.type),
-                  sub: String(first['syndrome'] || constitution.sub),
-                  pattern: String(first['pattern'] || constitution.pattern),
-                  description: String(first['description'] || constitution.description),
-                  suggestions: Array.isArray(first['suggestions']) ? first['suggestions'] as string[] : constitution.suggestions,
+                  ...base,
+                  type: String(first['syndrome'] || base.type),
+                  sub: String(first['syndrome'] || base.sub),
+                  pattern: String(first['pattern'] || base.pattern),
+                  description: String(first['description'] || base.description),
+                  suggestions: Array.isArray(first['suggestions']) ? first['suggestions'] as string[] : base.suggestions,
                 },
               }
               setResult(safe)
               normOk = true
+            } else {
+              setFreeSearchResult({ error: '無法解析體質結果，請重新嘗試' })
+              return
             }
           } catch (e) {
             console.error('handleFreeSearch setResult norm failed:', e)
           }
           if (normOk) setStep('result')
-        } else if (!data.ok && !data.answer) {
-          setFreeSearchMode('input')
         } else {
           setFreeSearchMode(data.followup_questions?.length > 0 ? 'questionnaire' : 'input')
         }
@@ -1319,39 +1332,8 @@ interface FreeSearchResult {
       {step === 'mode' && (
         <main className="max-w-2xl mx-auto px-6 pt-20 pb-20 min-h-[90vh] flex flex-col justify-center">
 
-          {/* ── Hero — Apple Zen with TCM imagery ── */}
+          {/* ── Hero ── */}
           <div className="text-center mb-14">
-            {/* Decorative TCM illustration — abstract bamboo/leaves SVG */}
-            <div className="flex justify-center mb-8">
-              <svg width="120" height="60" viewBox="0 0 120 60" fill="none" style={{ opacity: 0.7 }}>
-                {/* Left bamboo stalks */}
-                <line x1="20" y1="60" x2="20" y2="10" stroke="#A3B5A0" strokeWidth="1.2"/>
-                <ellipse cx="20" cy="45" rx="6" ry="2.5" fill="none" stroke="#A3B5A0" strokeWidth="0.8"/>
-                <ellipse cx="20" cy="30" rx="6" ry="2.5" fill="none" stroke="#A3B5A0" strokeWidth="0.8"/>
-                <ellipse cx="20" cy="15" rx="6" ry="2.5" fill="none" stroke="#A3B5A0" strokeWidth="0.8"/>
-                {/* Left leaves */}
-                <path d="M20 30 Q10 25 5 30 Q10 35 20 30Z" fill="#A3B5A0" opacity="0.5"/>
-                <path d="M20 20 Q10 15 5 20 Q10 25 20 20Z" fill="#A3B5A0" opacity="0.4"/>
-                <path d="M20 40 Q10 35 5 40 Q10 45 20 40Z" fill="#A3B5A0" opacity="0.3"/>
-                {/* Right bamboo stalks */}
-                <line x1="100" y1="60" x2="100" y2="5" stroke="#A3B5A0" strokeWidth="1.2"/>
-                <ellipse cx="100" cy="50" rx="6" ry="2.5" fill="none" stroke="#A3B5A0" strokeWidth="0.8"/>
-                <ellipse cx="100" cy="35" rx="6" ry="2.5" fill="none" stroke="#A3B5A0" strokeWidth="0.8"/>
-                <ellipse cx="100" cy="20" rx="6" ry="2.5" fill="none" stroke="#A3B5A0" strokeWidth="0.8"/>
-                <ellipse cx="100" cy="8" rx="6" ry="2.5" fill="none" stroke="#A3B5A0" strokeWidth="0.8"/>
-                {/* Right leaves */}
-                <path d="M100 35 Q110 30 115 35 Q110 40 100 35Z" fill="#A3B5A0" opacity="0.5"/>
-                <path d="M100 20 Q110 15 115 20 Q110 25 100 20Z" fill="#A3B5A0" opacity="0.4"/>
-                <path d="M100 50 Q110 45 115 50 Q110 55 100 50Z" fill="#A3B5A0" opacity="0.3"/>
-                {/* Center YinYang */}
-                <circle cx="60" cy="35" r="14" stroke="#2C4A3E" strokeWidth="0.8" fill="none"/>
-                <path d="M60 21 Q66 28 60 35 Q54 42 60 49" stroke="#2C4A3E" strokeWidth="0.8" fill="none"/>
-                <path d="M60 49 Q54 42 60 35 Q66 28 60 21" stroke="#8B6E5A" strokeWidth="0.8" fill="none"/>
-                <circle cx="60" cy="27" r="2.5" fill="#8B6E5A"/>
-                <circle cx="60" cy="43" r="2.5" fill="#2C4A3E"/>
-              </svg>
-            </div>
-
             <h2 className="text-5xl font-light mb-3" style={{ color: '#1C2C24', letterSpacing: '-0.02em', lineHeight: 1.05 }}>
               {t('header.title')}
             </h2>
@@ -1443,14 +1425,18 @@ interface FreeSearchResult {
                                     {q.options?.map(opt => (
                                       <button key={opt.value}
                                         onClick={() => {
+                                          const requestId = ++freeSearchRequestIdRef.current
+                                          // Cancel any in-flight request
+                                          if (controllerRef.current) controllerRef.current.abort()
+                                          const controller = new AbortController()
+                                          controllerRef.current = controller
                                           const newAnswers = { ...freeSearchAnswers, [q.id]: opt.value }
-                                          // Directly call API with merged answers to avoid stale closure
-                                          const symptomText = freeText || localStorage.getItem('lastSymptom') || ''
+                                          // Only use localStorage for symptom text (freeText may be stale)
+                                          const symptomText = localStorage.getItem('lastSymptom') || ''
                                           setFreeSearchAnswers(newAnswers)
                                           setFreeText(symptomText)
                                           setFreeSearchLoading(true)
                                           setFreeSearchResult({ loading: '正在搜尋中醫資料庫...' })
-                                          const controller = new AbortController()
                                           const timeoutId = setTimeout(() => controller.abort(), 15000)
                                           fetch('/api/ask', {
                                             method: 'POST',
@@ -1460,32 +1446,39 @@ interface FreeSearchResult {
                                               answers: newAnswers,
                                             }),
                                             signal: controller.signal,
-                                          }).then(res => { clearTimeout(timeoutId); return res.json() }).then(data => {
+                                          })
+                                          .then(res => { clearTimeout(timeoutId); if (!res.ok) throw new Error('HTTP ' + res.status); return res.json() })
+                                          .then(data => {
+                                            if (requestId !== freeSearchRequestIdRef.current) return // stale response
                                             if (!data.ok && !data.answer) {
                                               setFreeSearchResult({ error: data.error || '搜尋失敗，請稍後再試' })
                                             } else {
                                               setFreeSearchResult(data)
-                                              if (data.done && data.result) {
+                                              if (data.done && data.result && !data.followup_questions?.length) {
                                                 let normOk = false
                                                 try {
                                                   const rawResult = data.result as Record<string, unknown>
                                                   const syns = (rawResult as any).syndromes
                                                   const first = Array.isArray(syns) ? syns[0] as Record<string, unknown> : null
                                                   if (first) {
-                                                    const constitution = analyzeCondition({})
-                                                    // Ensure required fields exist
+                                                    const base = analyzeCondition(freeSearchAnswers)
                                                     const safe: ResultData = {
+                                                      ...base,
+                                                      questionnaire_answers: freeSearchAnswers,
                                                       constitution: {
-                                                        ...constitution,
-                                                        type: String(first['syndrome'] || constitution.type),
-                                                        sub: String(first['syndrome'] || constitution.sub),
-                                                        pattern: String(first['pattern'] || constitution.pattern),
-                                                        description: String(first['description'] || constitution.description),
-                                                        suggestions: Array.isArray(first['suggestions']) ? first['suggestions'] as string[] : constitution.suggestions,
+                                                        ...base,
+                                                        type: String(first['syndrome'] || base.type),
+                                                        sub: String(first['syndrome'] || base.sub),
+                                                        pattern: String(first['pattern'] || base.pattern),
+                                                        description: String(first['description'] || base.description),
+                                                        suggestions: Array.isArray(first['suggestions']) ? first['suggestions'] as string[] : base.suggestions,
                                                       },
                                                     }
                                                     setResult(safe)
                                                     normOk = true
+                                                  } else {
+                                                    setFreeSearchResult({ error: '無法解析體質結果，請重新嘗試' })
+                                                    return
                                                   }
                                                 } catch (e) {
                                                   console.error('setResult norm failed:', e)
@@ -1495,11 +1488,12 @@ interface FreeSearchResult {
                                                 setFreeSearchMode(data.followup_questions?.length > 0 ? 'questionnaire' : 'input')
                                               }
                                             }
-                                            setFreeSearchLoading(false)
-                                          }).catch(() => {
-                                            setFreeSearchResult({ error: '網路錯誤，請檢查連線後再試' })
-                                            setFreeSearchLoading(false)
                                           })
+                                          .catch(e => {
+                                            console.error('FreeSearch API error:', e)
+                                            setFreeSearchResult({ error: '網路錯誤，請檢查連線後再試' })
+                                          })
+                                          .finally(() => setFreeSearchLoading(false))
                                         }}
                                         className="w-full text-left px-4 py-3 rounded-xl text-sm transition-all duration-200"
                                         style={{
@@ -2470,25 +2464,6 @@ interface FreeSearchResult {
       {step === 'result' && result && (
         <ErrorBoundary step="result" result={result}>
         <main className="max-w-2xl mx-auto px-6 pt-16 pb-12">
-          {/* ── Medical Disclaimer (P0) ── */}
-          <div className="rounded-2xl px-4 py-3.5 mb-6 text-left"
-            style={{ background: 'rgba(44,74,62,0.04)', border: '1px solid rgba(44,74,62,0.10)' }}>
-            <div className="flex items-start gap-2.5">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ color: '#2C4A3E', marginTop: '1px', flexShrink: 0 }}>
-                <circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1"/>
-                <path d="M8 5v3M8 10.5v.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
-              </svg>
-              <div>
-                <p className="text-xs font-medium mb-0.5" style={{ color: '#2C4A3E', letterSpacing: '0.04em' }}>
-                  ⚠️ 醫療免責聲明
-                </p>
-                <p className="text-xs leading-relaxed" style={{ color: '#4A4A42', lineHeight: 1.7 }}>
-                  本系統內容僅供健康參考，不構成醫療建議、診斷或治療。AI 分析結果可能與專業中醫師判斷有所不同，請勿取代醫師診療。如有健康疑慮，請諮詢合資格的中醫師或醫療專業人員。
-                </p>
-              </div>
-            </div>
-          </div>
-
           {/* ── Result Header ── */}
           <div className="text-center mb-6">
             <div className="flex justify-center mb-4">
