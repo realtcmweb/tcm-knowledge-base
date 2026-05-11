@@ -1055,6 +1055,8 @@ interface FreeSearchResult {
     setFreeSearchLoading(true)
     setFreeSearchResult({ loading: '正在搜尋中醫資料庫...' })
     try {
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 15000)
       const res = await fetch('/api/ask', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1062,7 +1064,9 @@ interface FreeSearchResult {
           question: freeText.trim(),
           answers: freeSearchAnswers,
         }),
+        signal: controller.signal,
       })
+      clearTimeout(timeoutId)
       const data = await res.json()
       if (!data.ok && !data.answer) {
         setFreeSearchResult({ error: data.error || '搜尋失敗，請稍後再試' })
@@ -1446,6 +1450,8 @@ interface FreeSearchResult {
                                           setFreeText(symptomText)
                                           setFreeSearchLoading(true)
                                           setFreeSearchResult({ loading: '正在搜尋中醫資料庫...' })
+                                          const controller = new AbortController()
+                                          const timeoutId = setTimeout(() => controller.abort(), 15000)
                                           fetch('/api/ask', {
                                             method: 'POST',
                                             headers: { 'Content-Type': 'application/json' },
@@ -1453,7 +1459,8 @@ interface FreeSearchResult {
                                               question: symptomText,
                                               answers: newAnswers,
                                             }),
-                                          }).then(res => res.json()).then(data => {
+                                            signal: controller.signal,
+                                          }).then(res => { clearTimeout(timeoutId); return res.json() }).then(data => {
                                             if (!data.ok && !data.answer) {
                                               setFreeSearchResult({ error: data.error || '搜尋失敗，請稍後再試' })
                                             } else {
