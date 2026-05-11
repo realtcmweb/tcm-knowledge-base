@@ -1038,19 +1038,30 @@ interface FreeSearchResult {
       } else {
         setFreeSearchResult(data)
         if (data.done && data.result) {
+          let normOk = false
           try {
             const rawResult = data.result as Record<string, unknown>
-            if (Array.isArray((rawResult as any).syndromes)) {
-              const syns = (rawResult as any).syndromes as Record<string, unknown>[]
-              setResult({ constitution: analyzeCondition({}), ...syns[0] } as unknown as ResultData)
-            } else {
-              setResult({ constitution: analyzeCondition({}), ...rawResult } as unknown as ResultData)
+            const syns = (rawResult as any).syndromes
+            const first = Array.isArray(syns) ? syns[0] as Record<string, unknown> : null
+            if (first) {
+              const constitution = analyzeCondition({})
+              const safe: ResultData = {
+                constitution: {
+                  ...constitution,
+                  type: String(first['syndrome'] || constitution.type),
+                  sub: String(first['syndrome'] || constitution.sub),
+                  pattern: String(first['pattern'] || constitution.pattern),
+                  description: String(first['description'] || constitution.description),
+                  suggestions: Array.isArray(first['suggestions']) ? first['suggestions'] as string[] : constitution.suggestions,
+                },
+              }
+              setResult(safe)
+              normOk = true
             }
-            setStep('result')
           } catch (e) {
-            console.error('handleFreeSearch setResult failed:', e)
-            setFreeSearchResult({ error: '結果顯示失敗，請重新嘗試' })
+            console.error('handleFreeSearch setResult norm failed:', e)
           }
+          if (normOk) setStep('result')
         } else if (!data.ok && !data.answer) {
           setFreeSearchMode('input')
         } else {
