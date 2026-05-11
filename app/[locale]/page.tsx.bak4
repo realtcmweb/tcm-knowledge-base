@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useRef, useCallback, useEffect } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useTranslations, useLocale } from 'next-intl'
 import Head from 'next/head'
@@ -803,37 +803,6 @@ function FaqItem({ faq }: { faq: { q: string; a: string } }) {
   )
 }
 
-
-// ============================================
-// Error Boundary
-// ============================================
-class ErrorBoundary extends React.Component<{children: React.ReactNode; step: string; result: unknown}, {hasError: boolean; error: string}> {
-  constructor(props: {children: React.ReactNode; step: string; result: unknown}) {
-    super(props)
-    this.state = { hasError: false, error: '' }
-  }
-  static getDerivedStateFromError(e: Error) {
-    return { hasError: true, error: e.message }
-  }
-  componentDidCatch(e: Error, info: React.ErrorInfo) {
-    console.error('[ErrorBoundary] caught:', e.message, info.componentStack?.slice(0, 200))
-  }
-  render() {
-    if (this.state.hasError) {
-      return (
-        <main className="max-w-2xl mx-auto px-6 pt-16 pb-12">
-          <div className="rounded-2xl p-6 text-center" style={{background:'rgba(44,74,62,0.06)',border:'1px solid rgba(44,74,62,0.15)'}}>
-            <p className="text-2xl mb-3">⚠️</p>
-            <p className="text-sm font-medium" style={{color:'#2C4A3E'}}>頁面發生錯誤</p>
-            <p className="text-xs text-stone-500 mt-2">結果顯示失敗，請重新整理頁面再試</p>
-            <p className="text-xs text-stone-400 mt-1 font-mono">{this.state.error}</p>
-          </div>
-        </main>
-      )
-    }
-    return this.props.children
-  }
-}
 
 // ============================================
 // 主元件
@@ -2461,7 +2430,6 @@ interface FreeSearchResult {
         </main>
       )}      {/* ── 結果 ── */}
       {step === 'result' && result && (
-        <ErrorBoundary step="result" result={result}>
         <main className="max-w-2xl mx-auto px-6 pt-16 pb-12">
           {/* ── Medical Disclaimer (P0) ── */}
           <div className="rounded-2xl px-4 py-3.5 mb-6 text-left"
@@ -3473,7 +3441,6 @@ interface FreeSearchResult {
             </p>
           </div>
         </main>
-        </ErrorBoundary>
       )}
 
       <footer className="text-center py-6 text-xs text-stone-400 border-t border-stone-200 mt-4">
