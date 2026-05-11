@@ -1038,8 +1038,19 @@ interface FreeSearchResult {
       } else {
         setFreeSearchResult(data)
         if (data.done && data.result) {
-          setStep('result')
-          setResult(data.result as ResultData)
+          try {
+            const rawResult = data.result as Record<string, unknown>
+            if (Array.isArray((rawResult as any).syndromes)) {
+              const syns = (rawResult as any).syndromes as Record<string, unknown>[]
+              setResult({ constitution: analyzeCondition({}), ...syns[0] } as unknown as ResultData)
+            } else {
+              setResult({ constitution: analyzeCondition({}), ...rawResult } as unknown as ResultData)
+            }
+            setStep('result')
+          } catch (e) {
+            console.error('handleFreeSearch setResult failed:', e)
+            setFreeSearchResult({ error: '結果顯示失敗，請重新嘗試' })
+          }
         } else if (!data.ok && !data.answer) {
           setFreeSearchMode('input')
         } else {
@@ -1406,8 +1417,25 @@ interface FreeSearchResult {
                                             } else {
                                               setFreeSearchResult(data)
                                               if (data.done && data.result) {
-                                                setStep('result')
-                                                setResult(data.result)
+                                                try {
+                                                  // Normalize result: syndromes[{...}] → single syndrome object
+                                                  const rawResult = data.result as Record<string, unknown>
+                                                  if (Array.isArray(rawResult.syndromes)) {
+                                                    const syns = rawResult.syndromes as Record<string, unknown>[]
+                                                    if (syns.length === 1) {
+                                                      setResult({ constitution: analyzeCondition({}), ...syns[0] } as unknown as ResultData)
+                                                    } else {
+                                                      // Multiple syndromes: use first one as primary
+                                                      setResult({ constitution: analyzeCondition({}), ...syns[0] } as unknown as ResultData)
+                                                    }
+                                                  } else {
+                                                    setResult({ constitution: analyzeCondition({}), ...rawResult } as unknown as ResultData)
+                                                  }
+                                                  setStep('result')
+                                                } catch (e) {
+                                                  console.error('setResult failed:', e)
+                                                  setFreeSearchResult({ error: '結果顯示失敗，請重新嘗試' })
+                                                }
                                               } else {
                                                 setFreeSearchMode(data.followup_questions?.length > 0 ? 'questionnaire' : 'input')
                                               }
