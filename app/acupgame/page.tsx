@@ -94,6 +94,13 @@ export default function HomePage() {
             <Link href="/acupgame/learn" className={styles.menuBtn}>進入學習</Link>
           </div>
 
+          {/* 每日挑戰入口 */}
+          <div className={styles.menuCard}>
+            <h3 className={styles.menuTitle}>🏆 每日挑戰</h3>
+            <p className={styles.menuDesc}>每天10道題，輕鬆鞏固所學</p>
+            <Link href="/acupgame/game" className={styles.menuBtn}>進入挑戰</Link>
+          </div>
+
           {/* 穴位故事入口 */}
           <div className={styles.menuCard}>
             <h3 className={styles.menuTitle}>📚 穴位故事</h3>
