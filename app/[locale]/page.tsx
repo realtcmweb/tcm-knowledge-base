@@ -1069,7 +1069,7 @@ interface FreeSearchResult {
     else if (maleKeywords.some(k => symptomText.includes(k))) autoGender = 'M'
     
     // If gender or age not provided, ask for them first (unless auto-detected)
-    if (!freeSearchAnswers['gender'] && !autoGender || !freeSearchAnswers['age']) {
+    if ((!freeSearchAnswers['gender'] && !autoGender) || !freeSearchAnswers['age']) {
       // Apply auto-detected gender if user didn't specify
       if (!freeSearchAnswers['gender'] && autoGender) {
         setFreeSearchAnswers(prev => ({ ...prev, gender: autoGender }))
