@@ -1461,10 +1461,10 @@ interface FreeSearchResult {
                                                   const syns = (rawResult as any).syndromes
                                                   const first = Array.isArray(syns) ? syns[0] as Record<string, unknown> : null
                                                   if (first) {
-                                                    const base = analyzeCondition(newAnswers)
+                                                    const base = analyzeCondition(freeSearchAnswers)
                                                     const safe: ResultData = {
                                                       ...base,
-                                                      questionnaire_answers: newAnswers,
+                                                      questionnaire_answers: freeSearchAnswers,
                                                       constitution: {
                                                         ...base,
                                                         type: String(first['syndrome'] || base.type),
