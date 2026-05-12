@@ -866,6 +866,7 @@ interface FreeSearchResult {
   need_followup?: boolean
   done?: boolean
   followup_question?: FollowupQuestion | null  // single question (not array)
+  followup_questions?: (FollowupQuestion | string)[]  // array (old backend)
   from_graphdb?: { herbs: Array<{ name: string } | string>; acupoints: string[] }
   treatment?: { syndrome: string; suggested_herbs: string[]; suggested_formulas: string[] }
   syndrome_distribution?: SyndromeDistribution[]  // 各證型百分比
@@ -1546,13 +1547,12 @@ interface FreeSearchResult {
 
                         <p className="text-sm font-medium mb-2" style={{ color: '#2C4A3E' }}>{freeSearchResult.answer}</p>
                         <div className="space-y-2">
-                          {freeSearchResult.followup_question && (() => {
-                            const q = freeSearchResult.followup_question
-                            return (
-                              <div className="mt-3">
-                                {typeof q === 'string' ? (
-                                  <p className="text-sm" style={{ color: '#4A4A42' }}>{q}</p>
-                                ) : (
+                          {/* Support both single question (new) and array (old) backend formats */}
+                          {(freeSearchResult.followup_question ? [freeSearchResult.followup_question] : freeSearchResult.followup_questions || []).map((q: FollowupQuestion | string) => (
+                            <div key={(typeof q === 'string' ? q : (q as FollowupQuestion).id) || Math.random()} className="mt-3">
+                              {typeof q === 'string' ? (
+                                <p className="text-sm" style={{ color: '#4A4A42' }}>{q}</p>
+                              ) : (
                                   <>
                                     <p className="text-sm font-medium mb-3" style={{ color: '#2C4A3E' }}>{q.text}</p>
                                     <div className="space-y-2">
@@ -1644,34 +1644,33 @@ interface FreeSearchResult {
                                     </div>
                                   </>
                                 )}
-                              </div>
-                            )
-                          })()}
+                            </div>
+                          ))}
                         </div>
                       </div>
                     ) : (
                       <div>
                         <p className="text-sm font-medium mb-2" style={{ color: '#2C4A3E' }}>{freeSearchResult.answer}</p>
-                        {freeSearchResult.findings?.length > 0 && (
+                        {freeSearchResult.findings && freeSearchResult.findings.length > 0 && (
                           <div className="mt-3 space-y-2">
                             <p className="text-xs" style={{ color: '#A3B5A0', letterSpacing: '0.06em' }}>📚 相關內容</p>
-                            {freeSearchResult.findings.slice(0, 3).map((f, i) => (
+                            {freeSearchResult.findings?.slice(0, 3).map((f, i) => (
                               <div key={i} className="text-xs p-2.5 rounded-lg" style={{ background: '#FAFAF7', color: '#4A4A42', lineHeight: 1.6 }}>{f.text?.slice(0, 200)}</div>
                             ))}
                           </div>
                         )}
-                        {freeSearchResult.suggested_syndromes?.length > 0 && (
+                        {freeSearchResult.suggested_syndromes && freeSearchResult.suggested_syndromes.length > 0 && (
                           <div className="mt-2 flex flex-wrap gap-1">
                             {freeSearchResult.suggested_syndromes.map(s => (
                               <span key={s} className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'rgba(139,110,90,0.10)', color: '#8B6E5A' }}>{s}</span>
                             ))}
                           </div>
                         )}
-                        {freeSearchResult.from_graphdb?.herbs?.length > 0 && (
+                        {freeSearchResult.from_graphdb?.herbs && freeSearchResult.from_graphdb.herbs.length > 0 && (
                           <div className="mt-2">
                             <p className="text-xs mb-1" style={{ color: '#A3B5A0' }}>🌿 建議中藥</p>
                             <div className="flex flex-wrap gap-1">
-                              {freeSearchResult.from_graphdb.herbs.map(h => (
+                              {freeSearchResult.from_graphdb?.herbs?.map(h => (
                                 <span key={h.name || h} className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'rgba(74,124,106,0.10)', color: '#4A7C6A' }}>{h.name || h}</span>
                               ))}
                             </div>
