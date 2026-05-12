@@ -1965,18 +1965,7 @@ interface FreeSearchResult {
             <button
               onClick={() => {
                 if (!freeSearchAnswers['gender'] || !freeSearchAnswers['age']) return
-                const symptomText = localStorage.getItem('lastSymptom') || freeText.trim()
-                const raw = symptomText.split(/[，。；,;、\s]+/).filter((s: string) => s.trim().length > 1)
-                const seen = new Set<string>()
-                const unique: string[] = []
-                for (const s of raw) {
-                  const norm = s.trim()
-                  if (!seen.has(norm)) { seen.add(norm); unique.push(norm) }
-                }
-                const extracted = unique.slice(0, 3)
-                setExtractedSymptoms(extracted.length > 0 ? extracted : [symptomText])
-                setSelectedPrioritySymptom('')
-                setStep('symptom_priority')
+                setStep('freesearch')
               }}
               disabled={!freeSearchAnswers['gender'] || !freeSearchAnswers['age']}
               className="w-full py-4 rounded-2xl font-medium text-base transition-all"
@@ -1990,116 +1979,7 @@ interface FreeSearchResult {
         </main>
       )}
 
-      {step === 'symptom_priority' && (
-        <main className="max-w-2xl mx-auto px-6 pt-20 pb-28 min-h-[80vh] flex flex-col justify-center">
-          <button
-            onClick={() => setStep('free_basic')}
-            className="flex items-center gap-2 text-sm mb-8"
-            style={{ color: '#8B6E5A' }}>
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="#8B6E5A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-            返回
-          </button>
 
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-light mb-3" style={{ color: '#1C2C24', lineHeight: 1.2 }}>
-              哪個症狀最困擾您？
-            </h2>
-            <p className="text-base" style={{ color: '#8B6E5A' }}>
-              AI 將根據此症狀進行追問
-            </p>
-          </div>
-
-          <div className="space-y-4 mb-24">
-            {extractedSymptoms.map((symptom, i) => (
-              <button key={i}
-                onClick={() => setSelectedPrioritySymptom(symptom)}
-                className="w-full py-5 px-6 rounded-2xl text-left transition-all"
-                style={{
-                  background: selectedPrioritySymptom === symptom ? 'rgba(44,74,62,0.08)' : '#FFFFFF',
-                  border: selectedPrioritySymptom === symptom ? '1.5px solid #2C4A3E' : '1px solid #E5E2DA',
-                  boxShadow: selectedPrioritySymptom === symptom ? '0 4px 20px rgba(44,74,62,0.10)' : 'none',
-                }}>
-                <p className="text-base font-medium" style={{ color: selectedPrioritySymptom === symptom ? '#2C4A3E' : '#1C2C24' }}>
-                  {symptom}
-                </p>
-              </button>
-            ))}
-          </div>
-
-          <div className="fixed bottom-0 left-0 right-0 px-6 py-5 max-w-2xl mx-auto" style={{ background: 'rgba(250,250,247,0.95)', backdropFilter: 'blur(20px)', borderTop: '1px solid rgba(229,226,218,0.6)' }}>
-            <button
-              onClick={() => {
-                if (!selectedPrioritySymptom) return
-                setFreeSearchLoading(true)
-                setFreeSearchResult({ loading: 'Searching TCM database...' })
-                if (controllerRef.current) controllerRef.current.abort()
-                const controller = new AbortController()
-                controllerRef.current = controller
-                const timeoutId = setTimeout(() => controller.abort(), 15000)
-                const symptomText = selectedPrioritySymptom + ' ' + (localStorage.getItem('lastSymptom') || '')
-                fetch('/api/ask', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                    question: symptomText.trim(),
-                    answers: { ...freeSearchAnswers, chief_complaint: selectedPrioritySymptom },
-                  }),
-                  signal: controller.signal,
-                })
-                .then(res => { clearTimeout(timeoutId); if (!res.ok) throw new Error('HTTP ' + res.status); return res.json() })
-                .then(data => {
-                  setFreeSearchLoading(false)
-                  if (!data.ok && !data.answer) {
-                    setFreeSearchResult({ error: data.error || 'Search failed' })
-                  } else {
-                    setFreeSearchResult(data)
-                    if (data.done && data.result && !data.followup_questions?.length) {
-                      let normOk = false
-                      try {
-                        const rawResult = data.result as Record<string, unknown>
-                        const syns = (rawResult as any).syndromes
-                        const first = Array.isArray(syns) ? syns[0] as Record<string, unknown> : null
-                        if (first) {
-                          const base = analyzeCondition(freeSearchAnswers)
-                          const safe: ResultData = {
-                            ...base,
-                            questionnaire_answers: { ...freeSearchAnswers, chief_complaint: selectedPrioritySymptom },
-                            constitution: {
-                              ...base,
-                              type: String(first['syndrome'] || base.type),
-                              sub: String(first['syndrome'] || base.sub),
-                              pattern: String(first['pattern'] || base.pattern),
-                              description: String(first['description'] || base.description),
-                              suggestions: Array.isArray(first['suggestions']) ? first['suggestions'] as string[] : base.suggestions,
-                            },
-                          }
-                          setResult(safe)
-                          normOk = true
-                        }
-                      } catch (e) { console.error('symptom_priority error:', e) }
-                      if (normOk) setStep('result')
-                    } else {
-                      setFreeSearchMode(data.followup_questions?.length > 0 ? 'questionnaire' : 'input')
-                    }
-                  }
-                })
-                .catch(e => {
-                  console.error('SymptomPriority error:', e)
-                  setFreeSearchLoading(false)
-                  setFreeSearchResult({ error: 'Network error' })
-                })
-              }}
-              disabled={!selectedPrioritySymptom}
-              className="w-full py-4 rounded-2xl font-medium text-base transition-all"
-              style={{
-                background: selectedPrioritySymptom ? '#2C4A3E' : '#C5D4C0',
-                color: '#FAFAF7',
-              }}>
-              以此症狀繼續分析
-            </button>
-          </div>
-        </main>
-      )}
 
       {step === 'smart' && (
         <main className="max-w-2xl mx-auto px-6 pt-20 pb-28 min-h-[80vh]">
