@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { loadProgress, saveProgress, updateStreak, generateDailyHomework, getTodayStr, type GameProgress } from './progress'
+import { ALL_MERIDIANS, MERIDIAN_MAP } from './data/index'
 import styles from './page.module.css'
 
 export default function HomePage() {
@@ -25,8 +26,9 @@ export default function HomePage() {
   if (!progress) return <div className={styles.loading}><div className={styles.loadingInner}>🏮 加載中...</div></div>
 
   const hw = progress.todayHomework
-  const learnedCount = progress.learnedPoints.length
-  const totalPoints = 11 // 肺經
+  const learnedCount = progress.learnedPoints.length // 全部已學穴位
+  const luTotal = MERIDIAN_MAP['LU']?.totalPoints ?? 11
+  const luLearned = progress.learnedPoints.filter(pid => pid.startsWith('LU')).length
 
   return (
     <div className={styles.container}>
@@ -119,9 +121,9 @@ export default function HomePage() {
           <div className={styles.progressCard}>
             <h3 className={styles.menuTitle}>📊 肺經學習進度</h3>
             <div className={styles.progressBar}>
-              <div className={styles.progressFill} style={{ width: `${(learnedCount / totalPoints) * 100}%` }} />
+              <div className={styles.progressFill} style={{ width: `${(luLearned / luTotal) * 100}%` }} />
             </div>
-            <p className={styles.progressText}>{learnedCount} / {totalPoints} 穴位</p>
+            <p className={styles.progressText}>{luLearned} / {luTotal} 穴位</p>
           </div>
         </div>
       )}
@@ -134,14 +136,23 @@ export default function HomePage() {
             <p className={styles.learnSubtitle}>沒有時間限制，沒有失敗，慢慢學</p>
           </div>
           <div className={styles.meridianGrid}>
-            <MeridianCard code="LU" name="肺經" emoji="🫁" learned={learnedCount} total={totalPoints} active={true} />
-            <MeridianCard code="LI" name="大腸經" emoji="💨" learned={0} total={20} active={false} />
-            <MeridianCard code="HT" name="心經" emoji="❤️" learned={0} total={9} active={false} />
-            <MeridianCard code="SP" name="脾經" emoji="🩸" learned={0} total={21} active={false} />
-            <MeridianCard code="ST" name="胃經" emoji="🍽️" learned={0} total={45} active={false} />
-            <MeridianCard code="KI" name="腎經" emoji="⚡" learned={0} total={27} active={false} />
+            {ALL_MERIDIANS.map(m => {
+              const meridianLearned = progress.learnedPoints.filter(pid => pid.startsWith(m.code)).length
+              const isActive = m.status === 'complete'
+              return (
+                <MeridianCard
+                  key={m.code}
+                  code={m.code}
+                  name={m.name}
+                  emoji={m.emoji}
+                  learned={meridianLearned}
+                  total={m.totalPoints}
+                  active={isActive}
+                />
+              )
+            })}
           </div>
-          {learnedCount > 0 && (
+          {luLearned > 0 && (
             <Link href="/acupgame/learn" className={styles.bigBtn}>▶️ 繼續學習肺經</Link>
           )}
         </div>
