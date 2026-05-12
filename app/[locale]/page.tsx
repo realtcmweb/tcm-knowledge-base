@@ -75,32 +75,6 @@ interface SavedResult {
   savedAt: string
 }
 
-interface FollowupQuestion {
-  id: string
-  text: string
-  options: Array<{ value: string; label: string }>
-}
-
-interface FreeSearchResult {
-  loading?: string
-  ok?: boolean
-  answer?: string
-  findings?: Array<{ source: string; text: string }>
-  suggested_syndromes?: string[]
-  suggested_herbs?: string[]
-  need_followup?: boolean
-  done?: boolean
-  followup_questions?: FollowupQuestion[]
-  from_graphdb?: { herbs: Array<{ name: string } | string>; acupoints: string[] }
-  treatment?: { syndrome: string; suggested_herbs: string[]; suggested_formulas: string[] }
-  context?: {
-    suspected_syndromes: string[]
-    confidence: number
-    answered_count: number
-  }
-  result?: ResultData
-  error?: string
-}
 
 function ResultSaveSection({ result }: { result: ResultData }) {
   const [history, setHistory] = useState<SavedResult[]>([])
@@ -1177,7 +1151,7 @@ interface FreeSearchResult {
           }
         }
       } catch (e) {
-        console.warn('Backend API unavailable, using local analysis:', e)
+        console.warn('返回end API unavailable, using local analysis:', e)
       }
 
       // Fall back to local analysis if backend unavailable
@@ -1930,12 +1904,12 @@ interface FreeSearchResult {
             className="flex items-center gap-2 text-sm mb-8"
             style={{ color: '#8B6E5A' }}>
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="#8B6E5A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-            Back
+            返回
           </button>
 
           <div className="text-center mb-10">
-            <h2 className="text-4xl font-light mb-3" style={{ color: '#1C2C24' }}>Please tell us your basic info</h2>
-            <p className="text-base" style={{ color: '#8B6E5A' }}>This helps AI give more accurate analysis</p>
+            <h2 className="text-4xl font-light mb-3" style={{ color: '#1C2C24' }}>請告訴我們您的基本資料</h2>
+            <p className="text-base" style={{ color: '#8B6E5A' }}>有助於 AI 提供更準確的分析</p>
           </div>
 
           <div className="space-y-5 mb-8">
@@ -1970,7 +1944,7 @@ interface FreeSearchResult {
             )}
 
             <div className="rounded-2xl p-5" style={{ background: '#FFFFFF', border: '1px solid #E5E2DA' }}>
-              <p className="text-sm font-medium mb-3" style={{ color: '#2C4A3E' }}>Age range</p>
+              <p className="text-sm font-medium mb-3" style={{ color: '#2C4A3E' }}>年齡範圍</p>
               <div className="flex gap-2 flex-wrap">
                 {['20-30', '31-40', '41-50', '51-60', '61-70', '70+'].map(a => (
                   <button key={a}
@@ -2010,7 +1984,7 @@ interface FreeSearchResult {
                 background: (freeSearchAnswers['gender'] && freeSearchAnswers['age']) ? '#2C4A3E' : '#C5D4C0',
                 color: '#FAFAF7',
               }}>
-              Start Analysis
+              開始分析
             </button>
           </div>
         </main>
@@ -2023,15 +1997,15 @@ interface FreeSearchResult {
             className="flex items-center gap-2 text-sm mb-8"
             style={{ color: '#8B6E5A' }}>
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="#8B6E5A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-            Back
+            返回
           </button>
 
           <div className="text-center mb-8">
             <h2 className="text-3xl font-light mb-3" style={{ color: '#1C2C24', lineHeight: 1.2 }}>
-              Which symptom bothers you most?
+              哪個症狀最困擾您？
             </h2>
             <p className="text-base" style={{ color: '#8B6E5A' }}>
-              AI will focus on this symptom to ask follow-up questions
+              AI 將根據此症狀進行追問
             </p>
           </div>
 
@@ -2121,7 +2095,7 @@ interface FreeSearchResult {
                 background: selectedPrioritySymptom ? '#2C4A3E' : '#C5D4C0',
                 color: '#FAFAF7',
               }}>
-              Continue with this symptom
+              以此症狀繼續分析
             </button>
           </div>
         </main>

@@ -37,6 +37,7 @@ export default function FeedbackButton({ step, variant = 'fab' }: FeedbackProps)
   const [selectedIssue, setSelectedIssue] = useState('')
   const [detail, setDetail] = useState('')
   const [sent, setSent] = useState(false)
+  const [apiError, setApiError] = useState('')
 
   const handleSend = async () => {
     const msg = [
@@ -59,10 +60,13 @@ export default function FeedbackButton({ step, variant = 'fab' }: FeedbackProps)
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ step, issue: selectedIssue, detail }),
       })
-    } catch {}
+    } catch {
+      setApiError('網路錯誤，請稍後再試')
+      return
+    }
 
     setSent(true)
-    setTimeout(() => { setOpen(false); setSent(false); setSelectedIssue(''); setDetail('') }, 2000)
+    setTimeout(() => { setOpen(false); setSent(false); setSelectedIssue(''); setDetail(''); setApiError('') }, 2000)
   }
 
   if (variant === 'text') {
@@ -158,6 +162,9 @@ export default function FeedbackButton({ step, variant = 'fab' }: FeedbackProps)
               onBlur={e => e.target.style.borderColor = '#E5E2DA'}
             />
 
+            {apiError && (
+              <p className="text-xs text-red-500 mb-3 text-center">{apiError}</p>
+            )}
             <div className="flex gap-2">
               <button onClick={() => setOpen(false)}
                 className="flex-1 py-2.5 text-sm rounded-xl"
