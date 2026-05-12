@@ -685,6 +685,15 @@ const SMART_SECTIONS = [
   },
 ]
 
+function fileToB64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(reader.result as string)
+    reader.onerror = reject
+    reader.readAsDataURL(file)
+  })
+}
+
 function analyzeCondition(answers: Record<string, string>): {
   type: string; sub: string; pattern: string; description: string
   suggestions: string[]; avoid: string[]; herbs: string[]; acupoints: string[]; diet: string[]
@@ -865,6 +874,16 @@ interface FreeSearchResult {
   const [freeSearchMode, setFreeSearchMode] = useState<'input' | 'questionnaire' | 'result'>('input')
   const [freeSearchAnswers, setFreeSearchAnswers] = useState<Record<string, string>>({})
   const [extractedSymptoms, setExtractedSymptoms] = useState<string[]>([])
+  // Free search 圖片（base64，會隨每次 /api/ask 一起送出）
+  const [fsTongueFront, setFsTongueFront] = useState<string>('')
+  const [fsTongueUnderside, setFsTongueUnderside] = useState<string>('')
+  const [fsFace, setFsFace] = useState<string>('')
+  const [fsShowImageUpload, setFsShowImageUpload] = useState(false)
+  const [fsTongueFrontPreview, setFsTongueFrontPreview] = useState<string>('')
+  const [fsTongueUndersidePreview, setFsTongueUndersidePreview] = useState<string>('')
+  const [fsFacePreview, setFsFacePreview] = useState<string>('')
+  // 追蹤已上傳的圖片（避免重複傳送大 base64）
+  const fsImagesSentRef = useRef<{tongue?: string; underside?: string; face?: string}>({})
   const [selectedPrioritySymptom, setSelectedPrioritySymptom] = useState<string>('')
   const [reportFile, setReportFile] = useState<File | null>(null)
   const [reportPreview, setReportPreview] = useState<string | null>(null)
@@ -1062,13 +1081,17 @@ interface FreeSearchResult {
       const controller = new AbortController()
       controllerRef.current = controller
       const timeoutId = setTimeout(() => controller.abort(), 15000)
+      const payload = {
+        question: freeText.trim(),
+        answers: freeSearchAnswers,
+        tongue_front: fsTongueFront || undefined,
+        tongue_underside: fsTongueUnderside || undefined,
+        face: fsFace || undefined,
+      }
       const res = await fetch('/api/ask', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          question: freeText.trim(),
-          answers: freeSearchAnswers,
-        }),
+        body: JSON.stringify(payload),
         signal: controller.signal,
       })
       clearTimeout(timeoutId)
@@ -1399,7 +1422,99 @@ interface FreeSearchResult {
                 {freeSearchLoading ? '分析中...' : '搜尋'}
               </button>
             </div>
-            {freeSearchResult && (
+            {/* ── 舌苔/面色上傳（Free Search 模式）─ */}
+          <div className="mb-6">
+            <button
+              onClick={() => setFsShowImageUpload(!fsShowImageUpload)}
+              className="w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm transition-all"
+              style={{
+                background: fsShowImageUpload ? 'rgba(44,74,62,0.04)' : 'rgba(139,110,90,0.05)',
+                border: `1px solid ${fsShowImageUpload ? '#2C4A3E' : 'rgba(139,110,90,0.12)'}`,
+              }}>
+              <div className="flex items-center gap-2">
+                <svg width="15" height="15" viewBox="0 0 15 15" fill="none" style={{ color: '#4A7C6A' }}>
+                  <circle cx="7.5" cy="7.5" r="5.5" stroke="currentColor" strokeWidth="1"/>
+                  <path d="M7.5 4.5C7.5 4.5 5 6.5 5 8.5a2.5 2.5 0 004 0" stroke="currentColor" strokeWidth="1" fill="none"/>
+                </svg>
+                <span style={{ color: '#4A4A42' }}>附加舌苔 / 面色照片</span>
+                <span className="text-xs" style={{ color: '#A3B5A0' }}>（可選，提升分析精準度）</span>
+              </div>
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"
+                style={{ color: '#A3B5A0', transform: fsShowImageUpload ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>
+                <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+              </svg>
+            </button>
+
+            {fsShowImageUpload && (
+              <div className="mt-2 space-y-3 px-1">
+                {/* 舌面 */}
+                <div className="flex items-center gap-2">
+                  <input type="file" accept="image/*" id="fs-tongue-front"
+                    className="hidden"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0]
+                      if (!file) return
+                      const b64 = await fileToB64(file)
+                      setFsTongueFront(b64)
+                      setFsTongueFrontPreview(URL.createObjectURL(file))
+                      e.target.value = ''
+                    }} />
+                  <label htmlFor="fs-tongue-front"
+                    className="flex-1 flex items-center gap-2 px-3 py-2 rounded-lg text-xs cursor-pointer transition"
+                    style={{ background: fsTongueFrontPreview ? 'rgba(44,74,62,0.06)' : '#FAFAF7', border: `1px solid ${fsTongueFrontPreview ? '#2C4A3E' : '#E5E2DA'}`, color: '#4A4A42' }}>
+                    <span style={{ color: fsTongueFrontPreview ? '#2C4A3E' : '#A3B5A0' }}>📷</span>
+                    {fsTongueFrontPreview ? '✓ 舌面已上傳' : '舌面照片'}
+                  </label>
+                  {/* 舌下 */}
+                  <input type="file" accept="image/*" id="fs-tongue-underside"
+                    className="hidden"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0]
+                      if (!file) return
+                      const b64 = await fileToB64(file)
+                      setFsTongueUnderside(b64)
+                      setFsTongueUndersidePreview(URL.createObjectURL(file))
+                      e.target.value = ''
+                    }} />
+                  <label htmlFor="fs-tongue-underside"
+                    className="flex-1 flex items-center gap-2 px-3 py-2 rounded-lg text-xs cursor-pointer transition"
+                    style={{ background: fsTongueUndersidePreview ? 'rgba(44,74,62,0.06)' : '#FAFAF7', border: `1px solid ${fsTongueUndersidePreview ? '#2C4A3E' : '#E5E2DA'}`, color: '#4A4A42' }}>
+                    <span style={{ color: fsTongueUndersidePreview ? '#2C4A3E' : '#A3B5A0' }}>🔎</span>
+                    {fsTongueUndersidePreview ? '✓ 舌下已上傳' : '舌下靜脈'}
+                  </label>
+                </div>
+                {/* 面色 */}
+                <div>
+                  <input type="file" accept="image/*" id="fs-face"
+                    className="hidden"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0]
+                      if (!file) return
+                      const b64 = await fileToB64(file)
+                      setFsFace(b64)
+                      setFsFacePreview(URL.createObjectURL(file))
+                      e.target.value = ''
+                    }} />
+                  <label htmlFor="fs-face"
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs cursor-pointer transition w-full"
+                    style={{ background: fsFacePreview ? 'rgba(44,74,62,0.06)' : '#FAFAF7', border: `1px solid ${fsFacePreview ? '#2C4A3E' : '#E5E2DA'}`, color: '#4A4A42' }}>
+                    <span style={{ color: fsFacePreview ? '#2C4A3E' : '#A3B5A0' }}>😊</span>
+                    {fsFacePreview ? '✓ 面色已上傳' : '面色照片（可選）'}
+                  </label>
+                </div>
+                {/* 預覽 */}
+                {(fsTongueFrontPreview || fsTongueUndersidePreview || fsFacePreview) && (
+                  <div className="flex gap-2 overflow-x-auto pb-1">
+                    {fsTongueFrontPreview && <img src={fsTongueFrontPreview} alt="舌面" className="w-16 h-16 object-cover rounded-lg" />}
+                    {fsTongueUndersidePreview && <img src={fsTongueUndersidePreview} alt="舌下" className="w-16 h-16 object-cover rounded-lg" />}
+                    {fsFacePreview && <img src={fsFacePreview} alt="面色" className="w-16 h-16 object-cover rounded-lg" />}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+{freeSearchResult && (
               <div className="mt-4 p-4 rounded-xl" style={{ background: '#FFFFFF', border: '1px solid #E5E2DA' }}>
                 {freeSearchResult.loading ? (
                   <div className="flex items-center gap-2 text-sm" style={{ color: '#8B6E5A' }}>
@@ -1435,13 +1550,17 @@ interface FreeSearchResult {
                                           setFreeSearchLoading(true)
                                           setFreeSearchResult({ loading: '正在搜尋中醫資料庫...' })
                                           const timeoutId = setTimeout(() => controller.abort(), 15000)
+                                          const followupPayload = {
+                                            question: symptomText,
+                                            answers: newAnswers,
+                                            tongue_front: fsTongueFront || undefined,
+                                            tongue_underside: fsTongueUnderside || undefined,
+                                            face: fsFace || undefined,
+                                          }
                                           fetch('/api/ask', {
                                             method: 'POST',
                                             headers: { 'Content-Type': 'application/json' },
-                                            body: JSON.stringify({
-                                              question: symptomText,
-                                              answers: newAnswers,
-                                            }),
+                                            body: JSON.stringify(followupPayload),
                                             signal: controller.signal,
                                           })
                                           .then(res => { clearTimeout(timeoutId); if (!res.ok) throw new Error('HTTP ' + res.status); return res.json() })
@@ -1900,7 +2019,7 @@ interface FreeSearchResult {
       {step === 'free_basic' && (
         <main className="max-w-2xl mx-auto px-6 pt-20 pb-20 min-h-[80vh] flex flex-col justify-center">
           <button
-            onClick={() => setStep('freesearch')}
+            onClick={() => setStep('mode')}
             className="flex items-center gap-2 text-sm mb-8"
             style={{ color: '#8B6E5A' }}>
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="#8B6E5A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
@@ -1965,7 +2084,7 @@ interface FreeSearchResult {
             <button
               onClick={() => {
                 if (!freeSearchAnswers['gender'] || !freeSearchAnswers['age']) return
-                setStep('freesearch')
+                setStep('mode')
               }}
               disabled={!freeSearchAnswers['gender'] || !freeSearchAnswers['age']}
               className="w-full py-4 rounded-2xl font-medium text-base transition-all"
