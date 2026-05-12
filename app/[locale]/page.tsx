@@ -1124,6 +1124,8 @@ interface FreeSearchResult {
                   description: String(first['description'] || base.description),
                   suggestions: Array.isArray(first['suggestions']) ? first['suggestions'] as string[] : base.suggestions,
                 },
+                tongue: data.tongue || undefined,
+                face: data.face || undefined,
               }
               setResult(safe)
               normOk = true
