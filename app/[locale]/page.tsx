@@ -850,6 +850,12 @@ interface FollowupQuestion {
   options: Array<{ value: string; label: string }>
 }
 
+interface SyndromeDistribution {
+  syndrome: string
+  score: number
+  percentage: number
+}
+
 interface FreeSearchResult {
   loading?: string
   ok?: boolean
@@ -859,14 +865,10 @@ interface FreeSearchResult {
   suggested_herbs?: string[]
   need_followup?: boolean
   done?: boolean
-  followup_questions?: (FollowupQuestion | string)[]  // string[] = old fallback, FollowupQuestion[] = new multi-turn
+  followup_question?: FollowupQuestion | null  // single question (not array)
   from_graphdb?: { herbs: Array<{ name: string } | string>; acupoints: string[] }
   treatment?: { syndrome: string; suggested_herbs: string[]; suggested_formulas: string[] }
-  context?: {
-    suspected_syndromes: string[]
-    confidence: number
-    answered_count: number
-  }
+  syndrome_distribution?: SyndromeDistribution[]  // 各證型百分比
   result?: ResultData
   error?: string
 }
@@ -1102,7 +1104,7 @@ interface FreeSearchResult {
       } else {
         setFreeSearchResult(data)
         // Only jump to result if done AND has result AND no followup questions
-        if (data.done && data.result && !data.followup_questions?.length) {
+        if (data.done && data.result && !data.followup_question) {
           let normOk = false
           try {
             const rawResult = data.result as Record<string, unknown>
@@ -1133,7 +1135,7 @@ interface FreeSearchResult {
           }
           if (normOk) setStep('result')
         } else {
-          setFreeSearchMode(data.followup_questions?.length > 0 ? 'questionnaire' : 'input')
+          setFreeSearchMode(data.followup_question ? 'questionnaire' : 'input')
         }
       }
     } catch (e) {
@@ -1397,7 +1399,7 @@ interface FreeSearchResult {
                 type="text"
                 value={freeText}
                 onChange={e => setFreeText(e.target.value)}
-                placeholder="例如：容易疲勞、晚上睡不好、胃口差"
+                placeholder="主要問題：容易疲勞；次要問題：睡眠差、胃口不好"
                 className="flex-1 px-4 py-3 rounded-xl text-sm"
                 style={{ 
                   border: '1px solid #D4E0D6',
@@ -1524,118 +1526,127 @@ interface FreeSearchResult {
                   <>
                     {freeSearchResult.need_followup ? (
                       <div>
+                        {/* 證型百分比橫條 — 每次追問都顯示 */}
+                        {freeSearchResult.syndrome_distribution && freeSearchResult.syndrome_distribution.length > 0 && (
+                          <div className="mb-4 p-3 rounded-lg" style={{ background: 'rgba(44,74,62,0.04)', border: '1px solid rgba(44,74,62,0.08)' }}>
+                            <p className="text-xs mb-2" style={{ color: '#8B6E5A' }}>目前最可能的證型：</p>
+                            <div className="space-y-1.5">
+                              {freeSearchResult.syndrome_distribution.slice(0, 4).map((item, i) => (
+                                <div key={i} className="flex items-center gap-2">
+                                  <span className="text-xs font-medium" style={{ color: i === 0 ? '#2C4A3E' : '#6B7B6B', width: 72, flexShrink: 0 }}>{item.syndrome}</span>
+                                  <div className="flex-1 h-1.5 rounded-full" style={{ background: '#E8E4DC' }}>
+                                    <div className="h-full rounded-full transition-all duration-300" style={{ width: `${item.percentage}%`, background: i === 0 ? '#2C4A3E' : '#A3B5A0' }} />
+                                  </div>
+                                  <span className="text-xs" style={{ color: '#8B6E5A', width: 36, flexShrink: 0 }}>{item.percentage}%</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
                         <p className="text-sm font-medium mb-2" style={{ color: '#2C4A3E' }}>{freeSearchResult.answer}</p>
                         <div className="space-y-2">
-                          {(freeSearchMode === 'questionnaire' || freeSearchResult.need_followup) && freeSearchResult.followup_questions?.map((q, i) => (
-                            <div key={i} className="mt-3">
-                              {typeof q === 'string' ? (
-                                <p className="text-sm" style={{ color: '#4A4A42' }}>{q}</p>
-                              ) : (
-                                <>
-                                  <p className="text-sm font-medium mb-3" style={{ color: '#2C4A3E' }}>{q.text}</p>
-                                  <div className="space-y-2">
-                                    {q.options?.map(opt => (
-                                      <button key={opt.value}
-                                        onClick={() => {
-                                          const requestId = ++freeSearchRequestIdRef.current
-                                          // Cancel any in-flight request
-                                          if (controllerRef.current) controllerRef.current.abort()
-                                          const controller = new AbortController()
-                                          controllerRef.current = controller
-                                          const newAnswers = { ...freeSearchAnswers, [q.id]: opt.value }
-                                          // Only use localStorage for symptom text (freeText may be stale)
-                                          const symptomText = localStorage.getItem('lastSymptom') || ''
-                                          setFreeSearchAnswers(newAnswers)
-                                          setFreeText(symptomText)
-                                          setFreeSearchLoading(true)
-                                          setFreeSearchResult({ loading: '正在搜尋中醫資料庫...' })
-                                          const timeoutId = setTimeout(() => controller.abort(), 15000)
-                                          const followupPayload = {
-                                            question: symptomText,
-                                            answers: newAnswers,
-                                            tongue_front: fsTongueFront || undefined,
-                                            tongue_underside: fsTongueUnderside || undefined,
-                                            face: fsFace || undefined,
-                                          }
-                                          fetch('/api/ask', {
-                                            method: 'POST',
-                                            headers: { 'Content-Type': 'application/json' },
-                                            body: JSON.stringify(followupPayload),
-                                            signal: controller.signal,
-                                          })
-                                          .then(res => { clearTimeout(timeoutId); if (!res.ok) throw new Error('HTTP ' + res.status); return res.json() })
-                                          .then(data => {
-                                            if (requestId !== freeSearchRequestIdRef.current) return // stale response
-                                            if (!data.ok && !data.answer) {
-                                              setFreeSearchResult({ error: data.error || '搜尋失敗，請稍後再試' })
-                                            } else {
-                                              setFreeSearchResult(data)
-                                              if (data.done && data.result && !data.followup_questions?.length) {
-                                                let normOk = false
-                                                try {
-                                                  const rawResult = data.result as Record<string, unknown>
-                                                  const syns = (rawResult as any).syndromes
-                                                  const first = Array.isArray(syns) ? syns[0] as Record<string, unknown> : null
-                                                  if (first) {
-                                                    const base = analyzeCondition(freeSearchAnswers)
-                                                    const safe: ResultData = {
-                                                      ...base,
-                                                      questionnaire_answers: freeSearchAnswers,
-                                                      constitution: {
-                                                        ...base,
-                                                        type: String(first['syndrome'] || base.type),
-                                                        sub: String(first['syndrome'] || base.sub),
-                                                        pattern: String(first['pattern'] || base.pattern),
-                                                        description: String(first['description'] || base.description),
-                                                        suggestions: Array.isArray(first['suggestions']) ? first['suggestions'] as string[] : base.suggestions,
-                                                      },
-                                                    }
-                                                    setResult(safe)
-                                                    normOk = true
-                                                  } else {
-                                                    setFreeSearchResult({ error: '無法解析體質結果，請重新嘗試' })
-                                                    return
-                                                  }
-                                                } catch (e) {
-                                                  console.error('setResult norm failed:', e)
-                                                }
-                                                if (normOk) setStep('result')
-                                              } else {
-                                                setFreeSearchMode(data.followup_questions?.length > 0 ? 'questionnaire' : 'input')
-                                              }
+                          {freeSearchResult.followup_question && (() => {
+                            const q = freeSearchResult.followup_question
+                            return (
+                              <div className="mt-3">
+                                {typeof q === 'string' ? (
+                                  <p className="text-sm" style={{ color: '#4A4A42' }}>{q}</p>
+                                ) : (
+                                  <>
+                                    <p className="text-sm font-medium mb-3" style={{ color: '#2C4A3E' }}>{q.text}</p>
+                                    <div className="space-y-2">
+                                      {q.options?.map(opt => (
+                                        <button key={opt.value}
+                                          onClick={() => {
+                                            const requestId = ++freeSearchRequestIdRef.current
+                                            if (controllerRef.current) controllerRef.current.abort()
+                                            const controller = new AbortController()
+                                            controllerRef.current = controller
+                                            const newAnswers = { ...freeSearchAnswers, [q.id]: opt.value }
+                                            const symptomText = localStorage.getItem('lastSymptom') || ''
+                                            setFreeSearchAnswers(newAnswers)
+                                            setFreeText(symptomText)
+                                            setFreeSearchLoading(true)
+                                            setFreeSearchResult({ loading: '正在分析中...' })
+                                            const timeoutId = setTimeout(() => controller.abort(), 15000)
+                                            const followupPayload = {
+                                              question: symptomText,
+                                              answers: newAnswers,
+                                              tongue_front: fsTongueFront || undefined,
+                                              tongue_underside: fsTongueUnderside || undefined,
+                                              face: fsFace || undefined,
                                             }
-                                          })
-                                          .catch(e => {
-                                            console.error('FreeSearch API error:', e)
-                                            setFreeSearchResult({ error: '網路錯誤，請檢查連線後再試' })
-                                          })
-                                          .finally(() => setFreeSearchLoading(false))
-                                        }}
-                                        className="w-full text-left px-4 py-3 rounded-xl text-sm transition-all duration-200"
-                                        style={{
-                                          background: freeSearchAnswers[q.id] === opt.value ? 'rgba(44,74,62,0.10)' : 'rgba(44,74,62,0.04)',
-                                          border: freeSearchAnswers[q.id] === opt.value ? '1px solid #2C4A3E' : '1px solid #E5E2DA',
-                                          color: freeSearchAnswers[q.id] === opt.value ? '#2C4A3E' : '#3A3A32',
-                                        }}
-                                      >
-                                        {opt.label}
-                                      </button>
-                                    ))}
-                                  </div>
-                                  {freeSearchResult.context?.suspected_syndromes && freeSearchResult.context.suspected_syndromes.length > 0 && (
-                                    <div className="mt-3 flex flex-wrap gap-1">
-                                      {freeSearchResult.context?.suspected_syndromes?.map(s => (
-                                        <span key={s} className="text-xs px-2 py-0.5 rounded-full"
-                                          style={{ background: 'rgba(139,110,90,0.10)', color: '#8B6E5A' }}>
-                                          {s}
-                                        </span>
+                                            fetch('/api/ask', {
+                                              method: 'POST',
+                                              headers: { 'Content-Type': 'application/json' },
+                                              body: JSON.stringify(followupPayload),
+                                              signal: controller.signal,
+                                            })
+                                            .then(res => { clearTimeout(timeoutId); if (!res.ok) throw new Error('HTTP ' + res.status); return res.json() })
+                                            .then(data => {
+                                              if (requestId !== freeSearchRequestIdRef.current) return
+                                              if (!data.ok && !data.answer) {
+                                                setFreeSearchResult({ error: data.error || '搜尋失敗，請稍後再試' })
+                                              } else {
+                                                setFreeSearchResult(data)
+                                                if (data.done && data.result && !data.followup_question) {
+                                                  let normOk = false
+                                                  try {
+                                                    const rawResult = data.result as Record<string, unknown>
+                                                    const syns = (rawResult as any).syndromes
+                                                    const first = Array.isArray(syns) ? syns[0] as Record<string, unknown> : null
+                                                    if (first) {
+                                                      const base = analyzeCondition(freeSearchAnswers)
+                                                      const safe: ResultData = {
+                                                        ...base,
+                                                        questionnaire_answers: freeSearchAnswers,
+                                                        constitution: {
+                                                          ...base,
+                                                          type: String(first['syndrome'] || base.type),
+                                                          sub: String(first['syndrome'] || base.sub),
+                                                          pattern: String(first['pattern'] || base.pattern),
+                                                          description: String(first['description'] || base.description),
+                                                          suggestions: Array.isArray(first['suggestions']) ? first['suggestions'] as string[] : base.suggestions,
+                                                        },
+                                                      }
+                                                      setResult(safe)
+                                                      normOk = true
+                                                    } else {
+                                                      setFreeSearchResult({ error: '無法解析體質結果，請重新嘗試' })
+                                                      return
+                                                    }
+                                                  } catch (e) {
+                                                    console.error('setResult norm failed:', e)
+                                                  }
+                                                  if (normOk) setStep('result')
+                                                } else {
+                                                  setFreeSearchMode(data.followup_question ? 'questionnaire' : 'input')
+                                                }
+                                              }
+                                            })
+                                            .catch(e => {
+                                              console.error('FreeSearch API error:', e)
+                                              setFreeSearchResult({ error: '網路錯誤，請檢查連線後再試' })
+                                            })
+                                            .finally(() => setFreeSearchLoading(false))
+                                          }}
+                                          className="w-full text-left px-4 py-3 rounded-xl text-sm transition-all duration-200"
+                                          style={{
+                                            background: freeSearchAnswers[q.id] === opt.value ? 'rgba(44,74,62,0.10)' : 'rgba(44,74,62,0.04)',
+                                            border: freeSearchAnswers[q.id] === opt.value ? '1px solid #2C4A3E' : '1px solid #E5E2DA',
+                                            color: freeSearchAnswers[q.id] === opt.value ? '#2C4A3E' : '#3A3A32',
+                                          }}
+                                        >
+                                          {opt.label}
+                                        </button>
                                       ))}
                                     </div>
-                                  )}
-                                </>
-                              )}
-                            </div>
-                          ))}
+                                  </>
+                                )}
+                              </div>
+                            )
+                          })()}
                         </div>
                       </div>
                     ) : (
