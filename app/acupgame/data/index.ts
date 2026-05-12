@@ -38,7 +38,7 @@ export const ST_MERIDIAN: MeridianInfo = {
   nameEn: 'Stomach Meridian',
   emoji: '🍽️',
   totalPoints: 45,
-  status: 'stub',
+  status: 'complete',
 }
 
 // 脾經 (Spleen) - 21穴位
@@ -48,7 +48,7 @@ export const SP_MERIDIAN: MeridianInfo = {
   nameEn: 'Spleen Meridian',
   emoji: '🩸',
   totalPoints: 21,
-  status: 'stub',
+  status: 'complete',
 }
 
 // 心經 (Heart) - 9穴位
@@ -58,7 +58,7 @@ export const HT_MERIDIAN: MeridianInfo = {
   nameEn: 'Heart Meridian',
   emoji: '❤️',
   totalPoints: 9,
-  status: 'stub',
+  status: 'complete',
 }
 
 // 小腸經 (Small Intestine) - 19穴位
@@ -68,7 +68,7 @@ export const SI_MERIDIAN: MeridianInfo = {
   nameEn: 'Small Intestine Meridian',
   emoji: '🔥',
   totalPoints: 19,
-  status: 'stub',
+  status: 'complete',
 }
 
 // 膀胱經 (Bladder) - 67穴位
@@ -114,7 +114,7 @@ export const SJ_MERIDIAN: MeridianInfo = {
 // 膽經 (Gallbladder) - 44穴位
 export const GB_MERIDIAN: MeridianInfo = {
   code: 'GB',
-  name: '膽經',
+  name: '肝經',
   nameEn: 'Gallbladder Meridian',
   emoji: '💚',
   totalPoints: 44,
