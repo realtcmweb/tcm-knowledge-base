@@ -6,6 +6,7 @@ import { useTranslations, useLocale } from 'next-intl'
 import Head from 'next/head'
 import Link from 'next/link'
 import LanguageSelector from '../../components/LanguageSelector'
+import FeedbackButton from '../../components/FeedbackButton'
 import { HerbRecommendation, getHerbTiming, SYNDROME_DATABASE, MERIDIAN_CLOCK } from '../../lib/tcm_knowledge'
 
 // Input with unit toggle (used for height/weight)
@@ -3689,6 +3690,8 @@ interface FreeSearchResult {
       <footer className="text-center py-6 text-xs text-stone-400 border-t border-stone-200 mt-4">
         <p>{t('footer.copyright')}</p>
       </footer>
+
+      <FeedbackButton step={step} />
     </div>
   )
 }
