@@ -1,7 +1,7 @@
 import NextAuth from 'next-auth'
 import Credentials from 'next-auth/providers/credentials'
 
-const AUTH_SECRET = process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET || ''
+const AUTH_SECRET = process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET || ''
 
 if (!AUTH_SECRET) {
   console.error('[NextAuth] Missing AUTH_SECRET/NEXTAUTH_SECRET env variable!')
