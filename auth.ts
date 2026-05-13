@@ -1,6 +1,5 @@
 import NextAuth from 'next-auth'
 import Google from 'next-auth/providers/google'
-import Credentials from 'next-auth/providers/credentials'
 
 const AUTH_SECRET = process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET || ''
 
@@ -20,28 +19,29 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     }),
     // Email/Password Credentials - 串 auth_api
-    Credentials({
-      name: 'Email',
-      credentials: {
-        email: { label: 'Email', type: 'email' },
-        password: { label: 'Password', type: 'password' },
-      },
-      async authorize(credentials) {
-        const res = await fetch(`${AUTH_API_URL}/auth/login`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(credentials),
-        })
-        if (!res.ok) return null
-        const data = await res.json()
-        if (!data.token) return null
-        return {
-          id: data.user.id,
-          email: data.user.email,
-          name: data.user.name,
-        }
-      },
-    }),
+    // TEMPORARILY DISABLED to test Google OAuth
+    // Credentials({
+    //   name: 'Email',
+    //   credentials: {
+    //     email: { label: 'Email', type: 'email' },
+    //     password: { label: 'Password', type: 'password' },
+    //   },
+    //   async authorize(credentials) {
+    //     const res = await fetch(`${AUTH_API_URL}/auth/login`, {
+    //       method: 'POST',
+    //       headers: { 'Content-Type': 'application/json' },
+    //       body: JSON.stringify(credentials),
+    //     })
+    //     if (!res.ok) return null
+    //     const data = await res.json()
+    //     if (!data.token) return null
+    //     return {
+    //       id: data.user.id,
+    //       email: data.user.email,
+    //       name: data.user.name,
+    //     }
+    //   },
+    // }),
   ],
   callbacks: {
     async jwt({ token, user, account }) {
