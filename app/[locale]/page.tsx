@@ -1139,13 +1139,12 @@ interface FreeSearchResult {
           if (normOk) setStep('result')
         } else {
           setFreeSearchMode(data.followup_question ? 'questionnaire' : 'input')
-          // Keep button disabled while followup question is shown
-          if (!data.followup_question) setFreeSearchLoading(false)
         }
       }
     } catch (e) {
       const isAbort = e instanceof DOMException && e.name === 'AbortException'
       setFreeSearchResult({ error: isAbort ? '網路超時，請稍後再試' : '網路錯誤，請檢查連線後再試' })
+    } finally {
       setFreeSearchLoading(false)
     }
   }
@@ -2013,6 +2012,7 @@ interface FreeSearchResult {
                   console.warn('[DEBUG] free_basic button disabled, missing:', { gender: g, age: a })
                   return
                 }
+                // Free_basic: ignore freeSearchLoading to keep button text stable
                 try {
                   console.log('[DEBUG] calling handleFreeSearch...')
                   await handleFreeSearch()
@@ -2026,7 +2026,7 @@ interface FreeSearchResult {
                 background: (freeSearchAnswers['gender'] && freeSearchAnswers['age']) ? '#2C4A3E' : '#C5D4C0',
                 color: '#FAFAF7',
               }}>
-              {freeSearchLoading ? '分析中...' : '開始分析'}
+              開始分析
             </button>
           </div>
         </main>
