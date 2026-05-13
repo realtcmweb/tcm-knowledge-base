@@ -1139,11 +1139,13 @@ interface FreeSearchResult {
           if (normOk) setStep('result')
         } else {
           setFreeSearchMode(data.followup_question ? 'questionnaire' : 'input')
+          // Keep button disabled while followup question is shown
+          if (!data.followup_question) setFreeSearchLoading(false)
         }
       }
     } catch (e) {
-      setFreeSearchResult({ error: '網路錯誤，請檢查連線後再試' })
-    } finally {
+      const isAbort = e instanceof DOMException && e.name === 'AbortException'
+      setFreeSearchResult({ error: isAbort ? '網路超時，請稍後再試' : '網路錯誤，請檢查連線後再試' })
       setFreeSearchLoading(false)
     }
   }
