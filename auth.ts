@@ -1,23 +1,30 @@
 import NextAuth from 'next-auth'
 import Credentials from 'next-auth/providers/credentials'
 
-// 你自己的 backend API URL
+const AUTH_SECRET = process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET || ''
+
+if (!AUTH_SECRET) {
+  console.error('[NextAuth] Missing AUTH_SECRET/NEXTAUTH_SECRET env variable!')
+}
+
 const AUTH_API_URL = process.env.AUTH_API_URL || process.env.NEXT_PUBLIC_API_URL?.replace(':8000', ':8001') || 'https://coinss.noip.me:8001'
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  secret: AUTH_SECRET,
+  trustHost: true,
   providers: [
-    // Google OAuth - 自己串
+    // Google OAuth
     {
       id: 'google',
       name: 'Google',
       type: 'oauth',
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      issuer: 'https://accounts.google.com',
       authorization: {
         params: { prompt: 'consent', access_type: 'offline', response_type: 'code' }
       },
       async profile(profile) {
-        // 拿 Google token 後同步到 auth_api
         return {
           id: profile.sub,
           email: profile.email,
@@ -56,7 +63,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.userId = user.id
       }
       if (account?.provider === 'google') {
-        // Google 登入成功後，同步到 auth_api
         try {
           await fetch(`${AUTH_API_URL}/auth/google`, {
             method: 'POST',
@@ -88,5 +94,4 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     signIn: '/login',
   },
   session: { strategy: 'jwt' },
-  trustHost: true,
 })
