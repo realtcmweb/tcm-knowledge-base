@@ -2006,12 +2006,18 @@ interface FreeSearchResult {
               onClick={async () => {
                 const g = freeSearchAnswers['gender']
                 const a = freeSearchAnswers['age']
+                console.log('[DEBUG] free_basic button clicked, state:', { gender: g, age: a, freeSearchLoading })
                 if (!g || !a) {
-                  console.warn('free_basic button clicked but missing:', { gender: g, age: a })
+                  console.warn('[DEBUG] free_basic button disabled, missing:', { gender: g, age: a })
                   return
                 }
-                console.log('free_basic: starting analysis with', { gender: g, age: a })
-                await handleFreeSearch()
+                try {
+                  console.log('[DEBUG] calling handleFreeSearch...')
+                  await handleFreeSearch()
+                  console.log('[DEBUG] handleFreeSearch completed')
+                } catch(e) {
+                  console.error('[DEBUG] handleFreeSearch threw:', e)
+                }
               }}
               className="w-full py-4 rounded-2xl font-medium text-base transition-all"
               style={{
