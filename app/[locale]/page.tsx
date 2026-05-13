@@ -2096,7 +2096,7 @@ interface FreeSearchResult {
             <button
               onClick={() => {
                 if (!freeSearchAnswers['gender'] || !freeSearchAnswers['age']) return
-                setStep('mode')
+                handleFreeSearch()
               }}
               disabled={!freeSearchAnswers['gender'] || !freeSearchAnswers['age']}
               className="w-full py-4 rounded-2xl font-medium text-base transition-all"
