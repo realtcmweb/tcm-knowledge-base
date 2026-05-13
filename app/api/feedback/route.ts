@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
 
     // Save to backend (best-effort)
     try {
-      const API_URL = process.env.API_BACKEND_URL || 'http://localhost:8000'
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
       await fetch(`${API_URL}/api/feedback`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || '/justin/api'
 
 export async function GET(req: NextRequest) {
   const q = req.nextUrl.searchParams.get('q')

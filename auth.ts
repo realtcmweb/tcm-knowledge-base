@@ -1,4 +1,5 @@
 import NextAuth from 'next-auth'
+import Google from 'next-auth/providers/google'
 import Credentials from 'next-auth/providers/credentials'
 
 const AUTH_SECRET = process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET || ''
@@ -13,28 +14,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   secret: AUTH_SECRET,
   trustHost: true,
   providers: [
-    // Google OAuth
-    {
-      id: 'google',
-      name: 'Google',
-      type: 'oauth',
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    // Google OAuth - use official provider
+    Google({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       authorization: {
-        url: 'https://accounts.google.com/o/oauth2/v2/auth',
         params: { prompt: 'consent', access_type: 'offline', response_type: 'code' }
-      },
-      token: 'https://oauth2.googleapis.com/token',
-      userinfo: 'https://www.googleapis.com/oauth2/v3/userinfo',
-      async profile(profile) {
-        return {
-          id: profile.sub,
-          email: profile.email,
-          name: profile.name,
-          image: profile.picture,
-        }
-      },
-    },
+      }
+    }),
     // Email/Password Credentials - 串 auth_api
     Credentials({
       name: 'Email',
