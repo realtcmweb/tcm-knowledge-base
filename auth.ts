@@ -20,10 +20,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       type: 'oauth',
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-      issuer: 'https://accounts.google.com',
       authorization: {
+        url: 'https://accounts.google.com/o/oauth2/v2/auth',
         params: { prompt: 'consent', access_type: 'offline', response_type: 'code' }
       },
+      token: 'https://oauth2.googleapis.com/token',
+      userinfo: 'https://www.googleapis.com/oauth2/v3/userinfo',
       async profile(profile) {
         return {
           id: profile.sub,
