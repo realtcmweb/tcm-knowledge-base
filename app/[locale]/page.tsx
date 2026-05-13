@@ -2003,17 +2003,22 @@ interface FreeSearchResult {
 
           <div className="fixed bottom-0 left-0 right-0 px-6 py-5 max-w-2xl mx-auto" style={{ background: 'rgba(250,250,247,0.95)', backdropFilter: 'blur(20px)', borderTop: '1px solid rgba(229,226,218,0.6)' }}>
             <button
-              onClick={() => {
-                if (!freeSearchAnswers['gender'] || !freeSearchAnswers['age']) return
-                handleFreeSearch()
+              onClick={async () => {
+                const g = freeSearchAnswers['gender']
+                const a = freeSearchAnswers['age']
+                if (!g || !a) {
+                  console.warn('free_basic button clicked but missing:', { gender: g, age: a })
+                  return
+                }
+                console.log('free_basic: starting analysis with', { gender: g, age: a })
+                await handleFreeSearch()
               }}
-              disabled={!freeSearchAnswers['gender'] || !freeSearchAnswers['age']}
               className="w-full py-4 rounded-2xl font-medium text-base transition-all"
               style={{
                 background: (freeSearchAnswers['gender'] && freeSearchAnswers['age']) ? '#2C4A3E' : '#C5D4C0',
                 color: '#FAFAF7',
               }}>
-              開始分析
+              {freeSearchLoading ? '分析中...' : '開始分析'}
             </button>
           </div>
         </main>
