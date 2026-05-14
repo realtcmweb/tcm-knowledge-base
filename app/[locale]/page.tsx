@@ -1507,7 +1507,7 @@ interface FreeSearchResult {
                                                 setFreeSearchResult({ error: data.error || '搜尋失敗，請稍後再試' })
                                               } else {
                                                 setFreeSearchResult(data)
-                                                if (data.done && data.result && !data.followup_question) {
+                                                if (data.done && data.result) {
                                                   let normOk = false
                                                   try {
                                                     const rawResult = data.result as Record<string, unknown>
