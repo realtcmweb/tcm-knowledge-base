@@ -1988,25 +1988,32 @@ interface FreeSearchResult {
                         }).then(res => res.json()).then(data => {
                           setFreeSearchResult(data)
                           if (data.done && data.result) {
-                            // Build ResultData from backend result
-                            const rawResult = data.result as Record<string, unknown>
-                            const syns = (rawResult as any).syndromes
-                            const first = Array.isArray(syns) && syns.length > 0 ? syns[0] as Record<string, unknown> : null
-                            const base = analyzeCondition(newAnswers)
-                            const safe: ResultData = {
-                              ...base,
-                              questionnaire_answers: newAnswers,
-                              constitution: first ? {
+                            try {
+                              const rawResult = data.result as Record<string, unknown>
+                              const syns = (rawResult as any).syndromes
+                              const first = Array.isArray(syns) && syns.length > 0 ? syns[0] as Record<string, unknown> : null
+                              const base = analyzeCondition(newAnswers)
+                              const safe: ResultData = {
                                 ...base,
-                                type: String(first['syndrome'] || base.type),
-                                sub: String(first['syndrome'] || base.sub),
-                                pattern: String(first['pattern'] || base.pattern),
-                                description: String(first['description'] || base.description),
-                                suggestions: Array.isArray(first['suggestions']) ? first['suggestions'] as string[] : base.suggestions,
-                              } : base,
+                                questionnaire_answers: newAnswers,
+                                constitution: first ? {
+                                  ...base,
+                                  type: String(first['syndrome'] || base.type),
+                                  sub: String(first['syndrome'] || base.sub),
+                                  pattern: String(first['pattern'] || base.pattern),
+                                  description: String(first['description'] || base.description),
+                                  suggestions: Array.isArray(first['suggestions']) ? first['suggestions'] as string[] : base.suggestions,
+                                } : base,
+                              }
+                              setResult(safe)
+                              setStep('result')
+                            } catch(e) {
+                              console.error('[free_basic] setResult failed:', e)
                             }
-                            setResult(safe)
-                            setStep('result')
+                          } else if (!data.done && data.followup_question) {
+                            // New followup question arrived — the inline block will auto-render it via the outer condition
+                          } else if (data.done || data.error) {
+                            // Done but no result, or error — keep on this step and show error if any
                           }
                         }).catch(() => {
                           setFreeSearchResult(prev => prev ? { ...prev, loading: undefined, error: '網路錯誤' } : null)
