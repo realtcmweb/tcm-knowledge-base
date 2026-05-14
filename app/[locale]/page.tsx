@@ -1053,8 +1053,13 @@ interface FreeSearchResult {
   }
 
   const handleFreeSearch = async () => {
-    if (!freeText.trim()) return
-    const symptomText = freeText.trim()
+    // Use freeText if available, otherwise check localStorage (for free_basic page)
+    let symptomText = freeText.trim()
+    if (!symptomText) {
+      const stored = localStorage.getItem('lastSymptom')
+      if (stored) symptomText = stored
+    }
+    if (!symptomText) return
     localStorage.setItem('lastSymptom', symptomText)
     
     // Auto-detect gender from symptom keywords

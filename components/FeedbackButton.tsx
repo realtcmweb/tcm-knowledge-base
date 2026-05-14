@@ -40,11 +40,42 @@ export default function FeedbackButton({ step, variant = 'fab' }: FeedbackProps)
   const [apiError, setApiError] = useState('')
 
   const handleSend = async () => {
+    // Collect rich context for debugging
+    const context: Record<string, string> = {}
+
+    // Step-specific context
+    if (step === 'free_basic') {
+      const gender = localStorage.getItem('freeSearchGender') || ''
+      const age = localStorage.getItem('freeSearchAge') || ''
+      const symptom = localStorage.getItem('lastSymptom') || ''
+      context.filledFields = `gender=${gender}, age=${age}`
+      context.symptomText = symptom
+    } else if (step === 'freesearch') {
+      context.freeText = localStorage.getItem('lastSymptom') || ''
+    } else if (step === 'questionnaire') {
+      const lastQ = localStorage.getItem('lastQuestionIndex') || ''
+      context.questionIndex = lastQ
+    } else if (step === 'result') {
+      const constitution = localStorage.getItem('lastConstitutionType') || ''
+      context.constitutionResult = constitution
+    }
+
+    // URL and timestamp
+    context.pageUrl = window.location.pathname + window.location.search
+    context.userAgent = navigator.userAgent
+
     const msg = [
       `🔔 頁面問題回報`,
-      `頁面：${STEP_LABELS[step] || step}`,
-      `問題：${selectedIssue || '（未選擇）'}`,
-      detail ? `補充：${detail}` : '',
+      `━━━━━━━━━━━━`,
+      `📄 頁面：${STEP_LABELS[step] || step}`,
+      `🐛 問題：${selectedIssue || '（未選擇）'}`,
+      detail ? `💬 補充：${detail}` : '',
+      `━━━━━━━━━━━━`,
+      `🕐 ${new Date().toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' })}`,
+      context.symptomText ? `🩺 症狀：${context.symptomText}` : '',
+      context.filledFields ? `📝 已填：${context.filledFields}` : '',
+      context.constitutionResult ? `📊 體質結果：${context.constitutionResult}` : '',
+      `🔗 ${context.pageUrl}`,
     ].filter(Boolean).join('\n')
 
     // Log locally for now, plus notify sub-agent
@@ -58,7 +89,7 @@ export default function FeedbackButton({ step, variant = 'fab' }: FeedbackProps)
       await fetch('/api/feedback', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ step, issue: selectedIssue, detail }),
+        body: JSON.stringify({ step, issue: selectedIssue, detail, timestamp: new Date().toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' }), context }),
       })
     } catch {
       setApiError('網路錯誤，請稍後再試')

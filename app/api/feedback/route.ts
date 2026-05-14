@@ -5,8 +5,27 @@ const TG_CHAT_ID = '8217693055'
 
 export async function POST(req: NextRequest) {
   try {
-    const { step, issue, detail } = await req.json()
-    const timestamp = new Date().toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' })
+    const { step, issue, detail, timestamp, context } = await req.json()
+    const ts = timestamp || new Date().toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' })
+
+    // Build enhanced message with context
+    const lines = [
+      `🔔 收到網站回報`,
+      `━━━━━━━━━━━━`,
+      `📄 頁面：${step}`,
+      `🐛 問題：${issue}`,
+      detail ? `💬 補充：${detail}` : '',
+      `━━━━━━━━━━━━`,
+      `🕐 ${ts}`,
+    ]
+    if (context) {
+      if (context.symptomText) lines.push(`🩺 症狀：${context.symptomText}`)
+      if (context.filledFields) lines.push(`📝 已填：${context.filledFields}`)
+      if (context.constitutionResult) lines.push(`📊 體質：${context.constitutionResult}`)
+      if (context.questionIndex) lines.push(`❓ 題目：第${context.questionIndex}題`)
+      if (context.pageUrl) lines.push(`🔗 ${context.pageUrl}`)
+    }
+    const msg = lines.filter(Boolean).join('\n')
 
     // Save to backend (best-effort)
     try {
@@ -14,7 +33,7 @@ export async function POST(req: NextRequest) {
       await fetch(`${API_URL}/api/feedback`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ step, issue, detail, timestamp }),
+        body: JSON.stringify({ step, issue, detail, timestamp: ts, context }),
         signal: AbortSignal.timeout(4000),
       })
     } catch {
@@ -22,8 +41,6 @@ export async function POST(req: NextRequest) {
     }
 
     // Send Telegram notification directly
-    const msg = `🔔 收到網站回報\n━━━━━━━━━━━━\n📄 頁面：${step}\n🐛 問題：${issue}\n💬 補充：${detail || '（無）'}\n━━━━━━━━━━━━\n🕐 ${timestamp}`
-
     try {
       const tgRes = await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`, {
         method: 'POST',
