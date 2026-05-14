@@ -1536,7 +1536,14 @@ interface FreeSearchResult {
                                                   } catch (e) {
                                                     console.error('setResult norm failed:', e)
                                                   }
-                                                  if (normOk) setStep('result')
+                                                  // Always try to transition to result if normOk
+                                                  if (normOk) {
+                                                    setStep('result')
+                                                  } else {
+                                                    // Emergency fallback: even if setResult failed, show result
+                                                    console.warn('[handleFreeSearch] normOk=false, emergency setStep result')
+                                                    setStep('result')
+                                                  }
                                                 } else {
                                                   setFreeSearchMode(data.followup_question ? 'questionnaire' : 'input')
                                                 }
@@ -2009,6 +2016,9 @@ interface FreeSearchResult {
                               setStep('result')
                             } catch(e) {
                               console.error('[free_basic] setResult failed:', e)
+                              // Emergency: still transition to result even if setResult failed
+                              console.warn('[free_basic] emergency setStep result after catch')
+                              setStep('result')
                             }
                           } else if (!data.done && data.followup_question) {
                             // New followup question arrived — the inline block will auto-render it via the outer condition
