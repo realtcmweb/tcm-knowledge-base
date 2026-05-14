@@ -1515,8 +1515,20 @@ interface FreeSearchResult {
                                                     const first = Array.isArray(syns) ? syns[0] as Record<string, unknown> : null
                                                     if (first) {
                                                       const base = analyzeCondition(freeSearchAnswers)
-                                                      // Look up full syndrome data from SYNDROME_DATABASE
-                                                      const syndromeRec = SYNDROME_DATABASE.find(s => s.type === first['syndrome'] || s.subType === first['syndrome'])
+                                                      // Normalize syndrome name for lookup (backend may return partial names)
+                                                      const syndromeMap: Record<string, string> = {
+                                                        '肺脾氣虛': '氣虛',
+                                                        '心脾兩虛': '氣虛',
+                                                        '痰濕蘊肺': '痰濕',
+                                                        '肝氣鬱結': '氣鬱',
+                                                        '脾胃虛弱': '脾虛',
+                                                        '腎陽不足': '陽虛',
+                                                        '肝腎陰虛': '陰虛',
+                                                        '濕熱蘊脾': '濕熱',
+                                                        '氣血兩虛': '氣虛',
+                                                      }
+                                                      const normalizedKey = syndromeMap[first['syndrome'] as string] || first['syndrome'] as string
+                                                      const syndromeRec = SYNDROME_DATABASE.find(s => s.type === normalizedKey || s.subType === normalizedKey || s.type.includes(normalizedKey) || (normalizedKey.includes(s.type)) || s.subType.includes(normalizedKey) || (normalizedKey.includes(s.subType)))
                                                       const safe: ResultData = {
                                                         ...base,
                                                         questionnaire_answers: freeSearchAnswers,
@@ -2010,8 +2022,20 @@ interface FreeSearchResult {
                               const syns = (rawResult as any).syndromes
                               const first = Array.isArray(syns) && syns.length > 0 ? syns[0] as Record<string, unknown> : null
                               const base = analyzeCondition(newAnswers)
-                              // Look up full syndrome data from SYNDROME_DATABASE
-                              const syndromeRec = SYNDROME_DATABASE.find(s => s.type === first['syndrome'] || s.subType === first['syndrome'])
+                              // Normalize syndrome name for lookup (backend may return partial names)
+                              const syndromeMap: Record<string, string> = {
+                                '肺脾氣虛': '氣虛',
+                                '心脾兩虛': '氣虛',
+                                '痰濕蘊肺': '痰濕',
+                                '肝氣鬱結': '氣鬱',
+                                '脾胃虛弱': '脾虛',
+                                '腎陽不足': '陽虛',
+                                '肝腎陰虛': '陰虛',
+                                '濕熱蘊脾': '濕熱',
+                                '氣血兩虛': '氣虛',
+                              }
+                              const normalizedKey = syndromeMap[first['syndrome'] as string] || first['syndrome'] as string
+                              const syndromeRec = SYNDROME_DATABASE.find(s => s.type === normalizedKey || s.subType === normalizedKey || s.type.includes(normalizedKey) || normalizedKey.includes(s.type) || s.subType.includes(normalizedKey) || normalizedKey.includes(s.subType))
                               const safe: ResultData = {
                                 ...base,
                                 questionnaire_answers: newAnswers,
