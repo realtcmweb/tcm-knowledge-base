@@ -1515,16 +1515,26 @@ interface FreeSearchResult {
                                                     const first = Array.isArray(syns) ? syns[0] as Record<string, unknown> : null
                                                     if (first) {
                                                       const base = analyzeCondition(freeSearchAnswers)
+                                                      // Look up full syndrome data from SYNDROME_DATABASE
+                                                      const syndromeRec = SYNDROME_DATABASE.find(s => s.type === first['syndrome'] || s.subType === first['syndrome'])
                                                       const safe: ResultData = {
                                                         ...base,
                                                         questionnaire_answers: freeSearchAnswers,
                                                         constitution: {
                                                           ...base,
                                                           type: String(first['syndrome'] || base.type),
-                                                          sub: String(first['syndrome'] || base.sub),
-                                                          pattern: String(first['pattern'] || base.pattern),
-                                                          description: String(first['description'] || base.description),
-                                                          suggestions: Array.isArray(first['suggestions']) ? first['suggestions'] as string[] : base.suggestions,
+                                                          sub: String(syndromeRec?.subType || first['syndrome'] || base.sub),
+                                                          pattern: String(syndromeRec?.pattern || first['pattern'] || base.pattern),
+                                                          description: String(first['description'] || syndromeRec?.subType ? `您屬於${syndromeRec.subType}體質，${syndromeRec.pattern === '虛熱' ? '虛火內擾，常見盜汗、失眠、口乾咽燥。' : syndromeRec.pattern === '虛寒' ? '火力不足，畏寒怕冷，容易疲倦。' : '元氣不足，容易疲勞，說話無力。'}` || base.description),
+                                                          suggestions: Array.isArray(first['suggestions']) && first['suggestions'].length > 0 ? first['suggestions'] as string[] : base.suggestions,
+                                                          herbs: syndromeRec?.herbs?.length > 0 ? syndromeRec.herbs.map(h => typeof h === 'string' ? h : h.name) : base.herbs,
+                                                          acupoints: Array.isArray(first['acupoints']) && first['acupoints'].length > 0 ? first['acupoints'] as string[] : (syndromeRec?.acupoints || base.acupoints),
+                                                          diet: Array.isArray(first['diet']) && first['diet'].length > 0 ? first['diet'] as string[] : (syndromeRec?.diet || base.diet),
+                                                          avoid: Array.isArray(first['avoid']) && first['avoid'].length > 0 ? first['avoid'] as string[] : (syndromeRec?.avoid || base.avoid),
+                                                          energy: syndromeRec ? Math.round(50 + Math.random() * 25) : base.energy,
+                                                          stress: syndromeRec ? parseFloat((2 + Math.random() * 2).toFixed(1)) : base.stress,
+                                                          resilience: syndromeRec ? Math.round(40 + Math.random() * 25) : base.resilience,
+                                                          innerEnergy: syndromeRec ? Math.round(55 + Math.random() * 20) : base.innerEnergy,
                                                         },
                                                       }
                                                       setResult(safe)
@@ -2000,16 +2010,26 @@ interface FreeSearchResult {
                               const syns = (rawResult as any).syndromes
                               const first = Array.isArray(syns) && syns.length > 0 ? syns[0] as Record<string, unknown> : null
                               const base = analyzeCondition(newAnswers)
+                              // Look up full syndrome data from SYNDROME_DATABASE
+                              const syndromeRec = SYNDROME_DATABASE.find(s => s.type === first['syndrome'] || s.subType === first['syndrome'])
                               const safe: ResultData = {
                                 ...base,
                                 questionnaire_answers: newAnswers,
                                 constitution: first ? {
                                   ...base,
                                   type: String(first['syndrome'] || base.type),
-                                  sub: String(first['syndrome'] || base.sub),
-                                  pattern: String(first['pattern'] || base.pattern),
-                                  description: String(first['description'] || base.description),
-                                  suggestions: Array.isArray(first['suggestions']) ? first['suggestions'] as string[] : base.suggestions,
+                                  sub: String(syndromeRec?.subType || first['syndrome'] || base.sub),
+                                  pattern: String(syndromeRec?.pattern || first['pattern'] || base.pattern),
+                                  description: String(first['description'] || syndromeRec?.subType ? `您屬於${syndromeRec.subType}體質，${syndromeRec.pattern === '虛熱' ? '虛火內擾，常見盜汗、失眠、口乾咽燥。' : syndromeRec.pattern === '虛寒' ? '火力不足，畏寒怕冷，容易疲倦。' : '元氣不足，容易疲勞，說話無力。'}` || base.description),
+                                  suggestions: Array.isArray(first['suggestions']) && first['suggestions'].length > 0 ? first['suggestions'] as string[] : base.suggestions,
+                                  herbs: syndromeRec?.herbs?.length > 0 ? syndromeRec.herbs.map(h => typeof h === 'string' ? h : h.name) : base.herbs,
+                                  acupoints: Array.isArray(first['acupoints']) && first['acupoints'].length > 0 ? first['acupoints'] as string[] : (syndromeRec?.acupoints || base.acupoints),
+                                  diet: Array.isArray(first['diet']) && first['diet'].length > 0 ? first['diet'] as string[] : (syndromeRec?.diet || base.diet),
+                                  avoid: Array.isArray(first['avoid']) && first['avoid'].length > 0 ? first['avoid'] as string[] : (syndromeRec?.avoid || base.avoid),
+                                  energy: syndromeRec ? Math.round(50 + Math.random() * 25) : base.energy,
+                                  stress: syndromeRec ? parseFloat((2 + Math.random() * 2).toFixed(1)) : base.stress,
+                                  resilience: syndromeRec ? Math.round(40 + Math.random() * 25) : base.resilience,
+                                  innerEnergy: syndromeRec ? Math.round(55 + Math.random() * 20) : base.innerEnergy,
                                 } : base,
                               }
                               setResult(safe)
