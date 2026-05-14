@@ -1987,7 +1987,25 @@ interface FreeSearchResult {
                           body: JSON.stringify({ question: lastSymptom, answers: newAnswers }),
                         }).then(res => res.json()).then(data => {
                           setFreeSearchResult(data)
-                          if (data.done && data.result && !data.followup_question) {
+                          if (data.done && data.result) {
+                            // Build ResultData from backend result
+                            const rawResult = data.result as Record<string, unknown>
+                            const syns = (rawResult as any).syndromes
+                            const first = Array.isArray(syns) && syns.length > 0 ? syns[0] as Record<string, unknown> : null
+                            const base = analyzeCondition(newAnswers)
+                            const safe: ResultData = {
+                              ...base,
+                              questionnaire_answers: newAnswers,
+                              constitution: first ? {
+                                ...base,
+                                type: String(first['syndrome'] || base.type),
+                                sub: String(first['syndrome'] || base.sub),
+                                pattern: String(first['pattern'] || base.pattern),
+                                description: String(first['description'] || base.description),
+                                suggestions: Array.isArray(first['suggestions']) ? first['suggestions'] as string[] : base.suggestions,
+                              } : base,
+                            }
+                            setResult(safe)
                             setStep('result')
                           }
                         }).catch(() => {
