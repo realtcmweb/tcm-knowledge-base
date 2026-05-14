@@ -1082,15 +1082,15 @@ interface FreeSearchResult {
     setFreeSearchLoading(true)
     setFreeSearchResult({ loading: '正在搜尋中醫資料庫...' })
     try {
-      // Save original symptom text for followup questions
-      localStorage.setItem('lastSymptom', freeText.trim())
+      // Save original symptom text for followup questions (use symptomText which may come from localStorage)
+      localStorage.setItem('lastSymptom', symptomText)
       // Cancel any in-flight request
       if (controllerRef.current) controllerRef.current.abort()
       const controller = new AbortController()
       controllerRef.current = controller
       const timeoutId = setTimeout(() => controller.abort(), 15000)
       const payload = {
-        question: freeText.trim(),
+        question: symptomText,
         answers: freeSearchAnswers,
         tongue_front: fsTongueFront || undefined,
         tongue_underside: fsTongueUnderside || undefined,
