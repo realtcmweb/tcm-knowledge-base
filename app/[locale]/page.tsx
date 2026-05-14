@@ -1954,85 +1954,150 @@ interface FreeSearchResult {
           </button>
 
           <div className="text-center mb-10">
-            <h2 className="text-4xl font-light mb-3" style={{ color: '#1C2C24' }}>請告訴我們您的基本資料</h2>
-            <p className="text-base" style={{ color: '#8B6E5A' }}>有助於 AI 提供更準確的分析</p>
+            <h2 className="text-4xl font-light mb-3" style={{ color: '#1C2C24' }}>
+              {freeSearchResult?.need_followup ? '請回答以下問題' : '請告訴我們您的基本資料'}
+            </h2>
+            <p className="text-base" style={{ color: '#8B6E5A' }}>
+              {freeSearchResult?.need_followup ? '協助 AI 更精準分析' : '有助於 AI 提供更準確的分析'}
+            </p>
           </div>
 
           <div className="space-y-5 mb-8">
-            {(!freeSearchAnswers['gender'] || freeSearchAnswers['gender'] === '') && (
+            {/* Show followup question inline when available */}
+            {freeSearchResult?.need_followup && freeSearchResult.followup_question && !freeSearchResult.loading && !freeSearchResult.error ? (
               <div className="rounded-2xl p-5" style={{ background: '#FFFFFF', border: '1px solid #E5E2DA' }}>
-                <p className="text-sm font-medium mb-3" style={{ color: '#2C4A3E' }}>性別 Gender <span className="text-xs" style={{ color: '#A3B5A0' }}>(已從症狀自動偵測)</span></p>
-                <div className="flex gap-3">
-                  {['M', 'F'].map(g => (
-                    <button key={g}
-                      onClick={() => setFreeSearchAnswers(prev => ({ ...prev, gender: g }))}
-                      className="flex-1 py-3 rounded-xl text-sm font-medium transition-all"
+                <p className="text-sm font-medium mb-3" style={{ color: '#2C4A3E' }}>
+                  {typeof freeSearchResult.followup_question === 'string'
+                    ? freeSearchResult.followup_question
+                    : (freeSearchResult.followup_question as any).text}
+                </p>
+                <div className="space-y-2">
+                  {((freeSearchResult.followup_question as any).options || []).map((opt: any) => (
+                    <button key={opt.value}
+                      onClick={() => {
+                        const newAnswers = { ...freeSearchAnswers, [(freeSearchResult.followup_question as any).id]: opt.value }
+                        setFreeSearchAnswers(newAnswers)
+                        // Immediately re-call API with updated answers
+                        const lastSymptom = localStorage.getItem('lastSymptom') || freeText.trim()
+                        setFreeSearchLoading(true)
+                        setFreeSearchResult(prev => prev ? { ...prev, loading: '分析中...' } : null)
+                        fetch('/api/ask', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ question: lastSymptom, answers: newAnswers }),
+                        }).then(res => res.json()).then(data => {
+                          setFreeSearchResult(data)
+                          if (data.done && data.result && !data.followup_question) {
+                            setStep('result')
+                          }
+                        }).catch(() => {
+                          setFreeSearchResult(prev => prev ? { ...prev, loading: undefined, error: '網路錯誤' } : null)
+                        }).finally(() => setFreeSearchLoading(false))
+                      }}
+                      className="w-full py-3 px-4 rounded-xl text-sm font-medium text-left transition-all"
                       style={{
-                        background: freeSearchAnswers['gender'] === g ? '#2C4A3E' : 'rgba(44,74,62,0.06)',
-                        color: freeSearchAnswers['gender'] === g ? '#FAFAF7' : '#4A4A42',
+                        background: freeSearchAnswers[(freeSearchResult.followup_question as any).id] === opt.value ? 'rgba(44,74,62,0.10)' : 'rgba(44,74,62,0.04)',
+                        border: freeSearchAnswers[(freeSearchResult.followup_question as any).id] === opt.value ? '1px solid #2C4A3E' : '1px solid #E5E2DA',
+                        color: freeSearchAnswers[(freeSearchResult.followup_question as any).id] === opt.value ? '#2C4A3E' : '#3A3A32',
                       }}>
-                      {g === 'M' ? '男 Male' : '女 Female'}
+                      {opt.label}
                     </button>
                   ))}
                 </div>
               </div>
-            )}
-            {freeSearchAnswers['gender'] && freeSearchAnswers['gender'] !== '' && (
-              <div className="rounded-2xl p-4 flex items-center justify-between" style={{ background: 'rgba(44,74,62,0.06)', border: '1px solid rgba(44,74,62,0.15)' }}>
-                <div>
-                  <p className="text-sm font-medium" style={{ color: '#2C4A3E' }}>性別 Gender</p>
-                  <p className="text-sm" style={{ color: '#4A4A42' }}>已自動偵測</p>
-                </div>
-                <span className="text-sm font-medium" style={{ color: '#2C4A3E' }}>
-                  {freeSearchAnswers['gender'] === 'M' ? '男 Male' : '女 Female'}
-                </span>
-              </div>
-            )}
+            ) : (
+              <>
+                {/* Gender - hidden once set */}
+                {(!freeSearchAnswers['gender'] || freeSearchAnswers['gender'] === '') && (
+                  <div className="rounded-2xl p-5" style={{ background: '#FFFFFF', border: '1px solid #E5E2DA' }}>
+                    <p className="text-sm font-medium mb-3" style={{ color: '#2C4A3E' }}>性別 Gender <span className="text-xs" style={{ color: '#A3B5A0' }}>(已從症狀自動偵測)</span></p>
+                    <div className="flex gap-3">
+                      {['M', 'F'].map(g => (
+                        <button key={g}
+                          onClick={() => setFreeSearchAnswers(prev => ({ ...prev, gender: g }))}
+                          className="flex-1 py-3 rounded-xl text-sm font-medium transition-all"
+                          style={{
+                            background: freeSearchAnswers['gender'] === g ? '#2C4A3E' : 'rgba(44,74,62,0.06)',
+                            color: freeSearchAnswers['gender'] === g ? '#FAFAF7' : '#4A4A42',
+                          }}>
+                          {g === 'M' ? '男 Male' : '女 Female'}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {freeSearchAnswers['gender'] && freeSearchAnswers['gender'] !== '' && (
+                  <div className="rounded-2xl p-4 flex items-center justify-between" style={{ background: 'rgba(44,74,62,0.06)', border: '1px solid rgba(44,74,62,0.15)' }}>
+                    <div>
+                      <p className="text-sm font-medium" style={{ color: '#2C4A3E' }}>性別 Gender</p>
+                      <p className="text-sm" style={{ color: '#4A4A42' }}>已自動偵測</p>
+                    </div>
+                    <span className="text-sm font-medium" style={{ color: '#2C4A3E' }}>
+                      {freeSearchAnswers['gender'] === 'M' ? '男 Male' : '女 Female'}
+                    </span>
+                  </div>
+                )}
 
-            <div className="rounded-2xl p-5" style={{ background: '#FFFFFF', border: '1px solid #E5E2DA' }}>
-              <p className="text-sm font-medium mb-3" style={{ color: '#2C4A3E' }}>年齡範圍</p>
-              <div className="flex gap-2 flex-wrap">
-                {['20-30', '31-40', '41-50', '51-60', '61-70', '70+'].map(a => (
-                  <button key={a}
-                    onClick={() => setFreeSearchAnswers(prev => ({ ...prev, age: a }))}
-                    className="px-4 py-2.5 rounded-xl text-sm font-medium transition-all"
-                    style={{
-                      background: freeSearchAnswers['age'] === a ? '#2C4A3E' : 'rgba(44,74,62,0.06)',
-                      color: freeSearchAnswers['age'] === a ? '#FAFAF7' : '#4A4A42',
-                    }}>
-                    {a}
-                  </button>
-                ))}
-              </div>
-            </div>
+                {/* Age - always show */}
+                <div className="rounded-2xl p-5" style={{ background: '#FFFFFF', border: '1px solid #E5E2DA' }}>
+                  <p className="text-sm font-medium mb-3" style={{ color: '#2C4A3E' }}>年齡範圍</p>
+                  <div className="flex gap-2 flex-wrap">
+                    {['20-30', '31-40', '41-50', '51-60', '61-70', '70+'].map(a => (
+                      <button key={a}
+                        onClick={() => setFreeSearchAnswers(prev => ({ ...prev, age: a }))}
+                        className="px-4 py-2.5 rounded-xl text-sm font-medium transition-all"
+                        style={{
+                          background: freeSearchAnswers['age'] === a ? '#2C4A3E' : 'rgba(44,74,62,0.06)',
+                          color: freeSearchAnswers['age'] === a ? '#FAFAF7' : '#4A4A42',
+                        }}>
+                        {a}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
           </div>
 
+          {/* Show answer feedback */}
+          {freeSearchResult && !freeSearchResult.loading && !freeSearchResult.error && (
+            <div className="mb-4 p-3 rounded-xl text-sm" style={{ background: 'rgba(44,74,62,0.06)', border: '1px solid rgba(44,74,62,0.12)' }}>
+              {freeSearchResult.answer && <p className="font-medium mb-1" style={{color:'#2C4A3E'}}>{freeSearchResult.answer}</p>}
+              {freeSearchResult.done && <p className="text-xs mt-1" style={{color:'#4A7C6A'}}>✅ 分析完成！</p>}
+            </div>
+          )}
+
           <div className="fixed bottom-0 left-0 right-0 px-6 py-5 max-w-2xl mx-auto" style={{ background: 'rgba(250,250,247,0.95)', backdropFilter: 'blur(20px)', borderTop: '1px solid rgba(229,226,218,0.6)' }}>
-            <button
-              onClick={async () => {
-                const g = freeSearchAnswers['gender']
-                const a = freeSearchAnswers['age']
-                console.log('[DEBUG] free_basic button clicked, state:', { gender: g, age: a, freeSearchLoading })
-                if (!g || !a) {
-                  console.warn('[DEBUG] free_basic button disabled, missing:', { gender: g, age: a })
-                  return
-                }
-                // Free_basic: ignore freeSearchLoading to keep button text stable
-                try {
-                  console.log('[DEBUG] calling handleFreeSearch...')
-                  await handleFreeSearch()
-                  console.log('[DEBUG] handleFreeSearch completed')
-                } catch(e) {
-                  console.error('[DEBUG] handleFreeSearch threw:', e)
-                }
-              }}
-              className="w-full py-4 rounded-2xl font-medium text-base transition-all"
-              style={{
-                background: (freeSearchAnswers['gender'] && freeSearchAnswers['age']) ? '#2C4A3E' : '#C5D4C0',
-                color: '#FAFAF7',
-              }}>
-              開始分析
-            </button>
+            {freeSearchResult?.error ? (
+              <div className="w-full py-3 px-4 rounded-2xl text-sm text-center" style={{ background: 'rgba(180,60,60,0.08)', color: '#B44', border: '1px solid rgba(180,60,60,0.2)' }}>
+                ⚠️ {freeSearchResult.error}
+              </div>
+            ) : freeSearchResult?.loading ? (
+              <button disabled className="w-full py-4 rounded-2xl font-medium text-base transition-all flex items-center justify-center gap-2" style={{ background: '#A3B5A0', color: '#FAFAF7' }}>
+                <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                分析中...
+              </button>
+            ) : (
+              <button
+                onClick={async () => {
+                  const g = freeSearchAnswers['gender']
+                  const a = freeSearchAnswers['age']
+                  if (!g || !a) return
+                  try {
+                    await handleFreeSearch()
+                  } catch(e) {
+                    console.error('[free_basic] handleFreeSearch threw:', e)
+                  }
+                }}
+                className="w-full py-4 rounded-2xl font-medium text-base transition-all cursor-pointer"
+                style={{
+                  background: (freeSearchAnswers['gender'] && freeSearchAnswers['age']) ? '#2C4A3E' : '#C5D4C0',
+                  color: '#FAFAF7',
+                }}
+              >
+                開始分析
+              </button>
+            )}
           </div>
         </main>
       )}
