@@ -1084,11 +1084,38 @@ interface FreeSearchResult {
     if (femaleKeywords.some(k => symptomText.includes(k))) autoGender = 'F'
     else if (maleKeywords.some(k => symptomText.includes(k))) autoGender = 'M'
     
+    // Auto-detect age from symptom text (e.g. "30歲", "40-50歲", "我今年35歲")
+    let autoAge = ''
+    const agePatterns = [
+      /(\d{2,3})\s*歲/i,
+      /(\d{2,3})\s*岁/i,
+      /年紀?\s*[為是]?\s*(\d{2,3})/i,
+      /(\d{2,3})\s*-?\s*\d{2,3}\s*歲/i,
+    ]
+    for (const pattern of agePatterns) {
+      const m = symptomText.match(pattern)
+      if (m) {
+        const ageNum = parseInt(m[1])
+        if (!isNaN(ageNum) && ageNum >= 10 && ageNum <= 100) {
+          if (ageNum <= 25) autoAge = '10-25'
+          else if (ageNum <= 35) autoAge = '26-35'
+          else if (ageNum <= 45) autoAge = '36-45'
+          else if (ageNum <= 55) autoAge = '46-55'
+          else if (ageNum <= 65) autoAge = '56-65'
+          else autoAge = '66以上'
+          break
+        }
+      }
+    }
+    
     // If gender or age not provided, ask for them first (unless auto-detected)
     if ((!freeSearchAnswers['gender'] && !autoGender) || !freeSearchAnswers['age']) {
-      // Apply auto-detected gender if user didn't specify
+      // Apply auto-detected values if user didn't specify
       if (!freeSearchAnswers['gender'] && autoGender) {
         setFreeSearchAnswers(prev => ({ ...prev, gender: autoGender }))
+      }
+      if (!freeSearchAnswers['age'] && autoAge) {
+        setFreeSearchAnswers(prev => ({ ...prev, age: autoAge }))
       }
       setStep('free_basic')
       return
@@ -1249,8 +1276,11 @@ interface FreeSearchResult {
       // When re-entering from free search flow, ALWAYS preserve the AI constitution
       // Never re-run analyzeCondition which can override with wrong local keyword matching
       const finalConstitution = freeSearchPendingResult?.constitution || (backendResult || analyzeCondition(answers))
+      // Clear all tongue/face state so tongue step starts fresh
+      setTongueFile(null); setTonguePreview(null); setTongueUndersideFile(null); setTongueUndersidePreview(null); setFaceFile(null); setFacePreview(null); setTongueStep('front')
       setResult({ ...(freeSearchPendingResult || {}), constitution: finalConstitution, tongue: tongueInfo, face: faceResult, questionnaire_answers: freeSearchPendingResult?.questionnaire_answers || answers, savedAt: new Date().toISOString(), tongueGuide: tongueGuideAnswers })
-      setStep('review')
+      // Fix: 先到舌苔上傳頁，不要直接跳到結果
+      setStep('tongue')
       setFreeSearchPendingResult(null)
     } catch (err) {
       console.error(err)
