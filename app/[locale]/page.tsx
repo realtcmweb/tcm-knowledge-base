@@ -727,7 +727,7 @@ function analyzeCondition(answers: Record<string, string>): {
 // ============================================
 // 類型
 // ============================================
-type Step = 'mode' | 'basic' | 'chief' | 'smart' | 'freesearch' | 'questionnaire' | 'tongue_guide' | 'tongue' | 'result' | 'free_basic' | 'symptom_priority'
+type Step = 'mode' | 'basic' | 'chief' | 'smart' | 'freesearch' | 'questionnaire' | 'tongue_guide' | 'tongue' | 'review' | 'result' | 'free_basic' | 'symptom_priority'
 type Mode = 'fast' | 'detailed' | 'smart'
 
 interface ResultData {
@@ -1250,7 +1250,7 @@ interface FreeSearchResult {
       // Never re-run analyzeCondition which can override with wrong local keyword matching
       const finalConstitution = freeSearchPendingResult?.constitution || (backendResult || analyzeCondition(answers))
       setResult({ ...(freeSearchPendingResult || {}), constitution: finalConstitution, tongue: tongueInfo, face: faceResult, questionnaire_answers: freeSearchPendingResult?.questionnaire_answers || answers, savedAt: new Date().toISOString(), tongueGuide: tongueGuideAnswers })
-      setStep('result')
+      setStep('review')
       setFreeSearchPendingResult(null)
     } catch (err) {
       console.error(err)
@@ -2150,13 +2150,15 @@ interface FreeSearchResult {
                                   innerEnergy: syndromeRec ? Math.round(55 + Math.random() * 20) : base.innerEnergy,
                                 } : base,
                               }
-                              setResult(safe)
-                              setStep('result')
+                              setFreeSearchPendingResult(safe)
+                              setTongueStep('front')
+                              setStep('tongue')
                             } catch(e) {
                               console.error('[free_basic] setResult failed:', e)
-                              // Emergency: still transition to result even if setResult failed
-                              console.warn('[free_basic] emergency setStep result after catch')
-                              setStep('result')
+                              console.warn('[free_basic] emergency transition to tongue after catch')
+                              setFreeSearchPendingResult(safe)
+                              setTongueStep('front')
+                              setStep('tongue')
                             }
                           } else if (!data.done && data.followup_question) {
                             // New followup question arrived — the inline block will auto-render it via the outer condition
@@ -2210,9 +2212,10 @@ interface FreeSearchResult {
                                   ...base, questionnaire_answers: newAnswers,
                                   constitution: first ? { ...base, type: String(first['syndrome'] || base.type), sub: String(syndromeRec?.subType || first['syndrome'] || base.sub), pattern: String(syndromeRec?.pattern || first['pattern'] || base.pattern), description: String(first['description'] || (syndromeRec?.subType ? `您屬於${syndromeRec.subType}體質，${syndromeRec.pattern === '虛熱' ? '虛火內擾，常見盜汗、失眠、口乾咽燥。' : syndromeRec.pattern === '虛寒' ? '火力不足，畏寒怕冷，容易疲倦。' : '元氣不足，容易疲勞，說話無力。'}` : base.description)), suggestions: Array.isArray(first['suggestions']) && first['suggestions'].length > 0 ? first['suggestions'] as string[] : base.suggestions, herbs: syndromeRec?.herbs?.length > 0 ? syndromeRec.herbs.map(h => typeof h === 'string' ? h : h.name) : base.herbs, acupoints: Array.isArray(first['acupoints']) && first['acupoints'].length > 0 ? first['acupoints'] as string[] : (syndromeRec?.acupoints || base.acupoints), diet: Array.isArray(first['diet']) && first['diet'].length > 0 ? first['diet'] as string[] : (syndromeRec?.diet || base.diet), avoid: Array.isArray(first['avoid']) && first['avoid'].length > 0 ? first['avoid'] as string[] : (syndromeRec?.avoid || base.avoid), energy: syndromeRec ? Math.round(50 + Math.random() * 25) : base.energy, stress: syndromeRec ? parseFloat((2 + Math.random() * 2).toFixed(1)) : base.stress, resilience: syndromeRec ? Math.round(40 + Math.random() * 25) : base.resilience, innerEnergy: syndromeRec ? Math.round(55 + Math.random() * 20) : base.innerEnergy, } : base,
                                 }
-                                setResult(safe)
-                                setStep('result')
-                              } catch(e) { console.error('[free_basic custom] setResult failed:', e); setStep('result') }
+                                setFreeSearchPendingResult(safe)
+                                setTongueStep('front')
+                                setStep('tongue')
+                              } catch(e) { console.error('[free_basic custom] setResult failed:', e); setFreeSearchPendingResult(safe); setTongueStep('front'); setStep('tongue') }
                             }
                           }).catch(() => setFreeSearchResult({ error: '網路錯誤' })).finally(() => setFreeSearchLoading(false))
                         }
@@ -2936,7 +2939,99 @@ interface FreeSearchResult {
             </div>
           )}
         </main>
-      )}      {/* ── 結果 ── */}
+      )}
+
+      {/* ── 自我檢查（舌苔上傳後確認頁） ── */}
+      {step === 'review' && result && (
+        <main className="max-w-2xl mx-auto px-6 pt-20 pb-16 min-h-[80vh] flex flex-col justify-center">
+          <div className="text-center mb-8">
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <div style={{ width: '36px', height: '1px', background: '#E5E2DA' }} />
+              <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                <circle cx="14" cy="14" r="12" stroke="#2C4A3E" strokeWidth="0.8" fill="none"/>
+                <path d="M9 14l4 4 6-7" stroke="#2C4A3E" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              <div style={{ width: '36px', height: '1px', background: '#E5E2DA' }} />
+            </div>
+            <h2 className="text-4xl font-light mb-3" style={{ color: '#1C2C24', letterSpacing: '-0.01em', lineHeight: 1.15 }}>分析完成</h2>
+            <p className="text-base" style={{ color: '#8B6E5A' }}>請確認以下資料無誤，再送出報告</p>
+          </div>
+
+          {/* 體質結果卡片 */}
+          <div className="rounded-2xl px-5 py-5 mb-4" style={{ background: '#FFFFFF', border: '1px solid #E5E2DA' }}>
+            <p className="text-xs mb-2" style={{ color: '#A3B5A0', letterSpacing: '0.08em' }}>體質類型</p>
+            <p className="text-2xl font-medium mb-1" style={{ color: '#1C2C24' }}>{result.constitution.type}</p>
+            <p className="text-sm" style={{ color: '#8B6E5A' }}>{result.constitution.sub} · {result.constitution.pattern}</p>
+          </div>
+
+          {/* 舌象摘要 */}
+          {(result.tongue || result.face || result.tongueGuide) && (
+            <div className="rounded-2xl px-5 py-4 mb-4" style={{ background: '#FAFAF7', border: '1px solid #E5E2DA' }}>
+              <p className="text-xs mb-3" style={{ color: '#A3B5A0', letterSpacing: '0.08em' }}>輔助分析</p>
+              <div className="flex gap-4 flex-wrap">
+                {result.tongue && (
+                  <div className="flex items-center gap-2 text-sm" style={{ color: '#4A4A42' }}>
+                    <span>📋</span><span>舌象已分析</span>
+                  </div>
+                )}
+                {result.face && (
+                  <div className="flex items-center gap-2 text-sm" style={{ color: '#4A4A42' }}>
+                    <span>😊</span><span>面色已分析</span>
+                  </div>
+                )}
+                {result.tongueGuide && (
+                  <div className="flex items-center gap-2 text-sm" style={{ color: '#4A4A42' }}>
+                    <span>👅</span><span>舌下靜脈已記錄</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* 問卷答案摘要 */}
+          {result.questionnaire_answers && (
+            <div className="rounded-2xl px-5 py-4 mb-6" style={{ background: '#FAFAF7', border: '1px solid #E5E2DA' }}>
+              <p className="text-xs mb-3" style={{ color: '#A3B5A0', letterSpacing: '0.08em' }}>問卷摘要</p>
+              <div className="space-y-2">
+                {Object.entries(result.questionnaire_answers)
+                  .filter(([k]) => !['gender','age'].includes(k))
+                  .slice(0, 8)
+                  .map(([k, v]) => (
+                    <div key={k} className="flex justify-between text-sm">
+                      <span style={{ color: '#A3B5A0' }}>{k}</span>
+                      <span style={{ color: '#4A4A42', fontWeight: 500 }}>{String(v)}</span>
+                    </div>
+                  ))}
+              </div>
+            </div>
+          )}
+
+          <p className="text-xs text-center mb-6" style={{ color: '#A3B5A0' }}>
+            📌 送出後將根據舌苔、面色與問診資料生成完整報告
+          </p>
+
+          <div className="space-y-3">
+            <button
+              onClick={() => setStep('result')}
+              className="w-full py-4 rounded-2xl font-medium text-base transition-all duration-300"
+              style={{ background: '#1C2C24', color: '#FAFAF7', letterSpacing: '0.04em', boxShadow: '0 4px 20px rgba(44,74,62,0.15)' }}
+              onMouseEnter={e => e.currentTarget.style.background = '#2C4A3E'}
+              onMouseLeave={e => e.currentTarget.style.background = '#1C2C24'}>
+              確認無誤，查看完整報告
+            </button>
+            <button
+              onClick={() => setStep('tongue')}
+              className="w-full py-3 text-sm transition-all duration-300"
+              style={{ color: '#8B6E5A', border: '1px dashed #C5B8A8', background: 'transparent' }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = '#8B6E5A'; e.currentTarget.style.background = 'rgba(139,110,90,0.04)' }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = '#C5B8A8'; e.currentTarget.style.background = 'transparent' }}>
+              返回修改舌苔
+            </button>
+          </div>
+        </main>
+      )}
+
+      {/* ── 結果 ── */}
       {step === 'result' && result && (
         <ErrorBoundary step="result" result={result}>
         <main className="max-w-2xl mx-auto px-6 pt-16 pb-12">
