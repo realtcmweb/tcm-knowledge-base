@@ -2254,23 +2254,40 @@ interface FreeSearchResult {
                   </div>
                 )}
 
-                {/* Age - always show */}
-                <div className="rounded-2xl p-5" style={{ background: '#FFFFFF', border: '1px solid #E5E2DA' }}>
-                  <p className="text-sm font-medium mb-3" style={{ color: '#2C4A3E' }}>年齡範圍</p>
-                  <div className="flex gap-2 flex-wrap">
-                    {['20-30', '31-40', '41-50', '51-60', '61-70', '70+'].map(a => (
-                      <button key={a}
-                        onClick={() => setFreeSearchAnswers(prev => ({ ...prev, age: a }))}
-                        className="px-4 py-2.5 rounded-xl text-sm font-medium transition-all"
-                        style={{
-                          background: freeSearchAnswers['age'] === a ? '#2C4A3E' : 'rgba(44,74,62,0.06)',
-                          color: freeSearchAnswers['age'] === a ? '#FAFAF7' : '#4A4A42',
-                        }}>
-                        {a}
-                      </button>
-                    ))}
+                {/* Age - hidden once set */}
+                {(!freeSearchAnswers['age'] || freeSearchAnswers['age'] === '') && (
+                  <div className="rounded-2xl p-5" style={{ background: '#FFFFFF', border: '1px solid #E5E2DA' }}>
+                    <p className="text-sm font-medium mb-3" style={{ color: '#2C4A3E' }}>年齡範圍</p>
+                    <div className="flex gap-2 flex-wrap">
+                      {['20-30', '31-40', '41-50', '51-60', '61-70', '70+'].map(a => (
+                        <button key={a}
+                          onClick={() => setFreeSearchAnswers(prev => ({ ...prev, age: a }))}
+                          className="px-4 py-2.5 rounded-xl text-sm font-medium transition-all"
+                          style={{
+                            background: freeSearchAnswers['age'] === a ? '#2C4A3E' : 'rgba(44,74,62,0.06)',
+                            color: freeSearchAnswers['age'] === a ? '#FAFAF7' : '#4A4A42',
+                          }}>
+                          {a}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
+                {freeSearchAnswers['age'] && freeSearchAnswers['age'] !== '' && (
+                  <div className="rounded-2xl p-4 flex items-center justify-between" style={{ background: 'rgba(44,74,62,0.06)', border: '1px solid rgba(44,74,62,0.15)' }}>
+                    <div>
+                      <p className="text-sm font-medium" style={{ color: '#2C4A3E' }}>年齡範圍</p>
+                      <p className="text-sm" style={{ color: '#4A4A42' }}>已設定：{freeSearchAnswers['age']}</p>
+                    </div>
+                    <button onClick={() => setFreeSearchAnswers(prev => ({ ...prev, age: '' }))}
+                      className="text-xs px-3 py-1.5 rounded-lg transition-all"
+                      style={{ color: '#8B6E5A', background: 'rgba(139,110,90,0.08)' }}
+                      onMouseEnter={e => e.currentTarget.style.background = 'rgba(139,110,90,0.15)'}
+                      onMouseLeave={e => e.currentTarget.style.background = 'rgba(139,110,90,0.08)'}>
+                      重選
+                    </button>
+                  </div>
+                )}
               </>
             )}
           </div>
