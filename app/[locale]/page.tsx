@@ -1124,7 +1124,7 @@ interface FreeSearchResult {
       } else {
         setFreeSearchResult(data)
         // Only jump to result if done AND has result AND no followup questions
-        if (data.done && data.result && !data.followup_question) {
+        if (data.done && data.result && !data.followup_question && !data.followup_questions?.length) {
           let normOk = false
           try {
             const rawResult = data.result as Record<string, unknown>
@@ -1545,7 +1545,7 @@ interface FreeSearchResult {
                                                 setFreeSearchResult({ error: data.error || '搜尋失敗，請稍後再試' })
                                               } else {
                                                 setFreeSearchResult(data)
-                                                if (data.done && data.result) {
+                                                if (data.done && data.result && !data.followup_questions?.length) {
                                                   let normOk = false
                                                   try {
                                                     const rawResult = data.result as Record<string, unknown>
@@ -1655,7 +1655,7 @@ interface FreeSearchResult {
                                                 signal: controller.signal,
                                               }).then(res => { clearTimeout(timeoutId); return res.json() }).then(data => {
                                                 setFreeSearchResult(data)
-                                                if (data.done && data.result) {
+                                                if (data.done && data.result && !data.followup_questions?.length) {
                                                   try {
                                                     const rawResult = data.result as Record<string, unknown>
                                                     const syns = (rawResult as any).syndromes
@@ -2110,7 +2110,7 @@ interface FreeSearchResult {
                           body: JSON.stringify({ question: lastSymptom, answers: newAnswers }),
                         }).then(res => res.json()).then(data => {
                           setFreeSearchResult(data)
-                          if (data.done && data.result) {
+                          if (data.done && data.result && !data.followup_questions?.length) {
                             try {
                               const rawResult = data.result as Record<string, unknown>
                               const syns = (rawResult as any).syndromes
@@ -2197,7 +2197,7 @@ interface FreeSearchResult {
                             body: JSON.stringify({ question: lastSymptom, answers: newAnswers }),
                           }).then(res => res.json()).then(data => {
                             setFreeSearchResult(data)
-                            if (data.done && data.result) {
+                            if (data.done && data.result && !(data.followup_questions?.length)) {
                               try {
                                 const rawResult = data.result as Record<string, unknown>
                                 const syns = (rawResult as any).syndromes
