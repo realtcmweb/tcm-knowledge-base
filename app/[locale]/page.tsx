@@ -874,7 +874,9 @@ interface FreeSearchResult {
   error?: string
 }
   const [tongueGuideOpen, setTongueGuideOpen] = useState(false)
+  const [skipTongueModal, setSkipTongueModal] = useState(false)
   const [freeSearchMode, setFreeSearchMode] = useState<'input' | 'questionnaire' | 'result'>('input')
+  const [freeSearchPendingResult, setFreeSearchPendingResult] = useState<ResultData | null>(null)
   const [freeSearchAnswers, setFreeSearchAnswers] = useState<Record<string, string>>({})
   const [extractedSymptoms, setExtractedSymptoms] = useState<string[]>([])
   // Free search 圖片（base64，會隨每次 /api/ask 一起送出）
@@ -999,18 +1001,28 @@ interface FreeSearchResult {
   const totalQ = currentQuestions.length
   const progress = totalQ > 0 ? ((qIndex + 1) / totalQ) * 100 : 0
 
+  // Auto-expand tongue guide when entering tongue step
+  useEffect(() => {
+    if (step === 'tongue') {
+      setTongueGuideOpen(true)
+    }
+  }, [step])
+
+  // Smooth transition: delay step change on last answer
   const handleAnswer = useCallback((value: string) => {
     if (!currentQ) return
     const newAnswers = { ...answers, [currentQ.id]: value }
     setAnswers(newAnswers)
     setCustomInput('')
+    const isLast = qIndex >= totalQ - 1
     setTimeout(() => {
       if (qIndex < totalQ - 1) {
         setQIndex(qIndex + 1)
       } else {
+        setTongueStep('front')
         setStep('tongue')
       }
-    }, 350)
+    }, isLast ? 600 : 350)
   }, [answers, qIndex, currentQ, totalQ])
 
   const handleInputSubmit = useCallback(() => {
@@ -1018,13 +1030,15 @@ interface FreeSearchResult {
     const newAnswers = { ...answers, [currentQ.id]: customInput }
     setAnswers(newAnswers)
     setCustomInput('')
+    const isLast = qIndex >= totalQ - 1
     setTimeout(() => {
       if (qIndex < totalQ - 1) {
         setQIndex(qIndex + 1)
       } else {
+        setTongueStep('front')
         setStep('tongue')
       }
-    }, 350)
+    }, isLast ? 600 : 350)
   }, [answers, qIndex, customInput, currentQ, totalQ])
 
   const handleTongueUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -1156,9 +1170,13 @@ interface FreeSearchResult {
           } catch (e) {
             console.error('handleFreeSearch setResult norm failed:', e)
           }
-          if (normOk) setStep('result')
+          if (normOk) {
+            setFreeSearchPendingResult(safe)
+            setTongueStep('front')
+            setStep('tongue')
+          }
         } else {
-          setFreeSearchMode(data.followup_question ? 'questionnaire' : 'input')
+          setFreeSearchMode((data.followup_question || (data.followup_questions && data.followup_questions.length > 0)) ? 'questionnaire' : 'input')
         }
       }
     } catch (e) {
@@ -1228,8 +1246,12 @@ interface FreeSearchResult {
           if (res.ok) faceResult = await res.json()
         } catch { /* silent */ }
       }
-      setResult({ constitution, tongue: tongueInfo, face: faceResult, questionnaire_answers: answers, savedAt: new Date().toISOString(), tongueGuide: tongueGuideAnswers })
+      // When re-entering from free search flow, ALWAYS preserve the AI constitution
+      // Never re-run analyzeCondition which can override with wrong local keyword matching
+      const finalConstitution = freeSearchPendingResult?.constitution || (backendResult || analyzeCondition(answers))
+      setResult({ ...(freeSearchPendingResult || {}), constitution: finalConstitution, tongue: tongueInfo, face: faceResult, questionnaire_answers: freeSearchPendingResult?.questionnaire_answers || answers, savedAt: new Date().toISOString(), tongueGuide: tongueGuideAnswers })
       setStep('result')
+      setFreeSearchPendingResult(null)
     } catch (err) {
       console.error(err)
     } finally {
@@ -1244,6 +1266,7 @@ interface FreeSearchResult {
     setFaceFile(null); setFacePreview(null); setFaceInfo(null); setShowFaceCapture(false)
     setResult(null); setImageLoaded(false)
     setReportFile(null); setReportPreview(null)
+    setFreeSearchPendingResult(null)
   }
 
   const isLastQ = qIndex === totalQ - 1
@@ -1434,16 +1457,16 @@ interface FreeSearchResult {
                 }}
                 onFocus={e => e.currentTarget.style.borderColor = '#2C4A3E'}
                 onBlur={e => e.currentTarget.style.borderColor = '#D4E0D6'}
-                onKeyDown={e => { if (e.key === 'Enter') handleFreeSearch() }}
+                onKeyDown={e => { if (e.key === 'Enter' && freeText.trim() && !freeSearchLoading) handleFreeSearch() }}
               />
               <button
                 onClick={handleFreeSearch}
                 className="px-5 py-3 rounded-xl text-sm font-medium transition-all duration-200"
                 style={{ 
-                  background: freeSearchLoading ? '#E5E2DA' : (freeText.trim() ? '#2C4A3E' : '#E5E2DA'),
-                  color: freeText.trim() && !freeSearchLoading ? '#FFFFFF' : '#A3B5A0',
+                  background: freeSearchLoading || !freeText.trim() ? '#E5E2DA' : '#2C4A3E',
+                  color: (freeText.trim() && !freeSearchLoading) ? '#FFFFFF' : '#A3B5A0',
                 }}
-                disabled={freeSearchLoading}
+                disabled={!freeText.trim() || freeSearchLoading}
               >
                 {freeSearchLoading ? '分析中...' : '搜尋'}
               </button>
@@ -1575,14 +1598,18 @@ interface FreeSearchResult {
                                                   }
                                                   // Always try to transition to result if normOk
                                                   if (normOk) {
-                                                    setStep('result')
+                                                    setFreeSearchPendingResult(safe)
+                                                    setTongueStep('front')
+                                                    setStep('tongue')
                                                   } else {
-                                                    // Emergency fallback: even if setResult failed, show result
-                                                    console.warn('[handleFreeSearch] normOk=false, emergency setStep result')
-                                                    setStep('result')
+                                                    // Emergency fallback: save and go to tongue
+                                                    console.warn('[handleFreeSearch] normOk=false, emergency go to tongue')
+                                                    setFreeSearchPendingResult(safe)
+                                                    setTongueStep('front')
+                                                    setStep('tongue')
                                                   }
                                                 } else {
-                                                  setFreeSearchMode(data.followup_question ? 'questionnaire' : 'input')
+                                                  setFreeSearchMode((data.followup_question || (data.followup_questions && data.followup_questions.length > 0)) ? 'questionnaire' : 'input')
                                                 }
                                               }
                                             })
@@ -1602,6 +1629,58 @@ interface FreeSearchResult {
                                           {opt.label}
                                         </button>
                                       ))}
+                                      <div className="flex gap-2 mt-2">
+                                        <input
+                                          type="text"
+                                          placeholder="其他（直接輸入）"
+                                          className="flex-1 px-3 py-2 text-sm rounded-lg border"
+                                          style={{ borderColor: '#E5E2DA', color: '#3A3A32', background: '#FAFAF7' }}
+                                          onKeyDown={(e) => {
+                                            if (e.key === 'Enter' && e.currentTarget.value.trim()) {
+                                              const customVal = e.currentTarget.value.trim()
+                                              const newAnswers = { ...freeSearchAnswers, [q.id]: customVal }
+                                              const symptomText = localStorage.getItem('lastSymptom') || ''
+                                              setFreeSearchAnswers(newAnswers)
+                                              setFreeText(symptomText)
+                                              setFreeSearchLoading(true)
+                                              setFreeSearchResult({ loading: '正在分析中...' })
+                                              const controller = new AbortController()
+                                              if (controllerRef.current) controllerRef.current.abort()
+                                              controllerRef.current = controller
+                                              const timeoutId = setTimeout(() => controller.abort(), 15000)
+                                              fetch('/api/ask', {
+                                                method: 'POST',
+                                                headers: { 'Content-Type': 'application/json' },
+                                                body: JSON.stringify({ question: symptomText, answers: newAnswers, tongue_front: fsTongueFront || undefined, tongue_underside: fsTongueUnderside || undefined, face: fsFace || undefined }),
+                                                signal: controller.signal,
+                                              }).then(res => { clearTimeout(timeoutId); return res.json() }).then(data => {
+                                                setFreeSearchResult(data)
+                                                if (data.done && data.result) {
+                                                  try {
+                                                    const rawResult = data.result as Record<string, unknown>
+                                                    const syns = (rawResult as any).syndromes
+                                                    const first = Array.isArray(syns) ? syns[0] as Record<string, unknown> : null
+                                                    if (first) {
+                                                      const base = analyzeCondition(newAnswers)
+                                                      const syndromeMap: Record<string, string> = { '肺脾氣虛': '氣虛', '心脾兩虛': '氣虛', '痰濕蘊肺': '痰濕', '肝氣鬱結': '氣鬱', '脾胃虛弱': '脾虛', '腎陽不足': '陽虛', '肝腎陰虛': '陰虛', '濕熱蘊脾': '濕熱', '氣血兩虛': '氣虛' }
+                                                      const normalizedKey = syndromeMap[first['syndrome'] as string] || first['syndrome'] as string
+                                                      const syndromeRec = SYNDROME_DATABASE.find(s => s.type === normalizedKey || s.subType === normalizedKey || s.type.includes(normalizedKey) || (normalizedKey.includes(s.type)) || s.subType.includes(normalizedKey) || (normalizedKey.includes(s.subType)))
+                                                      const safe: ResultData = {
+                                                        ...base, questionnaire_answers: newAnswers,
+                                                        constitution: { ...base, type: String(first['syndrome'] || base.type), sub: String(syndromeRec?.subType || first['syndrome'] || base.sub), pattern: String(syndromeRec?.pattern || first['pattern'] || base.pattern), description: String(first['description'] || (syndromeRec?.subType ? `您屬於${syndromeRec.subType}體質，${syndromeRec.pattern === '虛熱' ? '虛火內擾，常見盜汗、失眠、口乾咽燥。' : syndromeRec.pattern === '虛寒' ? '火力不足，畏寒怕冷，容易疲倦。' : '元氣不足，容易疲勞，說話無力。'}` : base.description)), suggestions: Array.isArray(first['suggestions']) && first['suggestions'].length > 0 ? first['suggestions'] as string[] : base.suggestions, herbs: syndromeRec?.herbs?.length > 0 ? syndromeRec.herbs.map(h => typeof h === 'string' ? h : h.name) : base.herbs, acupoints: Array.isArray(first['acupoints']) && first['acupoints'].length > 0 ? first['acupoints'] as string[] : (syndromeRec?.acupoints || base.acupoints), diet: Array.isArray(first['diet']) && first['diet'].length > 0 ? first['diet'] as string[] : (syndromeRec?.diet || base.diet), avoid: Array.isArray(first['avoid']) && first['avoid'].length > 0 ? first['avoid'] as string[] : (syndromeRec?.avoid || base.avoid), energy: syndromeRec ? Math.round(50 + Math.random() * 25) : base.energy, stress: syndromeRec ? parseFloat((2 + Math.random() * 2).toFixed(1)) : base.stress, resilience: syndromeRec ? Math.round(40 + Math.random() * 25) : base.resilience, innerEnergy: syndromeRec ? Math.round(55 + Math.random() * 20) : base.innerEnergy, },
+                                                      }
+                                                      setResult(safe)
+                                                      setFreeSearchPendingResult(safe)
+                                                      setTongueStep('front')
+                                                      setStep('tongue')
+                                                    }
+                                                  } catch(e) { console.error('custom input norm failed:', e) }
+                                                }
+                                              }).catch(() => setFreeSearchResult({ error: '網路錯誤' }))
+                                            }
+                                          }}
+                                        />
+                                      </div>
                                     </div>
                                   </>
                                 )}
@@ -2097,6 +2176,49 @@ interface FreeSearchResult {
                       {opt.label}
                     </button>
                   ))}
+                  <div className="flex gap-2 mt-2">
+                    <input
+                      type="text"
+                      placeholder="其他（直接輸入）"
+                      className="flex-1 px-3 py-2 text-sm rounded-lg border"
+                      style={{ borderColor: '#E5E2DA', color: '#3A3A32', background: '#FAFAF7' }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && e.currentTarget.value.trim()) {
+                          const customVal = e.currentTarget.value.trim()
+                          const newAnswers = { ...freeSearchAnswers, [(freeSearchResult.followup_question as any).id]: customVal }
+                          const lastSymptom = localStorage.getItem('lastSymptom') || freeText.trim()
+                          setFreeSearchAnswers(newAnswers)
+                          setFreeText(lastSymptom)
+                          setFreeSearchLoading(true)
+                          setFreeSearchResult(prev => prev ? { ...prev, loading: '分析中...' } : null)
+                          fetch('/api/ask', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ question: lastSymptom, answers: newAnswers }),
+                          }).then(res => res.json()).then(data => {
+                            setFreeSearchResult(data)
+                            if (data.done && data.result) {
+                              try {
+                                const rawResult = data.result as Record<string, unknown>
+                                const syns = (rawResult as any).syndromes
+                                const first = Array.isArray(syns) && syns.length > 0 ? syns[0] as Record<string, unknown> : null
+                                const base = analyzeCondition(newAnswers)
+                                const syndromeMap: Record<string, string> = { '肺脾氣虛': '氣虛', '心脾兩虛': '氣虛', '痰濕蘊肺': '痰濕', '肝氣鬱結': '氣鬱', '脾胃虛弱': '脾虛', '腎陽不足': '陽虛', '肝腎陰虛': '陰虛', '濕熱蘊脾': '濕熱', '氣血兩虛': '氣虛' }
+                                const normalizedKey = syndromeMap[first['syndrome'] as string] || first['syndrome'] as string
+                                const syndromeRec = SYNDROME_DATABASE.find(s => s.type === normalizedKey || s.subType === normalizedKey || s.type.includes(normalizedKey) || normalizedKey.includes(s.type) || s.subType.includes(normalizedKey) || normalizedKey.includes(s.subType))
+                                const safe: ResultData = {
+                                  ...base, questionnaire_answers: newAnswers,
+                                  constitution: first ? { ...base, type: String(first['syndrome'] || base.type), sub: String(syndromeRec?.subType || first['syndrome'] || base.sub), pattern: String(syndromeRec?.pattern || first['pattern'] || base.pattern), description: String(first['description'] || (syndromeRec?.subType ? `您屬於${syndromeRec.subType}體質，${syndromeRec.pattern === '虛熱' ? '虛火內擾，常見盜汗、失眠、口乾咽燥。' : syndromeRec.pattern === '虛寒' ? '火力不足，畏寒怕冷，容易疲倦。' : '元氣不足，容易疲勞，說話無力。'}` : base.description)), suggestions: Array.isArray(first['suggestions']) && first['suggestions'].length > 0 ? first['suggestions'] as string[] : base.suggestions, herbs: syndromeRec?.herbs?.length > 0 ? syndromeRec.herbs.map(h => typeof h === 'string' ? h : h.name) : base.herbs, acupoints: Array.isArray(first['acupoints']) && first['acupoints'].length > 0 ? first['acupoints'] as string[] : (syndromeRec?.acupoints || base.acupoints), diet: Array.isArray(first['diet']) && first['diet'].length > 0 ? first['diet'] as string[] : (syndromeRec?.diet || base.diet), avoid: Array.isArray(first['avoid']) && first['avoid'].length > 0 ? first['avoid'] as string[] : (syndromeRec?.avoid || base.avoid), energy: syndromeRec ? Math.round(50 + Math.random() * 25) : base.energy, stress: syndromeRec ? parseFloat((2 + Math.random() * 2).toFixed(1)) : base.stress, resilience: syndromeRec ? Math.round(40 + Math.random() * 25) : base.resilience, innerEnergy: syndromeRec ? Math.round(55 + Math.random() * 20) : base.innerEnergy, } : base,
+                                }
+                                setResult(safe)
+                                setStep('result')
+                              } catch(e) { console.error('[free_basic custom] setResult failed:', e); setStep('result') }
+                            }
+                          }).catch(() => setFreeSearchResult({ error: '網路錯誤' })).finally(() => setFreeSearchLoading(false))
+                        }
+                      }}
+                    />
+                  </div>
                 </div>
               </div>
             ) : (
@@ -2390,6 +2512,14 @@ interface FreeSearchResult {
 
       {step === 'tongue' && (
         <main className="max-w-2xl mx-auto px-6 pt-20 pb-16 min-h-[70vh] flex flex-col justify-center">
+
+          {/* ── 自由輸入流程引導橫幅 ── */}
+          {freeSearchPendingResult && (
+            <div className="mb-6 rounded-2xl px-4 py-3 text-sm" style={{ background: 'rgba(44,74,62,0.06)', border: '1px solid rgba(44,74,62,0.14)' }}>
+              <p style={{ color: '#2C4A3E', fontWeight: 500, marginBottom: '4px' }}>📋 AI 已分析您的問診</p>
+              <p style={{ color: '#4A4A42' }}>體質類型：<span style={{ fontWeight: 600, color: '#8B6E5A' }}>{freeSearchPendingResult.constitution.type}</span> — 請拍攝舌苔讓 AI 合併分析，準確率提升 30~40%</p>
+            </div>
+          )}
 
           <div className="text-center mb-10">
             <div className="flex items-center justify-center gap-3 mb-3">
@@ -2747,17 +2877,46 @@ interface FreeSearchResult {
             onMouseLeave={e => { if (!loading) e.currentTarget.style.background = '#1C2C24' }}>
             {loading ? '分析中...' : (tonguePreview && tongueStep === 'underside') ? '分析舌苔並送出' : tonguePreview ? '繼續拍舌下' : '略過舌苔，直接分析'}
           </button>
-          {!tonguePreview && (
-            <button onClick={() => {
-              setResult({ constitution: analyzeCondition(answers), questionnaire_answers: answers, savedAt: new Date().toISOString() })
-              setStep('result')
-            }}
+          {/* 自由輸入流程：強制要求舌苔，不顯示跳過 */}
+          {!freeSearchPendingResult && !tonguePreview && !skipTongueModal && (
+            <button onClick={() => setSkipTongueModal(true)}
               className="w-full py-3 text-sm mt-2 transition-all duration-300"
               style={{ color: '#A3B5A0' }}
               onMouseEnter={e => e.currentTarget.style.color = '#8B6E5A'}
               onMouseLeave={e => e.currentTarget.style.color = '#A3B5A0'}>
               跳過舌苔分析
             </button>
+          )}
+
+          {skipTongueModal && (
+            <div className="mt-3 rounded-2xl p-4" style={{ background: 'rgba(139,110,90,0.06)', border: '1px solid rgba(139,110,90,0.14)' }}>
+              <p className="text-sm font-medium mb-2" style={{ color: '#8B6E5A' }}>⚠️ 建議補拍舌苔</p>
+              <p className="text-xs leading-relaxed mb-3" style={{ color: '#4A4A42' }}>
+                舌苔佔中醫診斷參考權重 <span style={{ fontWeight: 600, color: '#8B6E5A' }}>30~40%</span>，補拍後準確率大幅提升。真的想跳過嗎？
+              </p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => {
+                    setSkipTongueModal(false)
+                    setResult({ constitution: analyzeCondition(answers), questionnaire_answers: answers, savedAt: new Date().toISOString() })
+                    setStep('result')
+                  }}
+                  className="flex-1 py-2.5 rounded-xl text-xs transition-all"
+                  style={{ background: '#F0EDE6', color: '#8B6E5A', border: '1px solid #E5E2DA' }}
+                  onMouseEnter={e => { e.currentTarget.style.background = '#E8E3DA' }}
+                  onMouseLeave={e => { e.currentTarget.style.background = '#F0EDE6' }}>
+                  仍要跳過
+                </button>
+                <button
+                  onClick={() => setSkipTongueModal(false)}
+                  className="flex-1 py-2.5 rounded-xl text-xs font-medium transition-all"
+                  style={{ background: '#2C4A3E', color: '#FAFAF7' }}
+                  onMouseEnter={e => { e.currentTarget.style.background = '#3A5C50' }}
+                  onMouseLeave={e => { e.currentTarget.style.background = '#2C4A3E' }}>
+                  返回拍攝
+                </button>
+              </div>
+            </div>
           )}
         </main>
       )}      {/* ── 結果 ── */}
