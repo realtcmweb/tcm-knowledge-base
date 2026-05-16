@@ -1154,9 +1154,18 @@ interface FreeSearchResult {
         if (data.done && data.result && !data.followup_question && !data.followup_questions?.length) {
           let normOk = false
           try {
+            // Normalize result: always extract a syndromes array (handles single-result vs multi-result)
             const rawResult = data.result as Record<string, unknown>
-            const syns = (rawResult as any).syndromes
-            const first = Array.isArray(syns) ? syns[0] as Record<string, unknown> : null
+            let syns: Record<string, unknown>[] | null = null
+            if (Array.isArray(rawResult)) {
+              syns = rawResult as Record<string, unknown>[]
+            } else if (Array.isArray((rawResult as any).syndromes)) {
+              syns = (rawResult as any).syndromes
+            } else if ((rawResult as any).syndrome) {
+              // Single result (no syndromes wrapper) — wrap it
+              syns = [rawResult as Record<string, unknown>]
+            }
+            const first = syns && syns.length > 0 ? syns[0] : null
             if (first) {
               const base = analyzeCondition(freeSearchAnswers)
               const syndromeMap: Record<string, string> = {
@@ -1578,9 +1587,18 @@ interface FreeSearchResult {
                                                 if (data.done && data.result && !data.followup_questions?.length) {
                                                   let normOk = false
                                                   try {
+                                                    // Normalize result: always extract a syndromes array (handles single-result vs multi-result)
                                                     const rawResult = data.result as Record<string, unknown>
-                                                    const syns = (rawResult as any).syndromes
-                                                    const first = Array.isArray(syns) ? syns[0] as Record<string, unknown> : null
+                                                    let syns: Record<string, unknown>[] | null = null
+                                                    if (Array.isArray(rawResult)) {
+                                                      syns = rawResult as Record<string, unknown>[]
+                                                    } else if (Array.isArray((rawResult as any).syndromes)) {
+                                                      syns = (rawResult as any).syndromes
+                                                    } else if ((rawResult as any).syndrome) {
+                                                      // Single result (no syndromes wrapper) — wrap it
+                                                      syns = [rawResult as Record<string, unknown>]
+                                                    }
+                                                    const first = syns && syns.length > 0 ? syns[0] : null
                                                     if (first) {
                                                       const base = analyzeCondition(freeSearchAnswers)
                                                       // Normalize syndrome name for lookup (backend may return partial names)
