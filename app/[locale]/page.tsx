@@ -1706,8 +1706,15 @@ interface FreeSearchResult {
                                                 if (data.done && data.result && !data.followup_questions?.length) {
                                                   try {
                                                     const rawResult = data.result as Record<string, unknown>
-                                                    const syns = (rawResult as any).syndromes
-                                                    const first = Array.isArray(syns) ? syns[0] as Record<string, unknown> : null
+                                                    let syns: Record<string, unknown>[] | null = null
+                                                    if (Array.isArray(rawResult)) {
+                                                      syns = rawResult as Record<string, unknown>[]
+                                                    } else if (Array.isArray((rawResult as any).syndromes)) {
+                                                      syns = (rawResult as any).syndromes
+                                                    } else if ((rawResult as any).syndrome) {
+                                                      syns = [rawResult as Record<string, unknown>]
+                                                    }
+                                                    const first = syns && syns.length > 0 ? syns[0] : null
                                                     if (first) {
                                                       const base = analyzeCondition(newAnswers)
                                                       const syndromeMap: Record<string, string> = { '肺脾氣虛': '氣虛', '心脾兩虛': '氣虛', '痰濕蘊肺': '痰濕', '肝氣鬱結': '氣鬱', '脾胃虛弱': '脾虛', '腎陽不足': '陽虛', '肝腎陰虛': '陰虛', '濕熱蘊脾': '濕熱', '氣血兩虛': '氣虛' }
@@ -2161,8 +2168,15 @@ interface FreeSearchResult {
                           if (data.done && data.result && !data.followup_questions?.length) {
                             try {
                               const rawResult = data.result as Record<string, unknown>
-                              const syns = (rawResult as any).syndromes
-                              const first = Array.isArray(syns) && syns.length > 0 ? syns[0] as Record<string, unknown> : null
+                              let syns: Record<string, unknown>[] | null = null
+                              if (Array.isArray(rawResult)) {
+                                syns = rawResult as Record<string, unknown>[]
+                              } else if (Array.isArray((rawResult as any).syndromes)) {
+                                syns = (rawResult as any).syndromes
+                              } else if ((rawResult as any).syndrome) {
+                                syns = [rawResult as Record<string, unknown>]
+                              }
+                              const first = syns && syns.length > 0 ? syns[0] : null
                               const base = analyzeCondition(newAnswers)
                               // Normalize syndrome name for lookup (backend may return partial names)
                               const syndromeMap: Record<string, string> = {
@@ -2250,8 +2264,15 @@ interface FreeSearchResult {
                             if (data.done && data.result && !(data.followup_questions?.length)) {
                               try {
                                 const rawResult = data.result as Record<string, unknown>
-                                const syns = (rawResult as any).syndromes
-                                const first = Array.isArray(syns) && syns.length > 0 ? syns[0] as Record<string, unknown> : null
+                                let syns: Record<string, unknown>[] | null = null
+                                if (Array.isArray(rawResult)) {
+                                  syns = rawResult as Record<string, unknown>[]
+                                } else if (Array.isArray((rawResult as any).syndromes)) {
+                                  syns = (rawResult as any).syndromes
+                                } else if ((rawResult as any).syndrome) {
+                                  syns = [rawResult as Record<string, unknown>]
+                                }
+                                const first = syns && syns.length > 0 ? syns[0] : null
                                 const base = analyzeCondition(newAnswers)
                                 const syndromeMap: Record<string, string> = { '肺脾氣虛': '氣虛', '心脾兩虛': '氣虛', '痰濕蘊肺': '痰濕', '肝氣鬱結': '氣鬱', '脾胃虛弱': '脾虛', '腎陽不足': '陽虛', '肝腎陰虛': '陰虛', '濕熱蘊脾': '濕熱', '氣血兩虛': '氣虛' }
                                 const normalizedKey = syndromeMap[first['syndrome'] as string] || first['syndrome'] as string
