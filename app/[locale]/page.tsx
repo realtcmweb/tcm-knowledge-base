@@ -2141,16 +2141,16 @@ interface FreeSearchResult {
           </div>
 
           <div className="space-y-5 mb-8">
-            {/* Show followup question inline when available */}
-            {freeSearchResult?.need_followup && freeSearchResult.followup_question && !freeSearchResult.loading && !freeSearchResult.error ? (
+            {/* Show followup question(s) inline when available */}
+            {freeSearchResult?.need_followup && (freeSearchResult.followup_question || freeSearchResult.followup_questions) && !freeSearchResult.loading && !freeSearchResult.error ? (
               <div className="rounded-2xl p-5" style={{ background: '#FFFFFF', border: '1px solid #E5E2DA' }}>
-                <p className="text-sm font-medium mb-3" style={{ color: '#2C4A3E' }}>
-                  {typeof freeSearchResult.followup_question === 'string'
-                    ? freeSearchResult.followup_question
-                    : (freeSearchResult.followup_question as any).text}
-                </p>
-                <div className="space-y-2">
-                  {((freeSearchResult.followup_question as any).options || []).map((opt: any) => (
+                {(freeSearchResult.followup_question ? [freeSearchResult.followup_question] : (freeSearchResult.followup_questions || [])).map((q: any) => (
+                  <div key={q.id} className="mb-4 last:mb-0">
+                    <p className="text-sm font-medium mb-3" style={{ color: '#2C4A3E' }}>
+                      {typeof q === 'string' ? q : q.text}
+                    </p>
+                    <div className="space-y-2">
+                      {((q as any).options || []).map((opt: any) => (
                     <button key={opt.value}
                       onClick={() => {
                         const newAnswers = { ...freeSearchAnswers, [(freeSearchResult.followup_question as any).id]: opt.value }
