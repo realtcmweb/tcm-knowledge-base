@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useMemo, useEffect } from 'react'
+import Link from 'next/link'
 
 interface Formula {
   id: number
@@ -38,6 +39,7 @@ const FORMULA_CATEGORIES = [
 ]
 
 export default function DatabasePage() {
+  const [activeTab, setActiveTab] = useState<'acupoints' | 'formulas' | 'herbs'>('formulas')
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCat, setSelectedCat] = useState('')
   const [selectedFormula, setSelectedFormula] = useState<Formula | null>(null)
@@ -70,181 +72,217 @@ export default function DatabasePage() {
   const activeCat = FORMULA_CATEGORIES.find(c => c.key === selectedCat) || FORMULA_CATEGORIES[0]
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#F7F5F0', fontFamily: '-apple-system, BlinkMacSystemFont, "PingFang TC", "Microsoft JhengHei", sans-serif' }}>
+    <div style={{
+      minHeight: '100vh', backgroundColor: '#F7F5F0',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "PingFang TC", "Microsoft JhengHei", sans-serif'
+    }}>
       {/* Header */}
       <div style={{
-        background: 'linear-gradient(135deg, #1a3A2C 0%, #2C4A3E 60%, #3D6B54 100%)',
-        color: '#FFFEF9', padding: '28px 20px 24px',
-        borderRadius: '0 0 24px 24px',
-        boxShadow: '0 4px 20px rgba(0,0,0,0.15)'
+        background: '#1a3A2C', color: '#FFFEF9',
+        padding: '0 0 18px', borderRadius: '0 0 20px 20px',
+        boxShadow: '0 2px 12px rgba(0,0,0,0.15)',
       }}>
-        <h1 style={{ fontSize: '22px', fontWeight: 800, marginBottom: '2px', letterSpacing: '0.05em' }}>
-          📖 中醫資料庫
-        </h1>
-        <p style={{ fontSize: '12px', opacity: 0.75, margin: 0 }}>205 首經典方劑 · 374 針灸穴位</p>
-      </div>
-
-      {/* Search */}
-      <div style={{ padding: '16px 16px 0' }}>
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: '10px',
-          backgroundColor: '#FFFEF9', borderRadius: '16px',
-          padding: '14px 18px', boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
-          border: '1.5px solid #E8E4DC',
-        }}>
-          <span style={{ fontSize: '18px' }}>🔍</span>
-          <input
-            type="text"
-            placeholder={loading ? '載入中...' : '搜尋方劑名稱、功效、分類...'}
-            value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
-            disabled={loading}
-            style={{
-              flex: 1, border: 'none', backgroundColor: 'transparent',
-              outline: 'none', fontSize: '14px', color: '#1a2C24'
-            }}
-          />
-          {searchQuery && (
-            <button onClick={() => setSearchQuery('')} style={{
-              background: '#E8E4DC', border: 'none', borderRadius: '50%',
-              width: '22px', height: '22px', cursor: 'pointer',
-              fontSize: '11px', color: '#7A7A6A', display: 'flex', alignItems: 'center', justifyContent: 'center'
-            }}>✕</button>
-          )}
-        </div>
-      </div>
-
-      {/* Category Pills + Active Filter */}
-      <div style={{ padding: '12px 16px 0', display: 'flex', alignItems: 'center', gap: '10px' }}>
-        {/* Mobile Category Button */}
-        <button
-          onClick={() => setShowCatSidebar(true)}
-          style={{
-            display: 'flex', alignItems: 'center', gap: '6px',
-            padding: '8px 14px', borderRadius: '20px',
-            backgroundColor: '#1a3A2C', color: '#FFFEF9',
-            border: 'none', cursor: 'pointer', fontSize: '13px', fontWeight: 600,
-            boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          <span style={{ fontSize: '16px' }}>{activeCat.emoji}</span>
-          <span>{activeCat.label}</span>
-          <span style={{ fontSize: '10px', opacity: 0.8 }}>▾</span>
-        </button>
-
-        {/* Stats */}
-        <div style={{ fontSize: '12px', color: '#7A7A6A', whiteSpace: 'nowrap' }}>
-          {loading ? '...' : `${filteredFormulas.length} 個方劑`}
-        </div>
-      </div>
-
-      {/* Formula List */}
-      <div style={{ padding: '12px 14px 100px' }}>
-        {loading ? (
-          <div style={{ padding: '60px 0', textAlign: 'center', color: '#7A7A6A', fontSize: '14px' }}>
-            載入中...
+        {/* Nav Bar */}
+        <div style={{ display: 'flex', alignItems: 'center', padding: '0 8px 0 4px', height: '50px' }}>
+          <Link href="/" style={{
+            display: 'flex', alignItems: 'center', gap: '4px',
+            padding: '8px 12px', color: '#FFFEF9', textDecoration: 'none',
+            fontSize: '13px', fontWeight: 600, opacity: 0.9,
+          }}>
+            <span style={{ fontSize: '15px' }}>🏠</span>
+            <span>首頁</span>
+          </Link>
+          <div style={{ flex: 1, textAlign: 'center', fontSize: '15px', fontWeight: 700, letterSpacing: '0.03em' }}>
+            📖 中醫大全
           </div>
-        ) : filteredFormulas.length === 0 ? (
-          <div style={{ padding: '60px 0', textAlign: 'center', color: '#7A7A6A' }}>
-            <div style={{ fontSize: '40px', marginBottom: '12px' }}>🔍</div>
-            <div style={{ fontSize: '15px', fontWeight: 600, marginBottom: '4px' }}>找不到符合的方劑</div>
-            <div style={{ fontSize: '12px' }}>試試其他關鍵字或分類</div>
+          <a href="https://yibian.hopto.org/db/" target="_blank" rel="noopener noreferrer" style={{
+            display: 'flex', alignItems: 'center', gap: '4px',
+            padding: '7px 10px', color: '#FFFEF9', textDecoration: 'none',
+            fontSize: '11px', fontWeight: 600,
+            backgroundColor: 'rgba(255,254,249,0.15)',
+            borderRadius: '20px', opacity: 0.9,
+          }}>醫砭 ↗</a>
+        </div>
+
+        {/* Search */}
+        <div style={{ padding: '0 16px' }}>
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: '8px',
+            backgroundColor: 'rgba(255,254,249,0.15)',
+            borderRadius: '14px', padding: '12px 14px',
+            border: '1.5px solid rgba(255,254,249,0.25)',
+          }}>
+            <span style={{ fontSize: '16px', opacity: 0.8 }}>🔍</span>
+            <input
+              type="text"
+              placeholder={loading ? '載入中...' : '搜尋方劑名稱、功效、分類...'}
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              disabled={loading}
+              style={{
+                flex: 1, border: 'none', backgroundColor: 'transparent',
+                outline: 'none', fontSize: '14px', color: '#FFFEF9'
+              }}
+            />
+            {searchQuery && (
+              <button onClick={() => setSearchQuery('')} style={{
+                background: 'rgba(255,254,249,0.2)', border: 'none', borderRadius: '50%',
+                width: '20px', height: '20px', cursor: 'pointer',
+                fontSize: '10px', color: '#FFFEF9', display: 'flex', alignItems: 'center', justifyContent: 'center'
+              }}>✕</button>
+            )}
           </div>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            {filteredFormulas.map(f => (
-              <button
-                key={f.id}
-                onClick={() => setSelectedFormula(f)}
-                style={{
-                  backgroundColor: '#FFFEF9',
-                  border: '1.5px solid #E8E4DC',
-                  borderRadius: '16px',
-                  padding: '14px 16px',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                  boxShadow: '0 1px 4px rgba(0,0,0,0.05)',
-                  transition: 'all 0.15s ease',
-                  width: '100%',
-                }}
-                onMouseEnter={e => {
-                  (e.currentTarget as HTMLButtonElement).style.borderColor = '#2C4A3E'
-                  ;(e.currentTarget as HTMLButtonElement).style.boxShadow = '0 4px 16px rgba(0,0,0,0.1)'
-                  ;(e.currentTarget as HTMLButtonElement).style.transform = 'translateY(-1px)'
-                }}
-                onMouseLeave={e => {
-                  (e.currentTarget as HTMLButtonElement).style.borderColor = '#E8E4DC'
-                  ;(e.currentTarget as HTMLButtonElement).style.boxShadow = '0 1px 4px rgba(0,0,0,0.05)'
-                  ;(e.currentTarget as HTMLButtonElement).style.transform = 'translateY(0)'
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px', marginBottom: '6px' }}>
-                  <div style={{ fontSize: '16px', fontWeight: 700, color: '#1a2C24', lineHeight: 1.3 }}>
-                    {f.name}
-                  </div>
-                  <div style={{
-                    flexShrink: 0,
-                    padding: '3px 10px',
-                    borderRadius: '20px',
-                    backgroundColor: '#EEEBE3',
-                    fontSize: '11px',
-                    color: '#2C4A3E',
-                    fontWeight: 700,
-                    whiteSpace: 'nowrap',
-                    marginTop: '2px',
-                  }}>
-                    {f.categoryLabel}
-                  </div>
-                </div>
-                <div style={{ fontSize: '12px', color: '#8A8A7A', marginBottom: '4px' }}>
-                  📚 出自《{f.source}》
-                </div>
-                <div style={{ fontSize: '13px', color: '#5A5A4A', lineHeight: 1.5 }}>
-                  {f.effects?.slice(0, 60)}{f.effects && f.effects.length > 60 ? '...' : ''}
-                </div>
-                {f.indications && (
-                  <div style={{ fontSize: '12px', color: '#9A9A8A', marginTop: '4px', lineHeight: 1.4 }}>
-                    主治：{f.indications?.slice(0, 50)}{f.indications.length > 50 ? '...' : ''}
-                  </div>
-                )}
-              </button>
-            ))}
+        </div>
+
+        {/* 4-Tab */}
+        <div style={{ display: 'flex', padding: '12px 14px 0', gap: '7px' }}>
+          {[
+            { key: 'acupoints', label: '針灸大全', emoji: '💉', count: '374' },
+            { key: 'formulas', label: '方劑大全', emoji: '🍵', count: '205' },
+            { key: 'herbs', label: '中藥大全', emoji: '🌿', count: '?', upcoming: true },
+          ].map(tab => (
+            <button
+              key={tab.key}
+              onClick={() => { setActiveTab(tab.key as 'acupoints' | 'formulas' | 'herbs'); setSelectedFormula(null); }}
+              disabled={tab.upcoming}
+              style={{
+                flex: 1, padding: '10px 4px',
+                backgroundColor: activeTab === tab.key ? '#FFFEF9' : 'rgba(255,254,249,0.12)',
+                color: activeTab === tab.key ? '#1a3A2C' : 'rgba(255,254,249,0.8)',
+                border: 'none', borderRadius: '12px', cursor: tab.upcoming ? 'default' : 'pointer',
+                fontSize: '11px', fontWeight: 700,
+                opacity: tab.upcoming ? 0.5 : 1,
+              }}
+            >
+              <div style={{ fontSize: '18px', marginBottom: '2px' }}>{tab.emoji}</div>
+              <div>{tab.label}</div>
+              <div style={{ fontSize: '10px', opacity: 0.7 }}>{tab.count}筆</div>
+            </button>
+          ))}
+        </div>
+
+        {/* Category Pills */}
+        {activeTab === 'formulas' && (
+          <div style={{ padding: '10px 14px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <button
+              onClick={() => setShowCatSidebar(true)}
+              style={{
+                display: 'flex', alignItems: 'center', gap: '6px',
+                padding: '7px 13px', borderRadius: '20px',
+                backgroundColor: 'rgba(255,254,249,0.15)',
+                color: '#FFFEF9', border: 'none', cursor: 'pointer',
+                fontSize: '12px', fontWeight: 600,
+                border: '1.5px solid rgba(255,254,249,0.25)',
+              }}
+            >
+              <span style={{ fontSize: '15px' }}>{activeCat.emoji}</span>
+              <span>{activeCat.label}</span>
+              <span style={{ fontSize: '10px', opacity: 0.8 }}>▾</span>
+            </button>
+            <div style={{ fontSize: '11px', color: 'rgba(255,254,249,0.65)', whiteSpace: 'nowrap' }}>
+              {loading ? '...' : `${filteredFormulas.length} 個方劑`}
+            </div>
           </div>
         )}
       </div>
 
-      {/* Category Sidebar (mobile drawer) */}
+      {/* Content */}
+      {activeTab === 'formulas' && (
+        <div style={{ padding: '12px 14px 100px' }}>
+          {loading ? (
+            <div style={{ padding: '60px 0', textAlign: 'center', color: '#7A7A6A', fontSize: '14px' }}>載入中...</div>
+          ) : filteredFormulas.length === 0 ? (
+            <div style={{ padding: '60px 0', textAlign: 'center', color: '#7A7A6A' }}>
+              <div style={{ fontSize: '40px', marginBottom: '12px' }}>🔍</div>
+              <div style={{ fontSize: '15px', fontWeight: 600, marginBottom: '4px' }}>找不到符合的方劑</div>
+              <div style={{ fontSize: '12px' }}>試試其他關鍵字或分類</div>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {filteredFormulas.map(f => (
+                <button
+                  key={f.id}
+                  onClick={() => setSelectedFormula(f)}
+                  style={{
+                    backgroundColor: '#FFFEF9', border: '1.5px solid #E8E4DC',
+                    borderRadius: '16px', padding: '14px 16px',
+                    cursor: 'pointer', textAlign: 'left',
+                    boxShadow: '0 1px 4px rgba(0,0,0,0.05)', width: '100%',
+                    transition: 'all 0.15s ease',
+                  }}
+                  onMouseEnter={e => {
+                    ;(e.currentTarget as HTMLButtonElement).style.borderColor = '#2C4A3E'
+                    ;(e.currentTarget as HTMLButtonElement).style.boxShadow = '0 4px 16px rgba(0,0,0,0.1)'
+                    ;(e.currentTarget as HTMLButtonElement).style.transform = 'translateY(-1px)'
+                  }}
+                  onMouseLeave={e => {
+                    ;(e.currentTarget as HTMLButtonElement).style.borderColor = '#E8E4DC'
+                    ;(e.currentTarget as HTMLButtonElement).style.boxShadow = '0 1px 4px rgba(0,0,0,0.05)'
+                    ;(e.currentTarget as HTMLButtonElement).style.transform = 'translateY(0)'
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px', marginBottom: '6px' }}>
+                    <div style={{ fontSize: '16px', fontWeight: 700, color: '#1a2C24', lineHeight: 1.3 }}>{f.name}</div>
+                    <div style={{
+                      flexShrink: 0, padding: '3px 10px', borderRadius: '20px',
+                      backgroundColor: '#EEEBE3', fontSize: '11px', color: '#2C4A3E', fontWeight: 700, whiteSpace: 'nowrap', marginTop: '2px',
+                    }}>
+                      {f.categoryLabel}
+                    </div>
+                  </div>
+                  <div style={{ fontSize: '12px', color: '#8A8A7A', marginBottom: '4px' }}>
+                    📚 出自《{f.source}》
+                  </div>
+                  <div style={{ fontSize: '13px', color: '#5A5A4A', lineHeight: 1.5 }}>
+                    {f.effects?.slice(0, 60)}{f.effects && f.effects.length > 60 ? '...' : ''}
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {activeTab === 'herbs' && (
+        <div style={{ padding: '60px 24px', textAlign: 'center', color: '#7A7A6A' }}>
+          <div style={{ fontSize: '48px', marginBottom: '14px' }}>🌿</div>
+          <div style={{ fontSize: '17px', fontWeight: 700, color: '#1a2C24', marginBottom: '8px' }}>中藥大全即將上線</div>
+          <div style={{ fontSize: '13px', lineHeight: 1.7 }}>
+            三百餘味中藥正在整理中<br />敬請期待
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'acupoints' && (
+        <div style={{ padding: '60px 24px', textAlign: 'center', color: '#7A7A6A' }}>
+          <div style={{ fontSize: '48px', marginBottom: '14px' }}>💉</div>
+          <div style={{ fontSize: '17px', fontWeight: 700, color: '#1a2C24', marginBottom: '8px' }}>針灸大全</div>
+          <div style={{ fontSize: '13px', lineHeight: 1.7 }}>
+            374 個針灸穴位 · WHO 國際標準<br />即將上線敬請期待
+          </div>
+        </div>
+      )}
+
+      {/* Category Sidebar */}
       {showCatSidebar && (
-        <div
-          style={{
-            position: 'fixed', inset: 0, zIndex: 100,
-            backgroundColor: 'rgba(0,0,0,0.4)',
-          }}
-          onClick={() => setShowCatSidebar(false)}
-        >
+        <div style={{ position: 'fixed', inset: 0, zIndex: 100, backgroundColor: 'rgba(0,0,0,0.4)' }} onClick={() => setShowCatSidebar(false)}>
           <div
             style={{
               position: 'absolute', left: 0, top: 0, bottom: 0,
               width: '75vw', maxWidth: '320px',
-              backgroundColor: '#FFFEF9',
-              borderRadius: '0 20px 20px 0',
-              padding: '24px 16px',
-              overflowY: 'auto',
+              backgroundColor: '#FFFEF9', borderRadius: '0 20px 20px 0',
+              padding: '24px 16px', overflowY: 'auto',
               boxShadow: '4px 0 20px rgba(0,0,0,0.2)',
             }}
             onClick={e => e.stopPropagation()}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <h2 style={{ fontSize: '16px', fontWeight: 700, color: '#1a2C24', margin: 0 }}>選擇分類</h2>
-              <button
-                onClick={() => setShowCatSidebar(false)}
-                style={{
-                  background: '#E8E4DC', border: 'none', borderRadius: '50%',
-                  width: '28px', height: '28px', cursor: 'pointer',
-                  fontSize: '12px', color: '#7A7A6A',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center'
-                }}>✕</button>
+              <h2 style={{ fontSize: '16px', fontWeight: 700, color: '#1a2C24', margin: 0 }}>選擇功效分類</h2>
+              <button onClick={() => setShowCatSidebar(false)} style={{
+                background: '#E8E4DC', border: 'none', borderRadius: '50%',
+                width: '28px', height: '28px', cursor: 'pointer',
+                fontSize: '12px', color: '#7A7A6A', display: 'flex', alignItems: 'center', justifyContent: 'center'
+              }}>✕</button>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
               {FORMULA_CATEGORIES.map(cat => (
@@ -274,31 +312,19 @@ export default function DatabasePage() {
 
       {/* Detail Bottom Sheet */}
       {selectedFormula && (
-        <div
-          style={{
-            position: 'fixed', inset: 0, zIndex: 200,
-            backgroundColor: 'rgba(0,0,0,0.4)',
-          }}
-          onClick={() => setSelectedFormula(null)}
-        >
+        <div style={{ position: 'fixed', inset: 0, zIndex: 200, backgroundColor: 'rgba(0,0,0,0.4)' }} onClick={() => setSelectedFormula(null)}>
           <div
             style={{
               position: 'absolute', left: 0, right: 0, bottom: 0,
-              maxHeight: '88vh',
-              backgroundColor: '#FFFEF9',
-              borderRadius: '24px 24px 0 0',
-              padding: '20px 20px 40px',
-              overflowY: 'auto',
-              boxShadow: '0 -4px 20px rgba(0,0,0,0.15)',
+              maxHeight: '88vh', backgroundColor: '#FFFEF9',
+              borderRadius: '24px 24px 0 0', padding: '20px 20px 40px',
+              overflowY: 'auto', boxShadow: '0 -4px 20px rgba(0,0,0,0.15)',
             }}
             onClick={e => e.stopPropagation()}
           >
-            {/* Drag Handle */}
             <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
               <div style={{ width: '40px', height: '4px', borderRadius: '2px', backgroundColor: '#D4D0C8' }} />
             </div>
-
-            {/* Header */}
             <div style={{ marginBottom: '16px' }}>
               <h2 style={{ fontSize: '22px', fontWeight: 800, color: '#1a2C24', marginBottom: '8px', lineHeight: 1.3 }}>
                 {selectedFormula.name}
@@ -308,20 +334,14 @@ export default function DatabasePage() {
                   display: 'inline-flex', alignItems: 'center', gap: '4px',
                   padding: '4px 12px', borderRadius: '20px',
                   backgroundColor: '#E8E4DC', fontSize: '12px', color: '#2C4A3E', fontWeight: 700,
-                }}>
-                  📚 《{selectedFormula.source}》
-                </span>
+                }}>📚 《{selectedFormula.source}》</span>
                 <span style={{
                   display: 'inline-flex', alignItems: 'center', gap: '4px',
                   padding: '4px 12px', borderRadius: '20px',
                   backgroundColor: '#1a3A2C', fontSize: '12px', color: '#FFFEF9', fontWeight: 700,
-                }}>
-                  {selectedFormula.categoryLabel}
-                </span>
+                }}>{selectedFormula.categoryLabel}</span>
               </div>
             </div>
-
-            {/* Sections */}
             {[
               { label: '💡 功效', value: selectedFormula.effects },
               { label: '📋 主治', value: selectedFormula.indications },
@@ -330,16 +350,10 @@ export default function DatabasePage() {
               { label: '🎵 方歌', value: selectedFormula.formulaSong },
             ].map(({ label, value }) => value ? (
               <div key={label} style={{ marginBottom: '16px' }}>
-                <div style={{ fontSize: '11px', fontWeight: 700, color: '#2C4A3E', marginBottom: '5px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                  {label}
-                </div>
-                <div style={{ fontSize: '14px', color: '#2C3428', lineHeight: 1.75 }}>
-                  {value}
-                </div>
+                <div style={{ fontSize: '11px', fontWeight: 700, color: '#2C4A3E', marginBottom: '5px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</div>
+                <div style={{ fontSize: '14px', color: '#2C3428', lineHeight: 1.75 }}>{value}</div>
               </div>
             ) : null)}
-
-            {/* Disclaimer */}
             <div style={{
               marginTop: '20px', padding: '12px 14px',
               backgroundColor: '#F5F2EB', borderRadius: '12px',
