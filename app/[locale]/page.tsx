@@ -1062,22 +1062,23 @@ interface FreeSearchResult {
       }
     }
     
-    // If gender or age not provided, ask for them first (unless auto-detected)
-    if (!freeSearchAnswers['gender'] && !autoGender) {
-      setStep('free_basic')
-      return
-    }
-    if (!freeSearchAnswers['age'] && !autoAge) {
-      // Apply auto-detected age if available
-      setStep('free_basic')
-      return
-    }
-    // Apply auto-detected values if user didn't specify
+    // Apply auto-detected values FIRST (before checking missing fields)
     if (!freeSearchAnswers['gender'] && autoGender) {
       setFreeSearchAnswers(prev => ({ ...prev, gender: autoGender }))
     }
     if (!freeSearchAnswers['age'] && autoAge) {
       setFreeSearchAnswers(prev => ({ ...prev, age: autoAge }))
+    }
+    // Re-read from updated state
+    const hasGender = freeSearchAnswers['gender'] || autoGender
+    const hasAge = freeSearchAnswers['age'] || autoAge
+    if (!hasGender) {
+      setStep('free_basic')
+      return
+    }
+    if (!hasAge) {
+      setStep('free_basic')
+      return
     }
     setFreeSearchLoading(true)
     setFreeSearchResult({ loading: '正在搜尋中醫資料庫...' })
