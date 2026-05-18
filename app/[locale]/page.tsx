@@ -1,308 +1,247 @@
 'use client'
 
-import React, { useState, useMemo, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
-
-interface Acupoint {
-  id: number
-  code: string
-  name: string
-  meridian: string
-  meridianName: string
-  location: string
-  indications: string
-}
-
-interface Formula {
-  id: number
-  name: string
-  source: string
-  effects: string
-  indications: string
-}
-
-const MERIDIANS = [
-  { code: 'LU', name: '肺經' }, { code: 'LI', name: '大腸經' },
-  { code: 'ST', name: '胃經' }, { code: 'SP', name: '脾經' },
-  { code: 'HT', name: '心經' }, { code: 'SI', name: '小腸經' },
-  { code: 'BL', name: '膀胱經' }, { code: 'KI', name: '腎經' },
-  { code: 'PC', name: '心包經' }, { code: 'SJ', name: '三焦經' },
-  { code: 'GB', name: '膽經' }, { code: 'LV', name: '肝經' },
-]
+import { useRouter } from 'next/navigation'
 
 export default function HomePage() {
+  const router = useRouter()
   const [search, setSearch] = useState('')
-  const [searchType, setSearchType] = useState<'all' | 'acupoints' | 'formulas'>('all')
-  const [results, setResults] = useState<Array<{ type: string; name: string; sub: string; id: string }>>([])
-  const [searched, setSearched] = useState(false)
-  const [acupoints, setAcupoints] = useState<Acupoint[]>([])
-  const [formulas, setFormulas] = useState<Formula[]>([])
   const [loading, setLoading] = useState(true)
+  const [acupointsCount, setAcupointsCount] = useState(0)
+  const [formulasCount, setFormulasCount] = useState(0)
 
   useEffect(() => {
     Promise.all([
       fetch('/data/acupoints.json').then(r => r.json()),
       fetch('/data/formulas.json').then(r => r.json()),
     ]).then(([a, f]) => {
-      setAcupoints(a)
-      setFormulas(f)
+      setAcupointsCount(a.length)
+      setFormulasCount(f.length)
       setLoading(false)
     })
   }, [])
 
   const handleSearch = () => {
     if (!search.trim()) return
-    const q = search.toLowerCase()
-    const found: Array<{ type: string; name: string; sub: string; id: string }> = []
-
-    if (searchType === 'all' || searchType === 'acupoints') {
-      acupoints.filter(a =>
-        a.name.toLowerCase().includes(q) ||
-        a.code.toLowerCase().includes(q) ||
-        a.meridianName.includes(q)
-      ).slice(0, 5).forEach(a => {
-        found.push({ type: '穴位', name: a.name, sub: `${a.code} · ${a.meridianName}`, id: a.code })
-      })
-    }
-
-    if (searchType === 'all' || searchType === 'formulas') {
-      formulas.filter(f =>
-        f.name.toLowerCase().includes(q) ||
-        f.source.toLowerCase().includes(q)
-      ).slice(0, 5).forEach(f => {
-        found.push({ type: '方劑', name: f.name, sub: `出自《${f.source}》`, id: String(f.id) })
-      })
-    }
-
-    setResults(found)
-    setSearched(true)
+    router.push(`/db?q=${encodeURIComponent(search.trim())}`)
   }
 
-  const accentColor = '#2C4A3E'
-  const bgColor = '#FAFAF7'
-  const cardBg = '#FFFFFF'
-  const borderColor = '#E5E2DA'
-  const textColor = '#1C2C24'
-  const mutedColor = '#7A7A6A'
-
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: bgColor }}>
+    <div style={{
+      minHeight: '100vh',
+      backgroundColor: '#F7F5F0',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "PingFang TC", "Microsoft JhengHei", sans-serif'
+    }}>
       {/* Hero */}
       <div style={{
-        background: `linear-gradient(160deg, ${accentColor} 0%, #3D5A4E 100%)`,
-        color: '#FAFAF7',
-        padding: '48px 24px 56px',
-        textAlign: 'center'
+        background: 'linear-gradient(160deg, #1a3A2C 0%, #2C4A3E 60%, #3D6B54 100%)',
+        color: '#FFFEF9',
+        padding: '36px 20px 44px',
+        borderRadius: '0 0 28px 28px',
+        boxShadow: '0 4px 24px rgba(0,0,0,0.18)',
       }}>
-        <h1 style={{ fontSize: '32px', fontWeight: 700, marginBottom: '12px', letterSpacing: '-0.02em' }}>
-          中醫資料庫
+        <h1 style={{ fontSize: '26px', fontWeight: 800, marginBottom: '4px', letterSpacing: '0.03em', textAlign: 'center' }}>
+          📖 中醫資料庫
         </h1>
-        <p style={{ fontSize: '16px', opacity: 0.9, marginBottom: '28px', lineHeight: 1.6 }}>
-          收錄針灸穴位、經典方劑，免費查閱
+        <p style={{ fontSize: '13px', opacity: 0.75, marginBottom: '24px', textAlign: 'center' }}>
+          針灸 · 方劑 · 中藥　三合一
         </p>
 
         {/* Search Box */}
-        <div style={{
-          maxWidth: '520px',
-          margin: '0 auto',
-          display: 'flex',
-          gap: '8px'
-        }}>
+        <div style={{ maxWidth: '480px', margin: '0 auto' }}>
           <div style={{
-            flex: 1,
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            backgroundColor: 'rgba(255,255,255,0.15)',
-            borderRadius: '12px',
-            padding: '14px 16px',
-            border: '1px solid rgba(255,255,255,0.2)'
+            display: 'flex', alignItems: 'center', gap: '10px',
+            backgroundColor: 'rgba(255,254,249,0.15)',
+            borderRadius: '16px', padding: '14px 16px',
+            border: '1.5px solid rgba(255,254,249,0.25)',
+            backdropFilter: 'blur(8px)',
           }}>
-            <span style={{ fontSize: '18px', opacity: 0.7 }}>🔍</span>
+            <span style={{ fontSize: '18px', opacity: 0.8 }}>🔍</span>
             <input
               type="text"
-              placeholder={loading ? '載入中...' : '搜尋穴位或方劑...'}
+              placeholder={loading ? '載入中...' : '搜尋穴位、方劑...'}
               value={search}
               onChange={e => setSearch(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleSearch()}
               disabled={loading}
               style={{
-                flex: 1,
-                border: 'none',
-                background: 'transparent',
-                outline: 'none',
-                fontSize: '16px',
-                color: '#FAFAF7'
+                flex: 1, border: 'none', background: 'transparent',
+                outline: 'none', fontSize: '15px', color: '#FFFEF9',
               }}
             />
-          </div>
-          <button
-            onClick={handleSearch}
-            disabled={loading}
-            style={{
-              padding: '14px 24px',
-              backgroundColor: '#FAFAF7',
-              color: accentColor,
-              border: 'none',
-              borderRadius: '12px',
-              fontSize: '15px',
-              fontWeight: 600,
-              cursor: loading ? 'not-allowed' : 'pointer',
-              opacity: loading ? 0.6 : 1,
-            }}
-          >
-            搜尋
-          </button>
-        </div>
-
-        {/* Type Toggle */}
-        <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', marginTop: '14px' }}>
-          {(['all', 'acupoints', 'formulas'] as const).map(type => (
+            {search && (
+              <button onClick={() => setSearch('')} style={{
+                background: 'rgba(255,254,249,0.2)', border: 'none', borderRadius: '50%',
+                width: '22px', height: '22px', cursor: 'pointer',
+                fontSize: '11px', color: '#FFFEF9', display: 'flex',
+                alignItems: 'center', justifyContent: 'center',
+              }}>✕</button>
+            )}
             <button
-              key={type}
-              onClick={() => setSearchType(type)}
+              onClick={handleSearch}
+              disabled={loading || !search.trim()}
               style={{
-                padding: '6px 16px',
-                backgroundColor: searchType === type ? '#FAFAF7' : 'transparent',
-                color: searchType === type ? accentColor : 'rgba(255,255,255,0.85)',
-                border: `1px solid ${searchType === type ? '#FAFAF7' : 'rgba(255,255,255,0.3)'}`,
-                borderRadius: '20px',
-                fontSize: '13px',
-                cursor: 'pointer',
-                fontWeight: 600,
+                padding: '8px 18px',
+                backgroundColor: search.trim() ? '#FFFEF9' : 'rgba(255,254,249,0.3)',
+                color: '#1a3A2C',
+                border: 'none', borderRadius: '20px',
+                fontSize: '13px', fontWeight: 700,
+                cursor: search.trim() ? 'pointer' : 'default',
               }}
             >
-              {type === 'all' ? '全部' : type === 'acupoints' ? '穴位' : '方劑'}
+              搜尋
             </button>
-          ))}
+          </div>
         </div>
 
-        {/* Search Results */}
-        {searched && (
-          <div style={{
-            maxWidth: '520px',
-            margin: '16px auto 0',
-            backgroundColor: 'rgba(255,255,255,0.1)',
-            borderRadius: '12px',
-            overflow: 'hidden',
-            backdropFilter: 'blur(10px)'
-          }}>
-            {results.length === 0 ? (
-              <div style={{ padding: '16px', color: 'rgba(255,255,255,0.7)', fontSize: '14px' }}>
-                找不到「{search}」，試試其他關鍵字
-              </div>
-            ) : (
-              results.map((r, i) => (
-                <div key={i} style={{
-                  padding: '12px 16px',
-                  borderBottom: i < results.length - 1 ? '1px solid rgba(255,255,255,0.1)' : 'none',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}>
-                  <div>
-                    <span style={{ fontSize: '11px', backgroundColor: 'rgba(255,255,255,0.2)', padding: '2px 8px', borderRadius: '10px', marginRight: '8px' }}>{r.type}</span>
-                    <span style={{ fontSize: '15px', fontWeight: 600 }}>{r.name}</span>
-                    <span style={{ fontSize: '12px', opacity: 0.7, marginLeft: '8px' }}>{r.sub}</span>
-                  </div>
-                  <Link href="/db" style={{ color: '#FAFAF7', fontSize: '12px', textDecoration: 'none', opacity: 0.7 }}>查看 →</Link>
-                </div>
-              ))
-            )}
-          </div>
-        )}
+        {/* Stats Row */}
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '32px', marginTop: '20px' }}>
+          {[
+            { emoji: '💉', count: loading ? '...' : acupointsCount, label: '針灸穴位' },
+            { emoji: '🍵', count: loading ? '...' : formulasCount, label: '經典方劑' },
+            { emoji: '🌿', count: '?', label: '中藥材' },
+          ].map((s, i) => (
+            <div key={i} style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '20px', marginBottom: '2px' }}>{s.emoji}</div>
+              <div style={{ fontSize: '20px', fontWeight: 800 }}>{s.count}</div>
+              <div style={{ fontSize: '11px', opacity: 0.7 }}>{s.label}</div>
+            </div>
+          ))}
+        </div>
       </div>
 
-      {/* Quick Stats */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: '1fr 1fr',
-        gap: '1px',
-        backgroundColor: borderColor,
-        borderTop: `1px solid ${borderColor}`,
-        borderBottom: `1px solid ${borderColor}`
-      }}>
-        {[
-          { emoji: '💉', count: '390', label: '針灸穴位' },
-          { emoji: '🍵', count: '205', label: '經典方劑' },
-        ].map((stat, i) => (
-          <div key={i} style={{
-            padding: '24px 16px',
-            backgroundColor: cardBg,
-            textAlign: 'center'
-          }}>
-            <div style={{ fontSize: '28px', marginBottom: '6px' }}>{stat.emoji}</div>
-            <div style={{ fontSize: '28px', fontWeight: 700, color: textColor }}>{stat.count}</div>
-            <div style={{ fontSize: '13px', color: mutedColor }}>{stat.label}</div>
-          </div>
-        ))}
+      {/* Tab Navigation */}
+      <div style={{ padding: '16px 16px 0' }}>
+        <div style={{
+          display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px',
+        }}>
+          {[
+            { href: '/', label: '首頁', emoji: '🏠', active: true },
+            { href: '/db', label: '針灸庫', emoji: '💉', active: false },
+            { href: '/db', label: '方劑庫', emoji: '🍵', active: false },
+          ].map(tab => (
+            <Link
+              key={tab.label}
+              href={tab.href}
+              style={{
+                display: 'flex', flexDirection: 'column', alignItems: 'center',
+                padding: '14px 8px',
+                backgroundColor: tab.active ? '#1a3A2C' : '#FFFEF9',
+                color: tab.active ? '#FFFEF9' : '#1a2C24',
+                borderRadius: '16px', textDecoration: 'none',
+                border: `1.5px solid ${tab.active ? '#1a3A2C' : '#E8E4DC'}`,
+                boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+              }}
+            >
+              <div style={{ fontSize: '22px', marginBottom: '4px' }}>{tab.emoji}</div>
+              <div style={{ fontSize: '13px', fontWeight: 700 }}>{tab.label}</div>
+            </Link>
+          ))}
+        </div>
       </div>
 
       {/* Feature Cards */}
-      <div style={{ padding: '24px' }}>
-        <h2 style={{ fontSize: '18px', fontWeight: 700, color: textColor, marginBottom: '16px' }}>
-          資料庫
+      <div style={{ padding: '16px' }}>
+        <h2 style={{ fontSize: '16px', fontWeight: 700, color: '#1a2C24', marginBottom: '12px', paddingLeft: '4px' }}>
+          中藥庫即將上線
         </h2>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          <Link href="/db" style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '16px',
-            padding: '18px',
-            backgroundColor: cardBg,
-            borderRadius: '14px',
-            border: `1px solid ${borderColor}`,
-            textDecoration: 'none',
-          }}>
-            <div style={{ fontSize: '36px' }}>💉</div>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: '16px', fontWeight: 600, color: textColor, marginBottom: '2px' }}>針灸庫</div>
-              <div style={{ fontSize: '13px', color: mutedColor }}>390 個穴位，按十二經絡分類</div>
-            </div>
-            <div style={{ fontSize: '20px', color: mutedColor }}>→</div>
-          </Link>
 
-          <Link href="/db" style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '16px',
-            padding: '18px',
-            backgroundColor: cardBg,
-            borderRadius: '14px',
-            border: `1px solid ${borderColor}`,
-            textDecoration: 'none',
-          }}>
-            <div style={{ fontSize: '36px' }}>🍵</div>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: '16px', fontWeight: 600, color: textColor, marginBottom: '2px' }}>方劑庫</div>
-              <div style={{ fontSize: '13px', color: mutedColor }}>205 首經典方劑，出自《傷寒論》《金匱》等</div>
+        {[
+          {
+            emoji: '💉', title: '針灸庫', sub: '針灸穴位',
+            desc: `${loading ? '...' : acupointsCount} 個穴位，WHO 國際標準編碼`,
+            tags: ['十二經絡', '奇經八脈', '經外奇穴'],
+            color: '#2C4A3E', bg: '#EEF4F0',
+          },
+          {
+            emoji: '🍵', title: '方劑庫', sub: '經典方劑',
+            desc: `${loading ? '...' : formulasCount} 首方劑，出自《傷寒論》《金匱》`,
+            tags: ['解表劑', '清熱劑', '補益劑', '更多'],
+            color: '#8B4513', bg: '#FDF3E7',
+          },
+          {
+            emoji: '🌿', title: '中藥庫', sub: '中藥材',
+            desc: '三百餘味中藥，藥性、歸經、功效',
+            tags: ['性味', '歸經', '主治'],
+            color: '#5A6A1A', bg: '#F0F4E0',
+            upcoming: true,
+          },
+        ].map((card, i) => (
+          <Link
+            key={i}
+            href={card.upcoming ? '#' : '/db'}
+            style={{
+              display: 'block', marginBottom: '10px',
+              padding: '18px 18px 14px',
+              backgroundColor: card.bg,
+              borderRadius: '18px',
+              border: `1.5px solid ${card.upcoming ? 'transparent' : '#E0DDD5'}`,
+              textDecoration: 'none',
+              opacity: card.upcoming ? 0.75 : 1,
+              cursor: card.upcoming ? 'default' : 'pointer',
+            }}
+            onClick={e => card.upcoming && e.preventDefault()}
+          >
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: '10px' }}>
+              <div style={{ fontSize: '36px', lineHeight: 1 }}>{card.emoji}</div>
+              <div style={{ flex: 1 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px' }}>
+                  <span style={{ fontSize: '17px', fontWeight: 800, color: '#1a2C24' }}>{card.title}</span>
+                  <span style={{ fontSize: '11px', color: card.color, backgroundColor: 'rgba(0,0,0,0.06)', padding: '2px 8px', borderRadius: '10px', fontWeight: 600 }}>
+                    {card.sub}
+                  </span>
+                  {card.upcoming && (
+                    <span style={{ fontSize: '10px', color: '#7A7A6A', backgroundColor: 'rgba(0,0,0,0.08)', padding: '2px 8px', borderRadius: '10px' }}>
+                      即將上線
+                    </span>
+                  )}
+                </div>
+                <div style={{ fontSize: '13px', color: '#5A5A4A', lineHeight: 1.5 }}>{card.desc}</div>
+              </div>
             </div>
-            <div style={{ fontSize: '20px', color: mutedColor }}>→</div>
+            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+              {card.tags.map(tag => (
+                <span key={tag} style={{
+                  fontSize: '11px', color: card.color,
+                  backgroundColor: 'rgba(0,0,0,0.06)',
+                  padding: '3px 10px', borderRadius: '12px', fontWeight: 600,
+                }}>{tag}</span>
+              ))}
+            </div>
           </Link>
-        </div>
+        ))}
       </div>
 
-      {/* Meridian Grid */}
-      <div style={{ padding: '0 24px 24px' }}>
-        <h2 style={{ fontSize: '18px', fontWeight: 700, color: textColor, marginBottom: '16px' }}>
-          十二經絡
+      {/* 12 Meridian Quick Access */}
+      <div style={{ padding: '0 16px 16px' }}>
+        <h2 style={{ fontSize: '16px', fontWeight: 700, color: '#1a2C24', marginBottom: '12px', paddingLeft: '4px' }}>
+          十二經絡快速查詢
         </h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px' }}>
-          {MERIDIANS.map(m => (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px' }}>
+          {[
+            { code: 'LU', name: '肺經', emoji: '🌬️' }, { code: 'LI', name: '大腸經', emoji: '💨' },
+            { code: 'ST', name: '胃經', emoji: '🍚' }, { code: 'SP', name: '脾經', emoji: '🟤' },
+            { code: 'HT', name: '心經', emoji: '❤️' }, { code: 'SI', name: '小腸經', emoji: '🔥' },
+            { code: 'BL', name: '膀胱經', emoji: '💧' }, { code: 'KI', name: '腎經', emoji: '🌙' },
+            { code: 'PC', name: '心包經', emoji: '🫀' }, { code: 'SJ', name: '三焦經', emoji: '🔥' },
+            { code: 'GB', name: '膽經', emoji: '💚' }, { code: 'LV', name: '肝經', emoji: '🌳' },
+          ].map(m => (
             <Link
               key={m.code}
-              href={`/db`}
+              href="/db"
               style={{
-                padding: '14px 8px',
-                backgroundColor: cardBg,
-                border: `1px solid ${borderColor}`,
-                borderRadius: '12px',
-                textAlign: 'center',
-                textDecoration: 'none',
+                display: 'flex', flexDirection: 'column', alignItems: 'center',
+                padding: '12px 4px',
+                backgroundColor: '#FFFEF9',
+                border: '1.5px solid #E8E4DC',
+                borderRadius: '14px', textDecoration: 'none',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
               }}
             >
-              <div style={{ fontSize: '18px', fontWeight: 700, color: accentColor, marginBottom: '2px' }}>{m.code}</div>
-              <div style={{ fontSize: '12px', color: mutedColor }}>{m.name}</div>
+              <span style={{ fontSize: '16px', marginBottom: '3px' }}>{m.emoji}</span>
+              <span style={{ fontSize: '13px', fontWeight: 700, color: '#1a3A2C' }}>{m.code}</span>
+              <span style={{ fontSize: '10px', color: '#8A8A7A' }}>{m.name}</span>
             </Link>
           ))}
         </div>
@@ -311,12 +250,11 @@ export default function HomePage() {
       {/* Footer */}
       <div style={{
         padding: '20px 24px',
-        borderTop: `1px solid ${borderColor}`,
-        textAlign: 'center',
-        fontSize: '12px',
-        color: mutedColor
+        borderTop: '1px solid #E8E4DC',
+        textAlign: 'center', fontSize: '11px', color: '#8A8A7A',
+        backgroundColor: '#FFFEF9',
       }}>
-        本資料庫內容僅供學術參考，不作商業用途。有病請尋求合法的醫師，非中醫師請勿擅自處方服藥。
+        ⚠️ 本資料庫內容僅供學術參考，不作商業用途。有病請尋求合法的醫師，非中醫師請勿擅自處方服藥。
       </div>
     </div>
   )
