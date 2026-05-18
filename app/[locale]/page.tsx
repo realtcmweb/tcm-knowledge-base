@@ -5,6 +5,9 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
 const MENU_ITEMS = [
+  { label: '👤 登錄 / 註冊', href: '#', action: 'login' },
+  { label: '🔍 放大字體', href: '#', action: 'font+' },
+  { label: '🔍 縮小字體', href: '#', action: 'font-' },
   { label: '📋 使用說明', href: '#', action: 'guide' },
   { label: '⚠️ 免責聲明', href: '#', action: 'disclaimer' },
   { label: 'ℹ️ 關於本站', href: '#', action: 'about' },
@@ -18,6 +21,7 @@ export default function HomePage() {
   const [acupointsCount, setAcupointsCount] = useState(0)
   const [formulasCount, setFormulasCount] = useState(0)
   const [showMenu, setShowMenu] = useState(false)
+  const [fontSize, setFontSize] = useState(14)
   const [modalContent, setModalContent] = useState<{title: string; body: string} | null>(null)
 
   useEffect(() => {
@@ -41,11 +45,13 @@ export default function HomePage() {
     if (action === 'disclaimer') setModalContent({ title: '⚠️ 免責聲明', body: '本資料庫內容僅供學術參考，不作商業用途。有病請尋求合法的醫師，非中醫師請勿擅自處方服藥。\n\n本站所收錄的中醫藥知識來源於公開文獻整理，編者在編輯過程中已盡可能核實內容準確性，但不保證所有資訊完全正確、及時或完整。讀者依此行事需自行承擔風險。' })
     else if (action === 'about') setModalContent({ title: 'ℹ️ 關於本站', body: '📖 醫道中醫大全是一個開源的中醫藥知識庫，收錄了針灸穴位、經典方劑等中醫藥資料。\n\n🎯 目標：讓中醫藥知識更容易被查詢和學習。\n\n📊 目前收錄：\n• 374 個針灸穴位（WHO 國際標準）\n• 205 首經典方劑\n• 更多內容持續更新中\n\n❤️ 製作給所有中醫藥愛好者。' })
     else if (action === 'contact') setModalContent({ title: '📩 聯絡我們', body: '📧 請在 GitHub 倉庫提交 Issue\n🔗 github.com/realtcmweb/tcm-knowledge-base\n\n我們會盡快回覆您。' })
+    else if (action === 'font+') setFontSize(Math.min(20, fontSize + 1))
+    else if (action === 'font-') setFontSize(Math.max(12, fontSize - 1))
     else if (action === 'guide') setModalContent({ title: '📋 使用說明', body: '📖 本資料庫分為四大專區：\n\n💉 針灸大全：收錄WHO國際標準穴位374個，可依經絡、穴性篩選。\n\n🍵 方劑大全：收錄205首經典方劑，按功效18分類。\n\n🩺 症狀區：輸入症狀找到可能的中醫證型。\n\n🌿 中藥大全：三百餘味中藥，正在整理中。\n\n🔍 搜尋：支援名稱、功效、分類等多種方式。' })
   }
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#F7F5F0', fontFamily: '-apple-system, BlinkMacSystemFont, "PingFang TC", "Microsoft JhengHei", sans-serif' }}>
+    <div style={{ minHeight: '100vh', backgroundColor: '#F7F5F0', fontSize: `${fontSize}px`, fontFamily: '-apple-system, BlinkMacSystemFont, "PingFang TC", "Microsoft JhengHei", sans-serif' }}>
       {/* Header */}
       <div style={{ background: '#1a3A2C', color: '#FFFEF9', padding: '0 0 32px', borderRadius: '0 0 24px 24px', boxShadow: '0 4px 20px rgba(0,0,0,0.15)' }}>
         <div style={{ display: 'flex', alignItems: 'center', padding: '0 8px 0 4px', height: '52px' }}>
@@ -103,7 +109,7 @@ export default function HomePage() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
               <div style={{ fontSize: '28px', lineHeight: 1 }}>💉</div>
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: '14px', fontWeight: 800, color: '#1a2C24', marginBottom: '1px' }}>針灸大全</div>
+                <div style={{ fontSize: '17px', fontWeight: 900, color: '#1a2C24', marginBottom: '2px' }}>針灸大全</div>
                 <div style={{ fontSize: '10px', color: '#5A8A6A', fontWeight: 600 }}>{loading ? '...' : acupointsCount} 穴位</div>
               </div>
             </div>
@@ -122,7 +128,7 @@ export default function HomePage() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
               <div style={{ fontSize: '28px', lineHeight: 1 }}>🍵</div>
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: '14px', fontWeight: 800, color: '#1a2C24', marginBottom: '1px' }}>方劑大全</div>
+                <div style={{ fontSize: '17px', fontWeight: 900, color: '#1a2C24', marginBottom: '2px' }}>方劑大全</div>
                 <div style={{ fontSize: '10px', color: '#8A5A3A', fontWeight: 600 }}>{loading ? '...' : formulasCount} 首方劑</div>
               </div>
             </div>
@@ -144,7 +150,7 @@ export default function HomePage() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
               <div style={{ fontSize: '28px', lineHeight: 1 }}>🩺</div>
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: '14px', fontWeight: 800, color: '#1a2C24', marginBottom: '1px' }}>症狀大全</div>
+                <div style={{ fontSize: '17px', fontWeight: 900, color: '#1a2C24', marginBottom: '2px' }}>症狀大全</div>
                 <div style={{ fontSize: '10px', color: '#6A4A8A', fontWeight: 600 }}>即將上線</div>
               </div>
             </div>
@@ -163,7 +169,7 @@ export default function HomePage() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
               <div style={{ fontSize: '28px', lineHeight: 1 }}>🌿</div>
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: '14px', fontWeight: 800, color: '#1a2C24', marginBottom: '1px' }}>中藥大全</div>
+                <div style={{ fontSize: '17px', fontWeight: 900, color: '#1a2C24', marginBottom: '2px' }}>中藥大全</div>
                 <div style={{ fontSize: '10px', color: '#5A6A1A', fontWeight: 600 }}>三百餘味</div>
               </div>
             </div>
