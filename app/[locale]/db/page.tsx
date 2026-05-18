@@ -24,7 +24,7 @@ interface Formula {
   usage: string
   effects: string
   indications: string
-  formulaSong: string
+  category: string
 }
 
 const MERIDIANS = [
@@ -36,10 +36,34 @@ const MERIDIANS = [
   { code: 'GB', name: '膽經' }, { code: 'LV', name: '肝經' },
 ]
 
+const FORMULA_CATEGORIES = [
+  { key: '', label: '全部' },
+  { key: '解表劑', label: '解表' },
+  { key: '清熱劑', label: '清熱' },
+  { key: '瀉下劑', label: '瀉下' },
+  { key: '和解劑', label: '和解' },
+  { key: '溫裡劑', label: '溫裡' },
+  { key: '補益劑', label: '補益' },
+  { key: '固澀劑', label: '固澀' },
+  { key: '安神劑', label: '安神' },
+  { key: '理氣劑', label: '理氣' },
+  { key: '理血劑', label: '理血' },
+  { key: '治風劑', label: '治風' },
+  { key: '祛濕劑', label: '祛濕' },
+  { key: '祛痰劑', label: '祛痰' },
+  { key: '消導劑', label: '消導' },
+  { key: '治燥劑', label: '治燥' },
+  { key: '驅蟲劑', label: '驅蟲' },
+  { key: '涌吐劑', label: '涌吐' },
+  { key: '治瘡劑', label: '治瘡' },
+  { key: '其他', label: '其他' },
+]
+
 export default function DatabasePage() {
-  const [activeTab, setActiveTab] = useState<'acupoints' | 'formulas' | 'herbs'>('acupoints')
+  const [activeTab, setActiveTab] = useState<'acupoints' | 'formulas' | 'herbs'>('formulas')
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedMeridian, setSelectedMeridian] = useState<string>('')
+  const [selectedFormulaCat, setSelectedFormulaCat] = useState<string>('')
   const [selectedAcupoint, setSelectedAcupoint] = useState<Acupoint | null>(null)
   const [selectedFormula, setSelectedFormula] = useState<Formula | null>(null)
   const [acupoints, setAcupoints] = useState<Acupoint[]>([])
@@ -73,14 +97,19 @@ export default function DatabasePage() {
   }, [acupoints, selectedMeridian, searchQuery])
 
   const filteredFormulas = useMemo(() => {
-    if (!searchQuery.trim()) return formulas
-    const q = searchQuery.toLowerCase()
-    return formulas.filter(f =>
-      f.name.toLowerCase().includes(q) ||
-      (f.source && f.source.toLowerCase().includes(q)) ||
-      (f.effects && f.effects.toLowerCase().includes(q))
-    )
-  }, [formulas, searchQuery])
+    let result = formulas
+    if (selectedFormulaCat) result = result.filter(f => f.category === selectedFormulaCat)
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase()
+      result = result.filter(f =>
+        f.name.toLowerCase().includes(q) ||
+        (f.source && f.source.toLowerCase().includes(q)) ||
+        (f.effects && f.effects.toLowerCase().includes(q)) ||
+        (f.category && f.category.toLowerCase().includes(q))
+      )
+    }
+    return result
+  }, [formulas, selectedFormulaCat, searchQuery])
 
   const accentColor = '#2C4A3E'
   const bgColor = '#FAFAF7'
@@ -100,13 +129,9 @@ export default function DatabasePage() {
       {/* Search */}
       <div style={{ padding: '16px 20px', backgroundColor: cardBg, borderBottom: `1px solid ${borderColor}` }}>
         <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '10px',
-          backgroundColor: '#F5F3EE',
-          borderRadius: '12px',
-          padding: '12px 16px',
-          border: `1px solid ${borderColor}`
+          display: 'flex', alignItems: 'center', gap: '10px',
+          backgroundColor: '#F5F3EE', borderRadius: '12px',
+          padding: '12px 16px', border: `1px solid ${borderColor}`
         }}>
           <span style={{ fontSize: '16px' }}>🔍</span>
           <input
@@ -132,13 +157,17 @@ export default function DatabasePage() {
       {/* Tabs */}
       <div style={{ display: 'flex', backgroundColor: cardBg, borderBottom: `1px solid ${borderColor}` }}>
         {[
-          { key: 'acupoints' as const, label: '針灸庫', emoji: '💉', count: '390' },
+          { key: 'acupoints' as const, label: '針灸庫', emoji: '💉', count: '374' },
           { key: 'formulas' as const, label: '方劑庫', emoji: '🍵', count: '205' },
           { key: 'herbs' as const, label: '中藥庫', emoji: '🌿', count: '?' },
         ].map(tab => (
           <button
             key={tab.key}
-            onClick={() => { setActiveTab(tab.key); setSelectedAcupoint(null); setSelectedFormula(null); }}
+            onClick={() => {
+              setActiveTab(tab.key)
+              setSelectedAcupoint(null)
+              setSelectedFormula(null)
+            }}
             style={{
               flex: 1, padding: '12px 4px',
               backgroundColor: activeTab === tab.key ? accentColor : cardBg,
@@ -153,45 +182,58 @@ export default function DatabasePage() {
         ))}
       </div>
 
-      {loading ? (
-        <div style={{ padding: '60px', textAlign: 'center', color: mutedColor }}>載入中...</div>
-      ) : activeTab === 'acupoints' ? (
-        <div style={{ display: 'flex' }}>
-          {/* Meridian Filter */}
-          <div style={{
-            padding: '10px 12px',
-            backgroundColor: '#F5F3EE',
-            display: 'flex',
-            gap: '6px',
-            overflowX: 'auto',
-            flexWrap: 'nowrap',
-            borderBottom: `1px solid ${borderColor}`,
-            width: '100%'
-          }}>
+      {/* Filter Bar */}
+      {activeTab === 'acupoints' && (
+        <div style={{
+          padding: '10px 12px', backgroundColor: '#F5F3EE',
+          display: 'flex', gap: '6px', overflowX: 'auto',
+          flexWrap: 'nowrap', borderBottom: `1px solid ${borderColor}`,
+        }}>
+          <button
+            onClick={() => setSelectedMeridian('')}
+            style={{
+              padding: '5px 12px', borderRadius: '16px', border: 'none',
+              fontSize: '11px', cursor: 'pointer', whiteSpace: 'nowrap',
+              backgroundColor: !selectedMeridian ? accentColor : '#E5E2DA',
+              color: !selectedMeridian ? '#FAFAF7' : textColor, fontWeight: 600,
+            }}
+          >全部</button>
+          {MERIDIANS.map(m => (
             <button
-              onClick={() => setSelectedMeridian('')}
+              key={m.code}
+              onClick={() => setSelectedMeridian(m.code === selectedMeridian ? '' : m.code)}
               style={{
-                padding: '5px 12px', borderRadius: '16px', border: 'none',
+                padding: '5px 10px', borderRadius: '16px', border: 'none',
                 fontSize: '11px', cursor: 'pointer', whiteSpace: 'nowrap',
-                backgroundColor: !selectedMeridian ? accentColor : '#E5E2DA',
-                color: !selectedMeridian ? '#FAFAF7' : textColor, fontWeight: 600,
+                backgroundColor: selectedMeridian === m.code ? accentColor : '#E5E2DA',
+                color: selectedMeridian === m.code ? '#FAFAF7' : textColor, fontWeight: 600,
               }}
-            >全部</button>
-            {MERIDIANS.map(m => (
-              <button
-                key={m.code}
-                onClick={() => setSelectedMeridian(m.code === selectedMeridian ? '' : m.code)}
-                style={{
-                  padding: '5px 10px', borderRadius: '16px', border: 'none',
-                  fontSize: '11px', cursor: 'pointer', whiteSpace: 'nowrap',
-                  backgroundColor: selectedMeridian === m.code ? accentColor : '#E5E2DA',
-                  color: selectedMeridian === m.code ? '#FAFAF7' : textColor, fontWeight: 600,
-                }}
-              >{m.code}</button>
-            ))}
-          </div>
+            >{m.code}</button>
+          ))}
         </div>
-      ) : null}
+      )}
+
+      {activeTab === 'formulas' && (
+        <div style={{
+          padding: '10px 12px', backgroundColor: '#F5F3EE',
+          display: 'flex', gap: '5px', overflowX: 'auto',
+          flexWrap: 'nowrap', borderBottom: `1px solid ${borderColor}`,
+        }}>
+          {FORMULA_CATEGORIES.map(cat => (
+            <button
+              key={cat.key}
+              onClick={() => setSelectedFormulaCat(cat.key)}
+              style={{
+                padding: '5px 11px', borderRadius: '16px', border: 'none',
+                fontSize: '11px', cursor: 'pointer', whiteSpace: 'nowrap',
+                backgroundColor: selectedFormulaCat === cat.key ? accentColor : '#E5E2DA',
+                color: selectedFormulaCat === cat.key ? '#FAFAF7' : textColor, fontWeight: 600,
+                minWidth: '40px',
+              }}
+            >{cat.label}</button>
+          ))}
+        </div>
+      )}
 
       <div style={{ display: 'flex' }}>
         {/* List */}
@@ -199,10 +241,11 @@ export default function DatabasePage() {
           flex: selectedAcupoint || selectedFormula ? '0 0 45%' : '1',
           overflowY: 'auto',
           borderRight: (selectedAcupoint || selectedFormula) ? `1px solid ${borderColor}` : 'none',
+          maxHeight: 'calc(100vh - 240px)',
         }}>
           {activeTab === 'acupoints' ? (
             <div>
-              <div style={{ padding: '10px 16px', fontSize: '11px', color: mutedColor, borderBottom: `1px solid ${borderColor}` }}>
+              <div style={{ padding: '10px 16px', fontSize: '11px', color: mutedColor, borderBottom: `1px solid ${borderColor}`, position: 'sticky', top: 0, backgroundColor: bgColor }}>
                 {filteredAcupoints.length} 個穴位
               </div>
               {filteredAcupoints.slice(0, 100).map(a => (
@@ -232,8 +275,8 @@ export default function DatabasePage() {
             </div>
           ) : activeTab === 'formulas' ? (
             <div>
-              <div style={{ padding: '10px 16px', fontSize: '11px', color: mutedColor, borderBottom: `1px solid ${borderColor}` }}>
-                {filteredFormulas.length} 個方劑
+              <div style={{ padding: '10px 16px', fontSize: '11px', color: mutedColor, borderBottom: `1px solid ${borderColor}`, position: 'sticky', top: 0, backgroundColor: bgColor }}>
+                {filteredFormulas.length} 個方劑 {selectedFormulaCat ? `· ${selectedFormulaCat}` : ''}
               </div>
               {filteredFormulas.slice(0, 100).map(f => (
                 <button
@@ -246,12 +289,23 @@ export default function DatabasePage() {
                     cursor: 'pointer', textAlign: 'left',
                   }}
                 >
-                  <div style={{ fontSize: '14px', fontWeight: 600, color: textColor, marginBottom: '2px' }}>{f.name}</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '2px' }}>
+                    <span style={{ fontSize: '14px', fontWeight: 600, color: textColor }}>{f.name}</span>
+                    <span style={{
+                      padding: '2px 8px', borderRadius: '10px',
+                      backgroundColor: '#F0EDE6', fontSize: '10px', color: accentColor, fontWeight: 600,
+                    }}>{f.category}</span>
+                  </div>
                   <div style={{ fontSize: '12px', color: mutedColor }}>
-                    出自{f.source} · {f.effects?.slice(0, 35)}...
+                    出自{f.source} · {f.effects?.slice(0, 30)}...
                   </div>
                 </button>
               ))}
+              {filteredFormulas.length === 0 && (
+                <div style={{ padding: '40px', textAlign: 'center', color: mutedColor, fontSize: '13px' }}>
+                  此分類尚無方劑
+                </div>
+              )}
               {filteredFormulas.length > 100 && (
                 <div style={{ padding: '12px', textAlign: 'center', fontSize: '12px', color: mutedColor }}>
                   搜尋取得更多結果
@@ -267,9 +321,9 @@ export default function DatabasePage() {
           ) : null}
         </div>
 
-        {/* Detail */}
+        {/* Detail Panel */}
         {selectedAcupoint && (
-          <div style={{ flex: '0 0 55%', overflowY: 'auto', padding: '20px', backgroundColor: cardBg }}>
+          <div style={{ flex: '0 0 55%', overflowY: 'auto', padding: '20px', backgroundColor: cardBg, maxHeight: 'calc(100vh - 240px)' }}>
             <div style={{ marginBottom: '16px' }}>
               <h2 style={{ fontSize: '20px', fontWeight: 700, color: textColor, marginBottom: '6px' }}>{selectedAcupoint.name}</h2>
               <span style={{
@@ -302,21 +356,27 @@ export default function DatabasePage() {
         )}
 
         {selectedFormula && (
-          <div style={{ flex: '0 0 55%', overflowY: 'auto', padding: '20px', backgroundColor: cardBg }}>
+          <div style={{ flex: '0 0 55%', overflowY: 'auto', padding: '20px', backgroundColor: cardBg, maxHeight: 'calc(100vh - 240px)' }}>
             <div style={{ marginBottom: '16px' }}>
               <h2 style={{ fontSize: '20px', fontWeight: 700, color: textColor, marginBottom: '6px' }}>{selectedFormula.name}</h2>
-              <span style={{
-                display: 'inline-block', padding: '4px 12px',
-                backgroundColor: '#F0EDE6', borderRadius: '20px',
-                fontSize: '12px', color: accentColor, fontWeight: 600,
-              }}>出自《{selectedFormula.source}》</span>
+              <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                <span style={{
+                  display: 'inline-block', padding: '4px 12px',
+                  backgroundColor: '#F0EDE6', borderRadius: '20px',
+                  fontSize: '12px', color: accentColor, fontWeight: 600,
+                }}>出自《{selectedFormula.source}》</span>
+                <span style={{
+                  display: 'inline-block', padding: '4px 12px',
+                  backgroundColor: accentColor, color: '#FAFAF7',
+                  borderRadius: '20px', fontSize: '12px', fontWeight: 600,
+                }}>{selectedFormula.category}</span>
+              </div>
             </div>
             {[
               { label: '組成', value: selectedFormula.composition },
               { label: '用法', value: selectedFormula.usage },
               { label: '功用', value: selectedFormula.effects },
               { label: '主治', value: selectedFormula.indications },
-              { label: '方歌', value: selectedFormula.formulaSong },
             ].map(({ label, value }) => value ? (
               <div key={label} style={{ marginBottom: '16px' }}>
                 <div style={{ fontSize: '11px', fontWeight: 700, color: accentColor, marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</div>
