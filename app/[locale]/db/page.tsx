@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useMemo, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 
 interface Formula {
@@ -38,6 +38,14 @@ const FORMULA_CATEGORIES = [
   { key: '治瘡劑', label: '治瘡消癰', emoji: '🩹' },
 ]
 
+const MENU_ITEMS = [
+  { label: '📋 使用說明', href: '#' },
+  { label: '🔗 醫砭 yibian.hopto.org', href: 'https://yibian.hopto.org/db/', external: true },
+  { label: '⚠️ 免責聲明', href: '#', action: 'disclaimer' },
+  { label: 'ℹ️ 關於本站', href: '#', action: 'about' },
+  { label: '📩 聯絡我們', href: '#', action: 'contact' },
+]
+
 export default function DatabasePage() {
   const [activeTab, setActiveTab] = useState<'acupoints' | 'formulas' | 'herbs'>('formulas')
   const [searchQuery, setSearchQuery] = useState('')
@@ -46,6 +54,8 @@ export default function DatabasePage() {
   const [formulas, setFormulas] = useState<Formula[]>([])
   const [loading, setLoading] = useState(true)
   const [showCatSidebar, setShowCatSidebar] = useState(false)
+  const [showMenu, setShowMenu] = useState(false)
+  const [modalContent, setModalContent] = useState<{title: string; body: string} | null>(null)
 
   useEffect(() => {
     fetch('/data/formulas.json').then(r => r.json()).then(d => {
@@ -54,22 +64,39 @@ export default function DatabasePage() {
     })
   }, [])
 
-  const filteredFormulas = useMemo(() => {
-    let result = formulas
-    if (selectedCat) result = result.filter(f => f.category === selectedCat)
+  const filteredFormulas = formulas.filter(f => {
+    if (selectedCat && f.category !== selectedCat) return false
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase()
-      result = result.filter(f =>
-        f.name.toLowerCase().includes(q) ||
+      return f.name.toLowerCase().includes(q) ||
         f.source.toLowerCase().includes(q) ||
         f.effects.toLowerCase().includes(q) ||
         f.categoryLabel.includes(q)
-      )
     }
-    return result
-  }, [formulas, selectedCat, searchQuery])
+    return true
+  })
 
   const activeCat = FORMULA_CATEGORIES.find(c => c.key === selectedCat) || FORMULA_CATEGORIES[0]
+
+  const handleMenuAction = (item: typeof MENU_ITEMS[0]) => {
+    setShowMenu(false)
+    if (item.action === 'disclaimer') {
+      setModalContent({
+        title: '⚠️ 免責聲明',
+        body: '本資料庫內容僅供學術參考，不作商業用途。有病請尋求合法的醫師，非中醫師請勿擅自處方服藥。\n\n本站所收录的中医药知识来源于公开文献整理，编者在编辑过程中已尽可能核实内容准确性，但不保证所有信息完全正确、及时或完整。读者依此行事需自行承担风险。',
+      })
+    } else if (item.action === 'about') {
+      setModalContent({
+        title: 'ℹ️ 關於本站',
+        body: '📖 中醫大全是一個開源的中醫藥知識庫，收錄了針灸穴位、經典方劑等中醫藥資料。\n\n🎯 目標：讓中醫藥知識更容易被查詢和學習。\n\n📊 目前收錄：\n• 374 個針灸穴位（WHO 國際標準）\n• 205 首經典方劑\n• 更多內容持續更新中\n\n❤️ 製作給所有中醫藥愛好者。',
+      })
+    } else if (item.action === 'contact') {
+      setModalContent({
+        title: '📩 聯絡我們',
+        body: '如有問題或建議，歡迎透過以下方式聯絡：\n\n📧 請在 GitHub 倉庫提交 Issue\n🔗 github.com/realtcmweb/tcm-knowledge-base\n\n我們會盡快回覆您。',
+      })
+    }
+  }
 
   return (
     <div style={{
@@ -95,13 +122,63 @@ export default function DatabasePage() {
           <div style={{ flex: 1, textAlign: 'center', fontSize: '15px', fontWeight: 700, letterSpacing: '0.03em' }}>
             📖 中醫大全
           </div>
-          <a href="https://yibian.hopto.org/db/" target="_blank" rel="noopener noreferrer" style={{
-            display: 'flex', alignItems: 'center', gap: '4px',
-            padding: '7px 10px', color: '#FFFEF9', textDecoration: 'none',
-            fontSize: '11px', fontWeight: 600,
-            backgroundColor: 'rgba(255,254,249,0.15)',
-            borderRadius: '20px', opacity: 0.9,
-          }}>醫砭 ↗</a>
+
+          {/* Menu Dropdown */}
+          <div style={{ position: 'relative' }}>
+            <button
+              onClick={() => setShowMenu(v => !v)}
+              style={{
+                display: 'flex', alignItems: 'center', gap: '4px',
+                padding: '7px 12px', color: '#FFFEF9', textDecoration: 'none',
+                fontSize: '13px', fontWeight: 600,
+                backgroundColor: showMenu ? 'rgba(255,254,249,0.2)' : 'rgba(255,254,249,0.12)',
+                border: 'none', borderRadius: '20px', cursor: 'pointer',
+              }}
+            >
+              ☰ <span style={{ fontSize: '11px' }}>選單</span>
+            </button>
+
+            {showMenu && (
+              <div style={{
+                position: 'absolute', right: 0, top: 'calc(100% + 8px)',
+                width: '220px',
+                backgroundColor: '#FFFEF9',
+                borderRadius: '14px',
+                boxShadow: '0 8px 24px rgba(0,0,0,0.18)',
+                overflow: 'hidden',
+                zIndex: 300,
+                border: '1px solid #E8E4DC',
+              }}>
+                {MENU_ITEMS.map((item, i) => (
+                  <a
+                    key={i}
+                    href={item.external ? item.href : item.action ? '#' : item.href}
+                    target={item.external ? '_blank' : undefined}
+                    rel={item.external ? 'noopener noreferrer' : undefined}
+                    onClick={e => {
+                      if (item.action) { e.preventDefault(); handleMenuAction(item) }
+                      else setShowMenu(false)
+                    }}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: '10px',
+                      padding: '13px 16px',
+                      color: '#1a2C24', textDecoration: 'none',
+                      fontSize: '13px', fontWeight: 600,
+                      borderBottom: i < MENU_ITEMS.length - 1 ? '1px solid #F0EDE5' : 'none',
+                      backgroundColor: 'transparent',
+                      cursor: 'pointer',
+                    }}
+                    onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#F5F2EB')}
+                    onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
+                  >
+                    <span style={{ fontSize: '15px' }}>{item.label.split(' ')[0]}</span>
+                    <span style={{ flex: 1 }}>{item.label.split(' ').slice(1).join(' ')}</span>
+                    {item.external && <span style={{ fontSize: '11px', color: '#8A8A7A' }}>↗</span>}
+                  </a>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Search */}
@@ -134,7 +211,7 @@ export default function DatabasePage() {
           </div>
         </div>
 
-        {/* 4-Tab */}
+        {/* 3-Tab */}
         <div style={{ display: 'flex', padding: '12px 14px 0', gap: '7px' }}>
           {[
             { key: 'acupoints', label: '針灸大全', emoji: '💉', count: '374' },
@@ -143,15 +220,14 @@ export default function DatabasePage() {
           ].map(tab => (
             <button
               key={tab.key}
-              onClick={() => { setActiveTab(tab.key as 'acupoints' | 'formulas' | 'herbs'); setSelectedFormula(null); }}
+              onClick={() => { setActiveTab(tab.key as 'acupoints' | 'formulas' | 'herbs'); setSelectedFormula(null) }}
               disabled={tab.upcoming}
               style={{
                 flex: 1, padding: '10px 4px',
                 backgroundColor: activeTab === tab.key ? '#FFFEF9' : 'rgba(255,254,249,0.12)',
                 color: activeTab === tab.key ? '#1a3A2C' : 'rgba(255,254,249,0.8)',
                 border: 'none', borderRadius: '12px', cursor: tab.upcoming ? 'default' : 'pointer',
-                fontSize: '11px', fontWeight: 700,
-                opacity: tab.upcoming ? 0.5 : 1,
+                fontSize: '11px', fontWeight: 700, opacity: tab.upcoming ? 0.5 : 1,
               }}
             >
               <div style={{ fontSize: '18px', marginBottom: '2px' }}>{tab.emoji}</div>
@@ -170,9 +246,8 @@ export default function DatabasePage() {
                 display: 'flex', alignItems: 'center', gap: '6px',
                 padding: '7px 13px', borderRadius: '20px',
                 backgroundColor: 'rgba(255,254,249,0.15)',
-                color: '#FFFEF9', border: 'none', cursor: 'pointer',
-                fontSize: '12px', fontWeight: 600,
-                border: '1.5px solid rgba(255,254,249,0.25)',
+                color: '#FFFEF9', border: '1.5px solid rgba(255,254,249,0.25)',
+                cursor: 'pointer', fontSize: '12px', fontWeight: 600,
               }}
             >
               <span style={{ fontSize: '15px' }}>{activeCat.emoji}</span>
@@ -226,13 +301,9 @@ export default function DatabasePage() {
                     <div style={{
                       flexShrink: 0, padding: '3px 10px', borderRadius: '20px',
                       backgroundColor: '#EEEBE3', fontSize: '11px', color: '#2C4A3E', fontWeight: 700, whiteSpace: 'nowrap', marginTop: '2px',
-                    }}>
-                      {f.categoryLabel}
-                    </div>
+                    }}>{f.categoryLabel}</div>
                   </div>
-                  <div style={{ fontSize: '12px', color: '#8A8A7A', marginBottom: '4px' }}>
-                    📚 出自《{f.source}》
-                  </div>
+                  <div style={{ fontSize: '12px', color: '#8A8A7A', marginBottom: '4px' }}>📚 出自《{f.source}》</div>
                   <div style={{ fontSize: '13px', color: '#5A5A4A', lineHeight: 1.5 }}>
                     {f.effects?.slice(0, 60)}{f.effects && f.effects.length > 60 ? '...' : ''}
                   </div>
@@ -247,9 +318,7 @@ export default function DatabasePage() {
         <div style={{ padding: '60px 24px', textAlign: 'center', color: '#7A7A6A' }}>
           <div style={{ fontSize: '48px', marginBottom: '14px' }}>🌿</div>
           <div style={{ fontSize: '17px', fontWeight: 700, color: '#1a2C24', marginBottom: '8px' }}>中藥大全即將上線</div>
-          <div style={{ fontSize: '13px', lineHeight: 1.7 }}>
-            三百餘味中藥正在整理中<br />敬請期待
-          </div>
+          <div style={{ fontSize: '13px', lineHeight: 1.7 }}>三百餘味中藥正在整理中<br />敬請期待</div>
         </div>
       )}
 
@@ -257,9 +326,7 @@ export default function DatabasePage() {
         <div style={{ padding: '60px 24px', textAlign: 'center', color: '#7A7A6A' }}>
           <div style={{ fontSize: '48px', marginBottom: '14px' }}>💉</div>
           <div style={{ fontSize: '17px', fontWeight: 700, color: '#1a2C24', marginBottom: '8px' }}>針灸大全</div>
-          <div style={{ fontSize: '13px', lineHeight: 1.7 }}>
-            374 個針灸穴位 · WHO 國際標準<br />即將上線敬請期待
-          </div>
+          <div style={{ fontSize: '13px', lineHeight: 1.7 }}>374 個針灸穴位 · WHO 國際標準<br />即將上線</div>
         </div>
       )}
 
@@ -364,6 +431,47 @@ export default function DatabasePage() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Modal (disclaimer/about/contact) */}
+      {modalContent && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 400, backgroundColor: 'rgba(0,0,0,0.4)' }} onClick={() => setModalContent(null)}>
+          <div
+            style={{
+              position: 'absolute', left: '50%', top: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: '90vw', maxWidth: '380px',
+              backgroundColor: '#FFFEF9', borderRadius: '20px',
+              padding: '24px 20px 28px', overflowY: 'auto',
+              boxShadow: '0 12px 40px rgba(0,0,0,0.2)',
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            <h2 style={{ fontSize: '17px', fontWeight: 700, color: '#1a2C24', marginBottom: '14px', textAlign: 'center' }}>
+              {modalContent.title}
+            </h2>
+            <div style={{ fontSize: '13px', color: '#3A3A2A', lineHeight: 1.9, whiteSpace: 'pre-wrap', textAlign: 'center' }}>
+              {modalContent.body}
+            </div>
+            <button
+              onClick={() => setModalContent(null)}
+              style={{
+                display: 'block', width: '100%', marginTop: '20px',
+                padding: '12px', backgroundColor: '#1a3A2C', color: '#FFFEF9',
+                border: 'none', borderRadius: '12px', cursor: 'pointer',
+                fontSize: '14px', fontWeight: 700,
+              }}
+            >關閉</button>
+          </div>
+        </div>
+      )}
+
+      {/* Click outside to close menu */}
+      {showMenu && (
+        <div
+          style={{ position: 'fixed', inset: 0, zIndex: 99 }}
+          onClick={() => setShowMenu(false)}
+        />
       )}
     </div>
   )
