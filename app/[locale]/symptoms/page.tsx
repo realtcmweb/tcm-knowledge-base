@@ -181,7 +181,7 @@ export default function SymptomsPage() {
                 padding: '5px 10px', borderRadius: '14px', border: 'none',
                 fontSize: '11px', fontWeight: 700, cursor: 'pointer',
                 backgroundColor: mode === 'expert' ? '#FFFEF9' : 'rgba(255,254,249,0.15)',
-                color: mode === 'expert' ? '#1a3A2C' : 'rgba(255,254,249,0.7)',
+                color: mode === 'expert' ? '#1a3A2C' : '#FFFEF9',
               }}
             >專家</button>
             <button
@@ -190,7 +190,7 @@ export default function SymptomsPage() {
                 padding: '5px 10px', borderRadius: '14px', border: 'none',
                 fontSize: '11px', fontWeight: 700, cursor: 'pointer',
                 backgroundColor: mode === 'popular' ? '#FFFEF9' : 'rgba(255,254,249,0.15)',
-                color: mode === 'popular' ? '#1a3A2C' : 'rgba(255,254,249,0.7)',
+                color: mode === 'popular' ? '#1a3A2C' : '#FFFEF9',
               }}
             >大眾</button>
           </div>
@@ -301,7 +301,7 @@ export default function SymptomsPage() {
                     borderRadius: '20px', border: 'none', cursor: 'pointer',
                     fontSize: '11px', fontWeight: 700,
                     backgroundColor: selectedPopularCat === cat.key ? '#FFFEF9' : 'rgba(255,254,249,0.15)',
-                    color: selectedPopularCat === cat.key ? '#1a3A2C' : 'rgba(255,254,249,0.75)',
+                    color: selectedPopularCat === cat.key ? '#1a3A2C' : '#FFFEF9',
                     whiteSpace: 'nowrap',
                   }}
                 >
@@ -327,7 +327,7 @@ export default function SymptomsPage() {
                   borderRadius: '20px', border: 'none', cursor: 'pointer',
                   fontSize: '11px', fontWeight: 700,
                   backgroundColor: selectedExpertCat === cat.key ? '#FFFEF9' : 'rgba(255,254,249,0.15)',
-                  color: selectedExpertCat === cat.key ? '#1a3A2C' : 'rgba(255,254,249,0.75)',
+                  color: selectedExpertCat === cat.key ? '#1a3A2C' : '#FFFEF9',
                   whiteSpace: 'nowrap',
                 }}
               >
