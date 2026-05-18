@@ -1,0 +1,293 @@
+{
+  "diseases": {
+    "內科": {
+      "肺系": [
+        {"name": "感冒", "synonyms": ["風寒感冒", "風熱感冒", "流感", "傷風"], "syndromes": ["風寒襲肺", "風熱犯肺", "暑濕傷表", "氣虛感冒"], "treatment_available": true},
+        {"name": "咳嗽", "synonyms": ["外感咳嗽", "內傷咳嗽", "慢性咳嗽"], "syndromes": ["風寒襲肺", "風熱犯肺", "風燥傷肺", "痰濕蘊肺", "痰熱鬱肺", "肝火犯肺", "肺陰虧耗"], "treatment_available": true},
+        {"name": "哮病", "synonyms": ["哮喘", "支氣管哮喘", "過敏性哮喘"], "syndromes": ["冷哮", "熱哮", "寒包熱哮", "風痰哮", "虛哮", "肺脾氣虛", "肺腎兩虛"], "treatment_available": false},
+        {"name": "喘證", "synonyms": ["喘息", "氣喘", "COPD"], "syndromes": ["風寒襲肺", "痰熱壅肺", "痰濁阻肺", "肺氣虛耗", "腎氣不納", "正虛喘脫"], "treatment_available": false},
+        {"name": "肺癰", "synonyms": ["肺膿腫", "膿胸"], "syndromes": ["初期", "成癰期", "潰膿期", "恢復期"], "treatment_available": false},
+        {"name": "肺癆", "synonyms": ["肺結核", "癆瘵"], "syndromes": ["肺陰虧損", "虛火灼肺", "氣陰耗傷", "陰陽兩虛"], "treatment_available": false},
+        {"name": "肺脹", "synonyms": ["肺氣腫", "COPD", "慢性阻塞性肺病"], "syndromes": ["外寒內飲", "痰熱郁肺", "痰蒙神竅", "肺腎氣虛", "陽虛水泛"], "treatment_available": false},
+        {"name": "肺痿", "synonyms": ["肺纖維化", "肺萎陷"], "syndromes": ["虛熱", "虛寒"], "treatment_available": false}
+      ],
+      "心系": [
+        {"name": "心悸", "synonyms": ["心慌", "心律不整", "心動過速"], "syndromes": ["心虚膽怯", "心血不足", "陰虛火旺", "心陽不振", "水飲凌心", "瘀阻心脈", "痰火擾心"], "treatment_available": false},
+        {"name": "胸痹", "synonyms": ["冠心病", "心絞痛", "胸悶"], "syndromes": ["心血瘀阻", "氣滯心胸", "痰濁閉阻", "寒凝心脈", "氣陰两虛", "心腎陰虛", "心腎陽虛"], "treatment_available": false},
+        {"name": "心衰", "synonyms": ["心力衰竭", "心功能不全"], "syndromes": ["氣虛血瘀", "陽虛水泛", "痰飲阻肺", "心肺氣虛", "脾腎陽虛", "陰陽兩虛"], "treatment_available": false},
+        {"name": "不寐", "synonyms": ["失眠", "多夢", "易醒", "睡眠障礙"], "syndromes": ["肝火擾心", "痰熱擾心", "心脾兩虛", "心腎不交", "心膽氣虛", "胃腑不和"], "treatment_available": true},
+        {"name": "多寐", "synonyms": ["嗜睡", "過度困倦", "日間嗜睡"], "syndromes": ["濕邪困脾", "脾氣虛弱", "陽虛不振", "痰濕內阻", "瘀血閉阻"], "treatment_available": false}
+      ],
+      "腦系": [
+        {"name": "頭痛", "synonyms": ["偏頭痛", "緊張性頭痛", "血管性頭痛"], "syndromes": ["風寒證", "風熱證", "風濕證", "肝陽證", "腎虛證", "氣血虛證", "痰濁證", "瘀血證"], "treatment_available": true},
+        {"name": "眩暈", "synonyms": ["頭暈", "血壓異常", "美尼爾氏病"], "syndromes": ["肝陽上亢", "氣血亏虛", "腎精不足", "痰濁中阻", "瘀血阻竅"], "treatment_available": false},
+        {"name": "中風", "synonyms": ["腦卒中", "腦血管意外", "中臟腑", "中經絡"], "syndromes": ["風痰瘀阻", "風陽上擾", "痰熱腑實", "氣虛絡瘀", "陰虛風動", "脫證"], "treatment_available": true},
+        {"name": "痴呆", "synonyms": ["認知障礙", "老年癡呆", "阿茲海默症"], "syndromes": ["髓海不足", "脾腎兩虛", "痰濁蒙竅", "瘀血內阻"], "treatment_available": false},
+        {"name": "癲狂", "synonyms": ["抑鬱症", "躁狂症", "精神分裂"], "syndromes": ["痰氣郁結", "氣虛痰結", "心脾兩虛", "痰火擾心", "火盛傷陰"], "treatment_available": false},
+        {"name": "癇證", "synonyms": ["癲癇", "羊癲風", "癲癇發作"], "syndromes": ["風痰閉阻", "痰火擾神", "心腎亏虛", "風火痰閉"], "treatment_available": false}
+      ],
+      "脾胃系": [
+        {"name": "胃痛", "synonyms": ["胃炎", "胃潰疡", "消化不良", "胃脘痛"], "syndromes": ["寒邪客胃", "飲食傷胃", "肝氣犯胃", "濕熱中阻", "瘀血停胃", "胃陰亏虛", "脾胃虛寒"], "treatment_available": true},
+        {"name": "胃痞", "synonyms": ["胃脹", "功能性消化不良", "脹滿"], "syndromes": ["肝胃不和", "脾胃虛弱", "痰濕內阻", "寒熱錯雜"], "treatment_available": false},
+        {"name": "嘔吐", "synonyms": ["胃氣上逆", "反胃", "惡心"], "syndromes": ["外邪犯胃", "痰飲內阻", "肝氣犯胃", "脾胃虛弱", "食積停滯"], "treatment_available": false},
+        {"name": "噎膈", "synonyms": ["食道癌", "吞嚥困難", "食道狹窄"], "syndromes": ["痰氣交阻", "瘀血內結", "津枯熱結", "氣虛陽微"], "treatment_available": false},
+        {"name": "呃逆", "synonyms": ["打嗝", "膈肌痙攣", "呃忒"], "syndromes": ["胃中寒冷", "胃火上逆", "氣機郁滯", "脾胃虛弱", "腎失攝納"], "treatment_available": false},
+        {"name": "腹痛", "synonyms": ["腹部不適", "腸痙攣", "肚子痛"], "syndromes": ["寒邪內阻", "濕熱蘊結", "飲食積滯", "肝氣郁滯", "瘀血內停", "中虛臟寒"], "treatment_available": false},
+        {"name": "泄瀉", "synonyms": ["腹瀉", "急慢性腹瀉", "腸炎", "拉肚子"], "syndromes": ["寒濕內盛", "濕熱傷中", "食積停滯", "肝氣乘脾", "脾氣虛弱", "腎陽虛衰"], "treatment_available": true},
+        {"name": "痢疾", "synonyms": ["細菌性痢疾", "阿米巴痢疾"], "syndromes": ["濕熱痢", "疫毒痢", "寒濕痢", "陰虛痢", "虛寒痢", "休息痢"], "treatment_available": false},
+        {"name": "便秘", "synonyms": ["排便困難", "腸道功能紊亂", "大便乾結"], "syndromes": ["熱秘", "氣秘", "冷秘", "虛秘", "血虛腸燥"], "treatment_available": false}
+      ],
+      "肝膽系": [
+        {"name": "脅痛", "synonyms": ["肋間神經痛", "肝區疼痛"], "syndromes": ["肝鬱氣滯", "濕熱蘊結", "瘀血阻絡", "肝陰不足"], "treatment_available": true},
+        {"name": "黃疸", "synonyms": ["肝細胞性黃疸", "阻塞性黃疸", "溶血性黃疸"], "syndromes": ["陽黃", "陰黃", "急黃"], "treatment_available": false},
+        {"name": "積證", "synonyms": ["肝脾腫大", "腹部腫塊", "癥瘕"], "syndromes": ["氣郁血阻", "瘀血內結", "正虛瘀結"], "treatment_available": false},
+        {"name": "聚證", "synonyms": ["胃腸氣滯", "腹脹"], "syndromes": ["肝氣郁結", "食濁內阻"], "treatment_available": false},
+        {"name": "鼓脹", "synonyms": ["腹水", "肝硬化", "水臌"], "syndromes": ["氣滞濕阻", "水濕內停", "瘀結水停", "陽虛水盛", "陰虛水停"], "treatment_available": false},
+        {"name": "癭病", "synonyms": ["甲狀腺腫大", "甲狀腺結節", "甲亢"], "syndromes": ["氣郁痰凝", "痰結血瘀", "肝火旺盛", "心肝陰虛", "腎肝陰虛"], "treatment_available": false},
+        {"name": "瘧疾", "synonyms": ["瘧原蟲病", "打擺子"], "syndromes": ["正瘧", "溫瘧", "寒瘧", "癘瘧", "勞瘧"], "treatment_available": false}
+      ],
+      "腎系": [
+        {"name": "水腫", "synonyms": ["浮腫", "水腫病", "腎性水腫"], "syndromes": ["風水泛濫", "濕毒浸淫", "水濕浸漬", "脾虛濕困", "腎陽衰微", "瘀水互結"], "treatment_available": false},
+        {"name": "淋證", "synonyms": ["泌尿道感染", "膀胱炎", "尿道炎"], "syndromes": ["熱淋", "血淋", "氣淋", "膏淋", "石淋", "勞淋"], "treatment_available": true},
+        {"name": "癃閉", "synonyms": ["尿瀦留", "排尿困難", "前列腺增生"], "syndromes": ["膀胱濕熱", "肺熱壅盛", "肝郁氣滯", "瘀血阻礙", "腎陽衰憊", "脾虛不升"], "treatment_available": false},
+        {"name": "陽痿", "synonyms": ["勃起功能障礙", "陰萎"], "syndromes": ["命門火衰", "心脾兩虛", "肝氣郁結", "濕熱下注", "恐懼傷腎"], "treatment_available": false},
+        {"name": "遺精", "synonyms": ["夢遺", "滑精"], "syndromes": ["腎虛不藏", "心火妄動", "肝火亢盛", "濕熱下注", "脾虛不攝"], "treatment_available": false},
+        {"name": "早泄", "synonyms": ["射精過早", "雞精"], "syndromes": ["腎氣不固", "心脾兩虛", "肝經濕熱", "陰虛火旺"], "treatment_available": true}
+      ],
+      "氣血津液": [
+        {"name": "郁證", "synonyms": ["抑鬱症", "焦慮症", "情緒問題"], "syndromes": ["肝氣郁結", "氣郁化火", "痰氣郁結", "心神失養", "心脾兩虛", "心腎陰虛"], "treatment_available": true},
+        {"name": "血證", "synonyms": ["出血證", "紫斑", "血小板減少"], "syndromes": ["鼻衄", "齒衄", "咳血", "吐血", "便血", "尿血", "紫斑"], "treatment_available": false},
+        {"name": "痰飲", "synonyms": ["痰濕", "水飲內停"], "syndromes": ["痰飲", "懸飲", "溢飲", "支飲"], "treatment_available": false},
+        {"name": "消渴", "synonyms": ["糖尿病", "多飲多尿", "三多症"], "syndromes": ["上消", "中消", "下消"], "treatment_available": false},
+        {"name": "汗證", "synonyms": ["自汗", "盜汗", "多汗症"], "syndromes": ["肺衛不固", "營衛不和", "陰虛火旺", "邪熱郁蒸"], "treatment_available": false},
+        {"name": "內傷發熱", "synonyms": ["功能性發熱", "不明原因發熱"], "syndromes": ["氣虛發熱", "血虛發熱", "陰虛發熱", "陽虛發熱", "氣郁發熱", "濕郁發熱", "瘀血發熱"], "treatment_available": false},
+        {"name": "厥證", "synonyms": ["暈厥", "昏厥", "休克"], "syndromes": ["氣厥", "血厥", "痰厥", "食厥", "暑厥"], "treatment_available": false},
+        {"name": "虛勞", "synonyms": ["虛損", "慢性疲勞", "亞健康"], "syndromes": ["肺氣虛", "心氣虛", "脾氣虛", "腎氣虛", "心血虛", "肝血虛", "腎陰虛", "胃陰虛", "腎陽虛"], "treatment_available": false},
+        {"name": "肥胖", "synonyms": ["單純性肥胖", "代謝綜合徵"], "syndromes": ["胃腸積熱", "脾虛濕盛", "痰濁內阻", "脾腎陽虛", "氣滯血瘀"], "treatment_available": false},
+        {"name": "癌病", "synonyms": ["惡性腫瘤", "癌症"], "syndromes": ["氣滞痰凝", "瘀毒內阻", "正氣虛弱", "陰陽失調"], "treatment_available": false}
+      ],
+      "肢體經絡": [
+        {"name": "痹證", "synonyms": ["關節疼痛", "類風濕關節炎", "風濕病"], "syndromes": ["風寒濕痹", "風濕熱痹", "寒濕阻絡", "痰瘀閉阻", "氣血虛痹", "肝腎虧虛"], "treatment_available": false},
+        {"name": "痙證", "synonyms": ["抽搐", "項強", "角弓反張"], "syndromes": ["邪壅經絡", "熱甚發痙", "痰濁阻滯", "陰血虧虛"], "treatment_available": false},
+        {"name": "痿證", "synonyms": ["肌肉萎縮", "弛緩性癱瘓", "重症肌無力"], "syndromes": ["肺熱津傷", "濕熱浸淫", "脾胃虛弱", "肝腎虧損", "瘀阻脈絡"], "treatment_available": false},
+        {"name": "顫證", "synonyms": ["帕金森氏病", "震顫麻痹", "不自覺顫抖"], "syndromes": ["風陽內動", "痰熱動風", "氣血兩虛", "腎精不足"], "treatment_available": false},
+        {"name": "腰痛", "synonyms": ["腰肌勞損", "腰椎間盤突出", "腰腿痛"], "syndromes": ["寒濕腰痛", "濕熱腰痛", "瘀血腰痛", "腎虛腰痛"], "treatment_available": true}
+      ]
+    },
+    "外科": {
+      "瘡疡": [
+        {"name": "癰", "synonyms": ["急性蜂窩織炎", "蜂窩組織炎"], "syndromes": ["火熱毒盛", "濕熱毒蘊", "氣血兩虛"], "treatment_available": false},
+        {"name": "疔", "synonyms": ["癤", "毛囊炎", "紅腫熱痛"], "syndromes": ["火毒熾盛", "熱毒內攻", "脾虛毒陷"], "treatment_available": false},
+        {"name": "丹毒", "synonyms": ["鏈球菌感染", "流火"], "syndromes": ["風熱毒蘊", "濕熱毒蘊", "胎火胎毒", "虛火內蕴"], "treatment_available": false},
+        {"name": "走黃", "synonyms": ["敗血症", "膿毒症"], "syndromes": ["氣血兩燔", "熱入心包"], "treatment_available": false},
+        {"name": "破傷風", "synonyms": ["金創痙", "牙關緊急"], "syndromes": ["風毒入絡", "陽明毒盛", "陰虛風動"], "treatment_available": false}
+      ],
+      "乳房": [
+        {"name": "乳癖", "synonyms": ["乳腺增生病", "乳腺囊性增生"], "syndromes": ["肝郁痰凝", "沖任失調"], "treatment_available": true},
+        {"name": "乳癧", "synonyms": ["乳腺炎", "急性乳腺炎"], "syndromes": ["肝郁", "胃熱", "火毒", "氣血凝滯"], "treatment_available": false},
+        {"name": "乳岩", "synonyms": ["乳腺癌", "乳腺惡性腫瘤"], "syndromes": ["肝郁痰凝", "冲任失調", "正虛毒熾"], "treatment_available": false}
+      ],
+      "皮膚": [
+        {"name": "濕疹", "synonyms": ["過敏性皮膚炎", "異位性皮炎"], "syndromes": ["濕熱浸淫", "脾虛濕盛", "血虛風燥"], "treatment_available": false},
+        {"name": "癬", "synonyms": ["皮膚癬", "足癬", "手癬"], "syndromes": ["風濕蘊結", "血虛風燥", "蟲濕困擾"], "treatment_available": false},
+        {"name": "瘰癧", "synonyms": ["淋巴結核", "鼠瘡"], "syndromes": ["氣滯痰凝", "痰濕結塊", "陰虛火旺", "氣血兩虛"], "treatment_available": false},
+        {"name": "疥瘡", "synonyms": ["疥癩", "皮膚寄生蟲病"], "syndromes": ["蟲毒侵襲", "濕毒蘊结"], "treatment_available": false},
+        {"name": "牛皮癬", "synonyms": ["銀屑病", "乾癬"], "syndromes": ["血熱內蘊", "血虛風燥", "瘀阻肌絡", "風濕阻絡"], "treatment_available": false},
+        {"name": "帶狀皰疹", "synonyms": ["蛇串瘡", "纏腰火丹", "生蛇"], "syndromes": ["肝經郁熱", "脾胃濕熱", "氣滯血瘀", "氣虛血瘀"], "treatment_available": false},
+        {"name": "脫髮", "synonyms": ["斑禿", "脫髮症", "秃髮"], "syndromes": ["肝腎不足", "氣血兩虛", "脾胃濕熱", "血熱風燥"], "treatment_available": false},
+        {"name": "神經性皮炎", "synonyms": ["慢性瘙癢性皮膚病", "牛皮癬"], "syndromes": ["肝鬱化火", "風濕蘊阻", "血虛風燥"], "treatment_available": false},
+        {"name": "扁平疣", "synonyms": ["病毒疣", "扁平濕疣"], "syndromes": ["風熱毒蘊", "瘀血阻絡"], "treatment_available": false},
+        {"name": "白疕", "synonyms": ["銀屑病", "牛皮癬"], "syndromes": ["血熱內蘊", "血虛風燥", "瘀阻肌絡"], "treatment_available": false}
+      ],
+      "肛腸": [
+        {"name": "痔瘡", "synonyms": ["內外痔", "肛門疾患", "痔核"], "syndromes": ["風傷腸絡", "濕熱下注", "氣滯血瘀", "脾虛氣陷", "陰虛腸燥"], "treatment_available": false},
+        {"name": "肛瘻", "synonyms": ["肛門瘻管", "痔瘻"], "syndromes": ["濕熱下注", "陰虛火旺", "氣血兩虛"], "treatment_available": false},
+        {"name": "脫肛", "synonyms": ["直腸脫出", "脫痔"], "syndromes": ["氣虛下陷", "濕熱下注"], "treatment_available": true},
+        {"name": "肛裂", "synonyms": ["肛門裂傷", "肛門裂"], "syndromes": ["血熱腸燥", "氣滯血瘀", "陰虛津亏"], "treatment_available": false}
+      ],
+      "泌尿男性": [
+        {"name": "前列腺炎", "synonyms": ["慢性前列腺炎", "前列腺痛"], "syndromes": ["濕熱蘊結", "氣滯血瘀", "陰虛火旺", "腎陽虛衰"], "treatment_available": false},
+        {"name": "前列腺增生", "synonyms": ["前列腺肥大", "攝護腺肥大"], "syndromes": ["濕熱下注", "氣瘀互結", "腎陽不足", "腎陰虧虛"], "treatment_available": false},
+        {"name": "男性不育症", "synonyms": ["不孕症", "無精子症"], "syndromes": ["腎虛精弱", "肝郁氣滯", "痰濕內阻", "瘀血阻絡"], "treatment_available": false}
+      ],
+      "腫瘤": [
+        {"name": "瘤岩", "synonyms": ["良性腫瘤", "惡性腫瘤", "癌症"], "syndromes": ["氣郁痰凝", "瘀毒內阻", "正氣虛弱"], "treatment_available": false},
+        {"name": "乳岩", "synonyms": ["乳腺癌"], "syndromes": ["肝郁痰凝", "冲任失調", "正虛毒熾"], "treatment_available": false}
+      ],
+      "其他": [
+        {"name": "腸癰", "synonyms": ["急性闌尾炎", "盲腸炎"], "syndromes": ["瘀滯證", "濕熱證", "毒熱證"], "treatment_available": true},
+        {"name": "膽石症", "synonyms": ["膽囊結石", "膽管結石"], "syndromes": ["肝郁氣滯", "濕熱蘊結", "瘀血阻絡", "肝陰不足"], "treatment_available": false},
+        {"name": "血栓閉塞性脈管炎", "synonyms": ["脈管炎", "雷諾氏病"], "syndromes": ["寒濕阻絡", "血瘀絡阻", "熱毒熾盛", "脾腎陽虛"], "treatment_available": false}
+      ]
+    },
+    "婦科": {
+      "月經": [
+        {"name": "月經失調", "synonyms": ["月經紊亂", "月經異常"], "syndromes": ["腎虛", "血虛", "脾虛", "肝郁", "血瘀", "痰濕"], "treatment_available": false},
+        {"name": "月經先期", "synonyms": ["經期提前"], "syndromes": ["陽盛血熱", "肝鬱血熱", "陰虛血熱", "血虛"], "treatment_available": false},
+        {"name": "月經後期", "synonyms": ["經期延後", "月經錯後"], "syndromes": ["腎虛", "血虛", "血寒", "氣滯", "痰濕"], "treatment_available": false},
+        {"name": "月經先後無定期", "synonyms": ["經期紊亂", "月經愆期"], "syndromes": ["肝郁", "腎虛"], "treatment_available": false},
+        {"name": "經間期出血", "synonyms": ["排卵期出血", "經間期流血"], "syndromes": ["腎陰虛", "濕熱", "血瘀"], "treatment_available": false},
+        {"name": "崩漏", "synonyms": ["功能性子宮出血", "月經過多"], "syndromes": ["腎虛", "脾虛", "血熱", "血瘀"], "treatment_available": true},
+        {"name": "閉經", "synonyms": ["停經", "月經不來"], "syndromes": ["肝腎不足", "氣血虛弱", "氣滯血瘀", "痰濕阻滯"], "treatment_available": false},
+        {"name": "痛經", "synonyms": ["經行腹痛", "月經痛"], "syndromes": ["氣滯血瘀", "寒凝血瘀", "濕熱蘊結", "氣血虛弱", "肝腎虧損"], "treatment_available": false},
+        {"name": "經前緊張綜合徵", "synonyms": ["經前綜合徵", "經前癥候群"], "syndromes": ["肝郁氣滯", "心血不足", "陰虛火旺", "脾腎陽虛"], "treatment_available": false},
+        {"name": "經行乳房脹痛", "synonyms": ["經前乳脹"], "syndromes": ["肝郁", "腎虛"], "treatment_available": false},
+        {"name": "經行頭痛", "synonyms": ["經期頭痛"], "syndromes": ["肝郁", "血瘀", "血虛"], "treatment_available": false},
+        {"name": "經行發熱", "synonyms": ["經期發熱"], "syndromes": ["肝郁", "血瘀", "陰虛"], "treatment_available": false},
+        {"name": "經行身痛", "synonyms": ["經期關節痛"], "syndromes": ["血虛", "血瘀"], "treatment_available": false},
+        {"name": "經行泄瀉", "synonyms": ["經期腹瀉"], "syndromes": ["脾虛", "腎虛"], "treatment_available": false},
+        {"name": "經行浮腫", "synonyms": ["經期水腫"], "syndromes": ["脾虛", "腎虛"], "treatment_available": false},
+        {"name": "經行吐衄", "synonyms": ["倒經", "逆經"], "syndromes": ["肝經郁火", "肺腎陰虛"], "treatment_available": false},
+        {"name": "經行情志異常", "synonyms": ["經期精神病"], "syndromes": ["肝郁", "痰火", "心血虛"], "treatment_available": false}
+      ],
+      "帶下": [
+        {"name": "帶下病", "synonyms": ["白帶異常", "陰道分泌物"], "syndromes": ["脾虛濕盛", "腎陽虛衰", "濕熱下注", "肝經濕熱", "痰濕蘊結"], "treatment_available": true}
+      ],
+      "妊娠": [
+        {"name": "妊娠惡阻", "synonyms": ["孕吐", "妊娠嘔吐"], "syndromes": ["脾胃虛弱", "肝氣犯胃", "痰濕內阻"], "treatment_available": false},
+        {"name": "妊娠腹痛", "synonyms": ["胎動不安", "宮縮痛"], "syndromes": ["血虛", "氣郁", "虛寒", "血瘀"], "treatment_available": false},
+        {"name": "胎動不安", "synonyms": ["先兆流產", "胎孕不固"], "syndromes": ["腎虛", "氣血虛弱", "血熱", "外傷"], "treatment_available": false},
+        {"name": "胎位不正", "synonyms": ["臀位", "橫位"], "syndromes": ["氣血虛弱", "氣郁"], "treatment_available": true},
+        {"name": "胎萎不長", "synonyms": ["胎兒發育遲緩"], "syndromes": ["氣血虛弱", "腎虛", "血熱"], "treatment_available": false},
+        {"name": "子腫", "synonyms": ["妊娠水腫"], "syndromes": ["脾虛", "腎虛", "氣郁"], "treatment_available": false},
+        {"name": "子眩", "synonyms": ["妊娠眩暈"], "syndromes": ["肝陽上亢", "氣血虛弱", "腎陰不足"], "treatment_available": false},
+        {"name": "子癇", "synonyms": ["妊娠癲癇", "產前子癇"], "syndromes": ["肝風內動", "痰火上擾"], "treatment_available": false},
+        {"name": "子淋", "synonyms": ["妊娠泌尿感染"], "syndromes": ["膀胱濕熱", "陰虛火旺"], "treatment_available": false},
+        {"name": "轉胞", "synonyms": ["妊娠尿瀦留"], "syndromes": ["腎虛", "氣虛"], "treatment_available": false},
+        {"name": "流產", "synonyms": ["自然流產", "先兆流產"], "syndromes": ["腎虛", "血熱", "血瘀", "外傷"], "treatment_available": false}
+      ],
+      "產後": [
+        {"name": "產後腹痛", "synonyms": ["宮縮痛", "產後肚子痛"], "syndromes": ["血瘀", "寒凝", "血虛", "氣郁"], "treatment_available": false},
+        {"name": "產後發熱", "synonyms": ["產褥熱", "產後感染"], "syndromes": ["感染邪毒", "外感", "血瘀", "血虛"], "treatment_available": false},
+        {"name": "產後血崩", "synonyms": ["產後大出血"], "syndromes": ["氣虛", "血瘀", "產道損傷"], "treatment_available": false},
+        {"name": "產後惡露不絕", "synonyms": ["產後陰道流血"], "syndromes": ["氣虛", "血熱", "血瘀"], "treatment_available": false},
+        {"name": "產後自汗盜汗", "synonyms": ["產後多汗"], "syndromes": ["氣虛", "陰虛"], "treatment_available": false},
+        {"name": "產後大便難", "synonyms": ["產後便祕"], "syndromes": ["血虛腸燥", "氣虛失運", "陰虛火旺"], "treatment_available": false},
+        {"name": "缺乳", "synonyms": ["乳汁不足", "泌乳不足"], "syndromes": ["氣血虛弱", "肝氣郁結", "痰濁阻滯"], "treatment_available": false},
+        {"name": "乳汁自出", "synonyms": ["溢乳"], "syndromes": ["氣虛", "肝郁"], "treatment_available": false},
+        {"name": "產後身痛", "synonyms": ["產後關節痛", "產後痹證"], "syndromes": ["血虛", "腎虛", "風寒", "血瘀"], "treatment_available": false},
+        {"name": "產後情志異常", "synonyms": ["產後憂鬱", "產後精神病"], "syndromes": ["肝郁", "痰火", "心血虛"], "treatment_available": false}
+      ],
+      "腫瘤": [
+        {"name": "癥瘕", "synonyms": ["婦科腫瘤", "子宫肌瘤", "卵巢囊腫"], "syndromes": ["氣滯", "血瘀", "痰濕", "熱毒"], "treatment_available": false},
+        {"name": "陰挺", "synonyms": ["陰道脫垂", "子宫脫垂"], "syndromes": ["氣虛下陷", "腎虛不固"], "treatment_available": true}
+      ],
+      "其他": [
+        {"name": "不孕症", "synonyms": ["原發性不孕", "繼發性不孕"], "syndromes": ["腎虛", "肝郁", "痰濕", "血瘀"], "treatment_available": false},
+        {"name": "絕經前後諸證", "synonyms": ["更年期綜合徵", "圍絕經期"], "syndromes": ["腎陰虛", "腎陽虛", "肝郁", "心脾兩虛"], "treatment_available": false},
+        {"name": "盆腔炎", "synonyms": ["盆腔炎症", "附件炎"], "syndromes": ["濕熱瘀結", "寒濕凝滯", "氣滯血瘀", "脾虛濕困"], "treatment_available": false},
+        {"name": "陰癢", "synonyms": ["陰道瘙癢", "外陰瘙癢"], "syndromes": ["肝經濕熱", "肝腎陰虛", "脾虛濕盛"], "treatment_available": false}
+      ]
+    },
+    "兒科": {
+      "新生兒": [
+        {"name": "硬腫症", "synonyms": ["新生兒硬皮症", "新生兒水腫"], "syndromes": ["陽氣虛弱", "寒凝血瘀"], "treatment_available": false},
+        {"name": "胎黃", "synonyms": ["新生兒黃疸"], "syndromes": ["濕熱郁蒸", "寒濕阻滯", "瘀積發黃", "脾虛濕困"], "treatment_available": false},
+        {"name": "臍瘡", "synonyms": ["新生兒臍炎", "臍部感染"], "syndromes": ["熱毒侵襲", "脾氣虛弱"], "treatment_available": false},
+        {"name": "臍濕", "synonyms": ["臍部潮濕"], "syndromes": ["濕邪浸淫"], "treatment_available": false},
+        {"name": "臍血", "synonyms": ["臍部出血"], "syndromes": ["氣血虛弱"], "treatment_available": false},
+        {"name": "臍突", "synonyms": ["臍疝"], "syndromes": ["先天不足"], "treatment_available": false}
+      ],
+      "肺系": [
+        {"name": "感冒", "synonyms": ["小兒感冒", "上呼吸道感染"], "syndromes": ["風寒感冒", "風熱感冒", "暑濕感冒", "虛人感冒"], "treatment_available": true},
+        {"name": "咳嗽", "synonyms": ["小兒咳嗽", "支氣管炎"], "syndromes": ["風寒襲肺", "風熱犯肺", "痰熱郁肺", "痰濕蘊肺", "肺脾氣虛", "肺陰不足"], "treatment_available": true},
+        {"name": "肺炎喘嗽", "synonyms": ["小兒肺炎", "支氣管肺炎"], "syndromes": ["風寒閉肺", "風熱閉肺", "痰熱閉肺", "毒熱閉肺", "肺脾氣虛", "心陽虛衰", "邪陷厥陰"], "treatment_available": false},
+        {"name": "哮喘", "synonyms": ["小兒哮喘", "支氣管哮喘"], "syndromes": ["熱性哮喘", "寒性哮喘", "外寒內熱", "肺脾氣虛", "腎虛不納"], "treatment_available": false},
+        {"name": "反覆呼吸道感染", "synonyms": ["複感", "頻繁感冒"], "syndromes": ["肺脾氣虛", "營衛失和", "肺腎兩虛"], "treatment_available": false}
+      ],
+      "脾胃": [
+        {"name": "鵝口瘡", "synonyms": ["口腔念珠菌病", "雪口病"], "syndromes": ["心脾積熱", "虛火上浮"], "treatment_available": false},
+        {"name": "口瘡", "synonyms": ["口腔潰疡", "鵝口瘡"], "syndromes": ["風熱乘脾", "心火上炎", "虛火上浮", "脾胃積熱"], "treatment_available": false},
+        {"name": "嘔吐", "synonyms": ["小兒嘔吐"], "syndromes": ["乳食傷胃", "胃热气逆", "脾胃虛弱", "肝氣犯胃"], "treatment_available": false},
+        {"name": "腹痛", "synonyms": ["小兒腹痛"], "syndromes": ["寒凝腹痛", "乳食積滯", "脾胃虛寒", "氣血兩虛"], "treatment_available": false},
+        {"name": "泄瀉", "synonyms": ["小兒腹瀉"], "syndromes": ["風寒泄瀉", "濕熱泄瀉", "傷食泄瀉", "脾虛泄瀉", "脾腎陽虛"], "treatment_available": false},
+        {"name": "厭食", "synonyms": ["食慾不振", "納呆"], "syndromes": ["脾胃不和", "脾胃氣虛", "脾胃陰虛", "肝氣犯胃"], "treatment_available": false},
+        {"name": "積滯", "synonyms": ["消化不良", "食積"], "syndromes": ["乳食停滯", "脾虛夾積"], "treatment_available": false},
+        {"name": "疳證", "synonyms": ["營養不良", "小兒消瘦"], "syndromes": ["疳氣", "疳積", "乾疳"], "treatment_available": false},
+        {"name": "便秘", "synonyms": ["小兒便祕"], "syndromes": ["乳食積滞", "腸道熱結", "血虛腸燥", "脾胃虛弱"], "treatment_available": false}
+      ],
+      "傳染病": [
+        {"name": "痄腮", "synonyms": ["流行性腮腺炎", "腮腺炎"], "syndromes": ["溫毒在表", "熱毒蘊結", "邪陷心肝", "毒竄睾腹"], "treatment_available": false},
+        {"name": "頓咳", "synonyms": ["百日咳", "鷄咳"], "syndromes": ["初咳期", "痙咳期", "恢復期"], "treatment_available": false},
+        {"name": "奶麻", "synonyms": ["幼兒急疹", "玫瑰疹"], "syndromes": ["風濕挾熱"], "treatment_available": false},
+        {"name": "風痧", "synonyms": ["風疹"], "syndromes": ["風濕挾熱"], "treatment_available": false},
+        {"name": "丹痧", "synonyms": ["猩紅熱"], "syndromes": ["邪侵肺衛", "毒氣熾盛", "疹後陰傷"], "treatment_available": false},
+        {"name": "水痘", "synonyms": ["天花", "水疱疹"], "syndromes": ["風熱挾濕", "熱毒熾盛"], "treatment_available": false},
+        {"name": "癤皰", "synonyms": ["膿皰瘡", "黃水瘡"], "syndromes": ["暑濕挾熱", "脾虛濕盛"], "treatment_available": false},
+        {"name": "痙證", "synonyms": ["小兒抽搐", "驚風"], "syndromes": ["邪陷心肝", "肝經風熱", "痰熱閉阻", "脾腎陽虛"], "treatment_available": false},
+        {"name": "遺尿", "synonyms": ["夜遺尿", "尿床"], "syndromes": ["腎氣不固", "脾肺氣虛", "肝經濕熱", "心腎不交"], "treatment_available": true}
+      ],
+      "心肝": [
+        {"name": "惊風", "synonyms": ["小兒驚厥", "驚厥"], "syndromes": ["急驚風", "慢驚風", "慢脾風"], "treatment_available": false},
+        {"name": "癲癇", "synonyms": ["小兒癲癇"], "syndromes": ["驚癇", "痰癇", "風癇", "瘀血癇", "虛癇"], "treatment_available": false},
+        {"name": "多動症", "synonyms": ["注意力缺陷多動障礙", "ADHD"], "syndromes": ["心肝火旺", "痰火內擾", "心脾兩虛", "肝腎陰虛"], "treatment_available": false},
+        {"name": "孤獨症", "synonyms": ["自閉症", "ASD"], "syndromes": ["心肝火旺", "痰蒙心竅", "心腎兩虛"], "treatment_available": true}
+      ]
+    }
+  },
+  "syndromes_map": {
+    "風寒襲肺": {"category": "內科", "symptoms": ["惡寒發熱", "無汗", "頭痛", "身痛", "骨節酸痛", "鼻塞流清涕"], "tongueSigns": ["舌質淡紅", "舌苔薄白"], "pulseTypes": ["浮緊"], "zhifa": "辛溫解表", "main_points": "列缺、合谷、風池、大椎"},
+    "風熱犯肺": {"category": "內科", "symptoms": ["發熱", "微惡風寒", "汗出口乾", "咽喉腫痛", "咳嗽痰黃稠", "鼻塞黃涕"], "tongueSigns": ["舌質紅", "舌苔薄黃"], "pulseTypes": ["浮數"], "zhifa": "辛涼解表", "main_points": "列缺、合谷、風池、大椎"},
+    "暑濕傷表": {"category": "內科", "symptoms": ["發熱微惡風寒", "心煩口渴", "胸悶嘔惡", "肢體沉重", "小便短赤"], "tongueSigns": ["舌質紅", "舌苔白膩"], "pulseTypes": ["濡數"], "zhifa": "清暑祛濕解表", "main_points": "大椎、陰陵泉、足三里"},
+    "氣虛感冒": {"category": "內科", "symptoms": ["惡寒發熱", "無汗", "神疲乏力", "氣短懶言", "自汗", "易於感冒"], "tongueSigns": ["舌質淡", "舌苔薄白"], "pulseTypes": ["浮弱"], "zhifa": "益氣解表", "main_points": "足三里、氣海、脾俞"},
+    "肺脾氣虛": {"category": "內科", "symptoms": ["咳嗽日久不愈", "咳聲低弱", "氣短乏力", "納差便溏", "自汗易感"], "tongueSigns": ["舌質淡", "舌體胖大"], "pulseTypes": ["虛弱"], "zhifa": "補肺健脾", "main_points": "肺俞、脾俞、足三里"},
+    "痰濕蘊肺": {"category": "內科", "symptoms": ["咳嗽痰多", "痰白黏稠", "胸悶納呆", "嘔惡腹脹", "便溏"], "tongueSigns": ["舌質淡", "舌苔白膩"], "pulseTypes": ["滑"], "zhifa": "燥濕化痰", "main_points": "豐隆、中脘、脾俞"},
+    "痰熱鬱肺": {"category": "內科", "symptoms": ["咳嗽痰黃黏稠", "胸悶口乾", "發熱面赤", "尿黃便乾"], "tongueSigns": ["舌質紅", "舌苔黃膩"], "pulseTypes": ["滑數"], "zhifa": "清熱化痰", "main_points": "尺澤、豐隆、曲池"},
+    "肝火犯肺": {"category": "內科", "symptoms": ["咳嗽陣作", "痰黏量少", "胸脅脹痛", "急躁易怒", "面紅口苦"], "tongueSigns": ["舌質紅", "舌苔薄黃"], "pulseTypes": ["弦數"], "zhifa": "清肝瀉火", "main_points": "太沖、陽陵泉、尺澤"},
+    "肺腎兩虛": {"category": "內科", "symptoms": ["喘促日久", "呼多吸少", "動則喘息", "腰膝酸軟", "畏寒肢冷"], "tongueSigns": ["舌質淡", "少苔"], "pulseTypes": ["沉弱"], "zhifa": "補腎納氣", "main_points": "腎俞、太溪、命門"},
+    "心脾兩虛": {"category": "內科", "symptoms": ["心悸失眠", "食少腹脹", "神疲乏力", "面色萎黃", "大便溏薄"], "tongueSigns": ["舌質淡", "舌苔薄白"], "pulseTypes": ["細弱"], "zhifa": "補益心脾", "main_points": "心俞、脾俞、足三里"},
+    "心腎不交": {"category": "內科", "symptoms": ["心煩失眠", "心悸不安", "眩暈耳鳴", "腰膝酸軟", "五心煩熱"], "tongueSigns": ["舌質紅", "少苔"], "pulseTypes": ["細數"], "zhifa": "滋陰降火", "main_points": "神門、太溪、心俞"},
+    "肝火擾心": {"category": "內科", "symptoms": ["失眠多夢", "急躁易怒", "頭暈脹痛", "口苦便秘", "眩暈耳鳴"], "tongueSigns": ["舌質紅", "舌苔黃"], "pulseTypes": ["弦數"], "zhifa": "清肝瀉火", "main_points": "太沖、肝俞、神門"},
+    "痰熱擾心": {"category": "內科", "symptoms": ["心煩失眠", "胸悶嘔惡", "痰多頭暈", "口苦便秘"], "tongueSigns": ["舌質紅", "舌苔黃膩"], "pulseTypes": ["滑數"], "zhifa": "清熱化痰", "main_points": "豐隆、內關、神門"},
+    "心血瘀阻": {"category": "內科", "symptoms": ["心胸刺痛", "痛處固定", "心悸失眠", "唇甲青紫"], "tongueSigns": ["舌質紫暗"], "pulseTypes": ["澀"], "zhifa": "活血化瘀", "main_points": "內關、膻中、膈俞"},
+    "肝陽上亢": {"category": "內科", "symptoms": ["眩暈耳鳴", "頭目脹痛", "急躁易怒", "失眠多夢", "腰膝酸軟"], "tongueSigns": ["舌質紅", "舌苔黃"], "pulseTypes": ["弦數"], "zhifa": "平肝潛陽", "main_points": "太沖、風池、百會"},
+    "腎精不足": {"category": "內科", "symptoms": ["眩暈耳鳴", "記憶減退", "腰膝酸軟", "齲齒脫髮", "齲齒松動"], "tongueSigns": ["舌質淡", "少苔"], "pulseTypes": ["細弱"], "zhifa": "補腎填精", "main_points": "腎俞、太溪、命門"},
+    "痰濁中阻": {"category": "內科", "symptoms": ["眩暈頭重", "胸悶嘔惡", "納呆便溏", "肢體困重"], "tongueSigns": ["舌質淡", "舌苔白膩"], "pulseTypes": ["濡滑"], "zhifa": "燥濕化痰", "main_points": "豐隆、中脘、陰陵泉"},
+    "瘀血阻竅": {"category": "內科", "symptoms": ["眩暈健忘", "失眠心悸", "頭痛如刺", "舌質紫暗"], "tongueSigns": ["舌質紫暗"], "pulseTypes": ["澀"], "zhifa": "活血化瘀", "main_points": "血海、膈俞、三陰交"},
+    "肝氣郁結": {"category": "內科", "symptoms": ["精神抑鬱", "胸悶善太息", "脅肋脹痛", "脘腹脹悶", "月經紊亂"], "tongueSigns": ["舌質淡紅"], "pulseTypes": ["弦"], "zhifa": "疏肝解郁", "main_points": "太沖、期門、肝俞"},
+    "氣郁化火": {"category": "內科", "symptoms": ["急躁易怒", "口苦咽乾", "胸脅脹痛", "便秘尿黃", "頭暈目赤"], "tongueSigns": ["舌質紅", "舌苔黃"], "pulseTypes": ["弦數"], "zhifa": "清肝瀉火", "main_points": "行間、俠溪、太沖"},
+    "痰氣郁結": {"category": "內科", "symptoms": ["精神抑鬱", "咽中如有物阻", "胸悶脅脹", "嘔惡痰多"], "tongueSigns": ["舌質淡", "苔白膩"], "pulseTypes": ["弦滑"], "zhifa": "化痰散結", "main_points": "豐隆、膻中、天突"},
+    "心神失養": {"category": "內科", "symptoms": ["精神恍惚", "心悸膽怯", "失眠健忘", "悲憂善哭"], "tongueSigns": ["舌質淡"], "pulseTypes": ["細弱"], "zhifa": "養心安神", "main_points": "心俞、神門、三陰交"},
+    "心膽氣虛": {"category": "內科", "symptoms": ["心悸膽怯", "善驚易恐", "坐臥不安", "失眠多夢", "氣短自汗"], "tongueSigns": ["舌質淡", "苔薄白"], "pulseTypes": ["細弱"], "zhifa": "益氣鎮驚", "main_points": "神門、心俞、膽俞"},
+    "脾胃虛弱": {"category": "內科", "symptoms": ["胃脘隱痛", "喜溫喜按", "納呆腹脹", "倦怠乏力", "大便溏薄"], "tongueSigns": ["舌質淡", "苔薄白"], "pulseTypes": ["虛緩"], "zhifa": "健脾益氣", "main_points": "脾俞、胃俞、足三里"},
+    "肝氣犯胃": {"category": "內科", "symptoms": ["胃脘脹痛", "連及兩脅", "噯氣頻繁", "情緒不舒則痛甚"], "tongueSigns": ["舌質淡紅"], "pulseTypes": ["弦"], "zhifa": "疏肝和胃", "main_points": "太沖、期門、中脘"},
+    "濕熱中阻": {"category": "內科", "symptoms": ["胃脘灼痛", "嘈雜泛酸", "口苦黏膩", "納呆惡心", "大便黏滯"], "tongueSigns": ["舌質紅", "苔黃膩"], "pulseTypes": ["滑數"], "zhifa": "清熱化濕", "main_points": "內庭、陰陵泉、公孫"},
+    "瘀血停胃": {"category": "內科", "symptoms": ["胃痛如刺", "痛處固定", "拒按", "血色青紫", "舌質紫暗"], "tongueSigns": ["舌質紫暗"], "pulseTypes": ["澀"], "zhifa": "活血化瘀", "main_points": "血海、膈俞、三陰交"},
+    "胃陰虧虛": {"category": "內科", "symptoms": ["胃痛隱作", "嘈雜不適", "口乾咽燥", "大便乾結", "手足心熱"], "tongueSigns": ["舌質紅", "少苔"], "pulseTypes": ["細數"], "zhifa": "滋陰益胃", "main_points": "胃俞、三陰交、太溪"},
+    "脾胃虛寒": {"category": "內科", "symptoms": ["胃痛隱作", "喜溫喜按", "泛吐清水", "納差乏力", "大便溏薄"], "tongueSigns": ["舌質淡", "苔白滑"], "pulseTypes": ["遲緩"], "zhifa": "溫中健脾", "main_points": "脾俞、胃俞、關元"},
+    "寒濕泄瀉": {"category": "內科", "symptoms": ["大便清稀", "腹痛腸鳴", "惡寒發熱", "鼻塞頭重"], "tongueSigns": ["舌質淡", "苔白膩"], "pulseTypes": ["濡緩"], "zhifa": "芳香化濕", "main_points": "陰陵泉、天樞、上巨虛"},
+    "濕熱泄瀉": {"category": "內科", "symptoms": ["大便黃褐臭穢", "肛門灼熱", "腹痛急迫", "發熱口渴"], "tongueSigns": ["舌質紅", "苔黃膩"], "pulseTypes": ["滑數"], "zhifa": "清熱利濕", "main_points": "曲池、陰陵泉、天樞"},
+    "肝氣乘脾": {"category": "內科", "symptoms": ["腹痛即瀉", "瀉後痛緩", "胸脅脹悶", "噯氣食少", "情緒緊張則發"], "tongueSigns": ["舌質淡紅"], "pulseTypes": ["弦緩"], "zhifa": "抑肝扶脾", "main_points": "太沖、脾俞、陽陵泉"},
+    "脾氣虛弱": {"category": "內科", "symptoms": ["大便時溏時瀉", "食慾不振", "腹脹乏力", "面色萎黃"], "tongueSigns": ["舌質淡", "苔薄白"], "pulseTypes": ["虛弱"], "zhifa": "健脾益氣", "main_points": "脾俞、足三里、陰陵泉"},
+    "腎陽虛衰": {"category": "內科", "symptoms": ["黎明泄瀉", "腹中冷痛", "形寒肢冷", "腰膝酸軟", "舌淡苔白"], "tongueSigns": ["舌質淡"], "pulseTypes": ["沉遲"], "zhifa": "溫補脾腎", "main_points": "命門、關元、腎俞"},
+    "肝膽濕熱": {"category": "內科", "symptoms": ["脅痛口苦", "噁心嘔吐", "厭食腹脹", "身黃尿黃", "發熱黃疸"], "tongueSigns": ["舌質紅", "苔黃膩"], "pulseTypes": ["弦數"], "zhifa": "清熱利濕", "main_points": "陽陵泉、膽俞、俠溪"},
+    "肝陰不足": {"category": "內科", "symptoms": ["脅肋隱痛", "頭暈目眩", "失眠多夢", "口乾咽燥", "舌紅少苔"], "tongueSigns": ["舌質紅", "少苔"], "pulseTypes": ["細弦"], "zhifa": "滋養肝陰", "main_points": "肝俞、太溪、三陰交"},
+    "寒凝肝脈": {"category": "內科", "symptoms": ["脅肋冷痛", "遇寒加重", "畏寒肢冷", "嘔吐清涎"], "tongueSigns": ["舌質淡", "苔白"], "pulseTypes": ["沉緊"], "zhifa": "溫經散寒", "main_points": "肝俞、章門、關元"},
+    "脾腎陽虛水腫": {"category": "內科", "symptoms": ["水腫午後為甚", "腰膝酸冷", "納呆便溏", "畏寒乏力", "面色晦暗"], "tongueSigns": ["舌質淡胖"], "pulseTypes": ["沉弱"], "zhifa": "溫補脾腎", "main_points": "脾俞、腎俞、命門"},
+    "膀胱濕熱": {"category": "內科", "symptoms": ["尿頻尿急", "尿道灼痛", "小腹脹痛", "尿液黃赤", "發熱腰痛"], "tongueSigns": ["舌質紅", "苔黃膩"], "pulseTypes": ["滑數"], "zhifa": "清熱利濕", "main_points": "中極、陰陵泉、膀胱俞"},
+    "腎虛不固": {"category": "內科", "symptoms": ["遺精滑泄", "腰膝酸軟", "頭暈耳鳴", "夜尿頻多", "陽痿早泄"], "tongueSigns": ["舌質淡", "苔薄白"], "pulseTypes": ["沉弱"], "zhifa": "補腎固精", "main_points": "腎俞、命門、氣海"},
+    "陰虛火旺": {"category": "內科", "symptoms": ["眩暈失眠", "潮熱盜汗", "口乾咽燥", "腰膝酸軟", "遺精早泄"], "tongueSigns": ["舌質紅", "少苔"], "pulseTypes": ["細數"], "zhifa": "滋陰降火", "main_points": "太溪、三陰交、心俞"},
+    "風痰瘀阻": {"category": "內科", "symptoms": ["半身不遂", "肢體麻木", "語言不利", "眩暈痰多"], "tongueSigns": ["舌質淡"], "pulseTypes": ["弦滑"], "zhifa": "祛風化痰", "main_points": "豐隆、合谷、百會"},
+    "風陽上擾": {"category": "內科", "symptoms": ["眩暈頭痛", "耳鳴面赤", "突然口眼歪斜", "肢體麻木"], "tongueSigns": ["舌質紅"], "pulseTypes": ["弦數"], "zhifa": "平肝熄風", "main_points": "太沖、太溪、百會"},
+    "氣虛絡瘀": {"category": "內科", "symptoms": ["肢體偏枯", "肢軟無力", "面色萎黃", "心悸氣短"], "tongueSigns": ["舌質淡紫"], "pulseTypes": ["細澀"], "zhifa": "益氣活血", "main_points": "足三里、三陰交、血海"},
+    "風寒濕痹": {"category": "內科", "symptoms": ["關節酸痛", "遊走不定", "遇寒加重", "得熱痛減", "屈伸不利"], "tongueSigns": ["舌質淡", "苔白"], "pulseTypes": ["浮緊"], "zhifa": "祛風散寒", "main_points": "風池、風門、命門"},
+    "風濕熱痹": {"category": "內科", "symptoms": ["關節紅腫熱痛", "發熱口渴", "小便黃赤", "屈伸不利"], "tongueSigns": ["舌質紅", "苔黃膩"], "pulseTypes": ["滑數"], "zhifa": "清熱祛風", "main_points": "曲池、陰陵泉、大椎"},
+    "寒濕腰痛": {"category": "內科", "symptoms": ["腰部冷痛重著", "遇寒加重", "得熱痛減", "轉側不利"], "tongueSigns": ["舌質淡", "苔白膩"], "pulseTypes": ["沉緊"], "zhifa": "散寒祛濕", "main_points": "命門、腰陽關、委中"},
+    "瘀血腰痛": {"category": "內科", "symptoms": ["腰痛如刺", "痛處固定", "拒按", "俯仰不利", "舌質紫暗"], "tongueSigns": ["舌質紫暗"], "pulseTypes": ["澀"], "zhifa": "活血化瘀", "main_points": "血海、三陰交、腰夾脊"},
+    "腎虛腰痛": {"category": "內科", "symptoms": ["腰痛酸軟", "遇勞加重", "喜按喜溫", "畏寒肢冷", "或潮熱盜汗"], "tongueSigns": ["舌質淡"], "pulseTypes": ["沉弱"], "zhifa": "補腎強腰", "main_points": "腎俞、命門、太溪"},
+    "肝腎不足": {"category": "外科", "symptoms": ["脫髮", "毛髮稀疏", "頭髮變細變軟", "頭暈耳鳴", "腰膝酸軟", "失眠健忘"], "tongueSigns": ["舌質淡", "苔少"], "pulseTypes": ["細弱"], "zhifa": "補益肝腎", "main_points": "肝俞、腎俞、太溪"},
+    "肝郁痰凝": {"category": "外科/婦科", "symptoms": ["乳房腫塊", "結節質地中等", "隨喜怒消長", "胸悶脅脹", "失眠多夢"], "tongueSigns": ["舌質淡", "苔薄白"], "pulseTypes": ["弦"], "zhifa": "疏肝解郁", "main_points": "太沖、期門、豐隆"},
+    "沖任失調": {"category": "婦科", "symptoms": ["月經紊亂", "經前乳房脹痛", "煩躁易怒", "腰膝酸軟"], "tongueSigns": ["舌質淡"], "pulseTypes": ["細弦"], "zhifa": "調理沖任", "main_points": "關元、三陰交、肝俞"},
+    "腎虛": {"category": "婦科", "symptoms": ["月經過少", "閉經", "不孕", "腰膝酸軟", "頭暈耳鳴", "性慾減退"], "tongueSigns": ["舌質淡", "苔少"], "pulseTypes": ["沉弱"], "zhifa": "補腎益精", "main_points": "腎俞、命門、氣海"},
+    "氣血虛弱": {"category": "婦科", "symptoms": ["月經過少", "閉經", "頭暈乏力", "面色萎黃", "心悸失眠", "產後缺乳"], "tongueSigns": ["舌質淡"], "pulseTypes": ["細弱"], "zhifa": "補益氣血", "main_points": "足三里、脾俞、血海"},
+    "氣虛下陷": {"category": "外科/婦科", "symptoms": ["陰挺", "脫肛", "眩暈乏力", "氣短懶言", "小腹下墜感"], "tongueSigns": ["舌質淡"], "pulseTypes": ["虛弱"], "zhifa": "補氣升提", "main_points": "百會、氣海、足三里"},
+    "肺脾氣虛過敏": {"category": "兒科", "symptoms": ["反覆感冒", "咳嗽喘促", "鼻塞流涕", "皮膚瘙癢", "食慾不振"], "tongueSigns": ["舌質淡", "苔薄白"], "pulseTypes": ["虛弱"], "zhifa": "補肺健脾", "main_points": "肺俞、脾俞、足三里"},
+    "心腎陰虛": {"category": "內科", "symptoms": ["虛煩失眠", "心悸不安", "腰膝酸軟", "健忘耳鳴", "五心煩熱"], "tongueSigns": ["舌質紅", "少苔"], "pulseTypes": ["細數"], "zhifa": "滋陰清熱", "main_points": "心俞、腎俞、神門"},
+    "脾腎陽虛": {"category": "內科", "symptoms": ["畏寒肢冷", "腰膝酸冷", "納差便溏", "水腫尿少", "面色晦暗"], "tongueSigns": ["舌質淡胖"], "pulseTypes": ["沉弱"], "zhifa": "溫補脾腎", "main_points": "脾俞、腎俞、命門"},
+    "心脾兩虛不寐": {"category": "內科", "symptoms": ["失眠多夢", "心悸健忘", "納差腹脹", "倦怠乏力", "面色萎黃"], "tongueSigns": ["舌質淡"], "pulseTypes": ["細弱"], "zhifa": "補益心脾", "main_points": "心俞、脾俞、神門"},
+    "肺經燥熱": {"category": "五官科", "symptoms": ["鼻塞黃涕", "前額眉棱骨痛", "咳嗽痰黃", "咽喉腫痛", "口乾舌燥"], "tongueSigns": ["舌質紅", "苔黃"], "pulseTypes": ["浮數"], "zhifa": "清肺瀉熱", "main_points": "列缺、合谷、曲池"},
+    "腎精不足耳鳴": {"category": "五官科", "symptoms": ["耳鳴如蟬", "持續不斷", "聽力減退", "眩暈頭暈", "腰膝酸軟"], "tongueSigns": ["舌質淡", "少苔"], "pulseTypes": ["細弱"], "zhifa": "補腎填精", "main_points": "腎俞、太溪、聽會"},
+    "肝火上炎耳鳴": {"category": "五官科", "symptoms": ["耳鳴如潮", "突發耳聾", "眩暈頭脹", "急躁易怒", "口苦咽乾"], "tongueSigns": ["舌質紅", "苔黃"], "pulseTypes": ["弦數"], "zhifa": "清肝瀉火", "main_points": "行間、俠溪、聽會"},
+    "肝腎陰虛視力": {"category": "五官科", "symptoms": ["視物模糊", "視力下降", "雙眼乾澀", "頭暈耳鳴", "腰膝酸軟"], "tongueSigns": ["舌質紅", "少苔"], "pulseTypes": ["細數"], "zhifa": "滋補肝腎", "main_points": "肝俞、腎俞、睛明"}
+  }
+}

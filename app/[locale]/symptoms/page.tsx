@@ -1,235 +1,20 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
+import diseasesData from '@/public/data/diseases.json'
 
 type Lang = 'tw' | 'cn'
 const LANG_KEY = 'tcm_lang'
-
-// === 專家模式 ===
-const EXPERT_TW = [
-  { key: '內科', emoji: '🧠', count: 21, symptoms: [
-    { name: '感冒', desc: '風寒/風熱感冒，惡寒發熱' },
-    { name: '咳嗽', desc: '外感咳嗽、內傷咳嗽' },
-    { name: '哮喘', desc: '支氣管哮喘、過敏性哮喘' },
-    { name: '胃痛', desc: '胃炎、胃潰疡、消化不良' },
-    { name: '嘔吐', desc: '胃氣上逆、脾胃虛弱' },
-    { name: '呃逆', desc: '打嗝、膈肌痙攣' },
-    { name: '腹痛', desc: '腹部不適、腸痙攣' },
-    { name: '腹瀉', desc: '急慢性腹瀉、腸炎' },
-    { name: '便祕', desc: '排便困難、腸道功能紊亂' },
-    { name: '不寐', desc: '失眠、多夢、易醒' },
-    { name: '心悸', desc: '心慌、心律不整' },
-    { name: '眩暈', desc: '頭暈、血壓異常' },
-    { name: '頭痛', desc: '偏頭痛、緊張性頭痛' },
-    { name: '郁證', desc: '抑鬱、焦慮、情緒問題' },
-    { name: '癲病', desc: '癲癇發作、神志異常' },
-    { name: '狂病', desc: '精神躁狂、神志失常' },
-    { name: '癇病', desc: '癲癇抽搐、口吐白沫' },
-    { name: '痴呆', desc: '認知障礙、老年癡呆' },
-    { name: '嗜睡', desc: '過度睏倦、精神不振' },
-    { name: '消渴', desc: '糖尿病、多飲多尿' },
-    { name: '陽強', desc: '陰莖異常勃起' },
-  ]},
-  { key: '骨傷科', emoji: '🦴', count: 12, symptoms: [
-    { name: '腰痛', desc: '腰肌勞損、腰椎間盤突出' },
-    { name: '坐骨神經痛', desc: '下肢放射性疼痛' },
-    { name: '肩周炎', desc: '五十肩、肩關節活動受限' },
-    { name: '膝痛', desc: '膝關節炎、韌帶損傷' },
-    { name: '踝扭傷', desc: '急性踝關節扭傷' },
-    { name: '頸椎病', desc: '頸椎骨質增生、脖子僵硬' },
-    { name: '痹病', desc: '關節疼痛、類風濕關節炎' },
-    { name: '面癱', desc: '面神經麻痺、口眼歪斜' },
-    { name: '面痛', desc: '三叉神經痛、面部抽搐' },
-    { name: '手腕痛', desc: '網球肘、腕管綜合徵' },
-    { name: '落枕', desc: '頸項強直、睡姿不良' },
-    { name: '急性腰扭傷', desc: '腰骶部急性損傷' },
-  ]},
-  { key: '皮外科', emoji: '🦠', count: 9, symptoms: [
-    { name: '斑禿', desc: '脫髮、斑片狀脫髮' },
-    { name: '神經性皮炎', desc: '慢性瘙癢性皮膚病' },
-    { name: '扁平疣', desc: '病毒性疣狀增生' },
-    { name: '癤瘡', desc: '毛囊炎、癤腫' },
-    { name: '丹毒', desc: '鏈球菌感染、皮膚紅腫' },
-    { name: '痔瘡', desc: '內外痔、肛門疾患' },
-    { name: '濕疹', desc: '過敏性皮膚炎' },
-    { name: '帶狀皰疹', desc: '蛇串瘡、神經痛' },
-    { name: '脫肛', desc: '直腸脫出' },
-  ]},
-  { key: '五官科', emoji: '👁️', count: 14, symptoms: [
-    { name: '目赤腫痛', desc: '結膜炎、眼睛紅腫' },
-    { name: '麥粒腫', desc: '瞼腺炎、眼瞼膿腫' },
-    { name: '眼瞼下垂', desc: '重症肌無力眼型' },
-    { name: '鼻炎', desc: '過敏性鼻炎、鼻塞' },
-    { name: '鼻衄', desc: '鼻出血' },
-    { name: '咽喉腫痛', desc: '急性扁桃體炎、咽炎' },
-    { name: '牙痛', desc: '齲齒、牙髓炎' },
-    { name: '口瘡', desc: '口腔潰疡、鵝口瘡' },
-    { name: '耳鳴耳聾', desc: '神經性耳鳴、聽力減退' },
-    { name: '肥胖', desc: '單純性肥胖、代謝綜合徵' },
-    { name: '陽痿', desc: '勃起功能障礙' },
-    { name: '早泄', desc: '射精過早' },
-    { name: '陽強', desc: '陰莖異常勃起' },
-    { name: '眩暈（五官）', desc: '梅尼埃病、前庭功能紊亂' },
-  ]},
-  { key: '急症', emoji: '🚨', count: 7, symptoms: [
-    { name: '暈厥', desc: '短暫意識喪失' },
-    { name: '虛脫', desc: '循環衰竭、血壓下降' },
-    { name: '高熱', desc: '高燒不退、體溫過高' },
-    { name: '抽搐', desc: '癲癇大发作、破傷風' },
-    { name: '內臟絞痛', desc: '心絞痛、膽絞痛、腎絞痛' },
-    { name: '出血', desc: '吐血、咯血、便血、尿血' },
-    { name: '溺水', desc: '窒息急救' },
-  ]},
-]
-
-const EXPERT_CN = [
-  { key: '内科', emoji: '🧠', count: 21, symptoms: [
-    { name: '感冒', desc: '风寒/风热感冒，恶寒发热' },
-    { name: '咳嗽', desc: '外感咳嗽、内伤咳嗽' },
-    { name: '哮喘', desc: '支气管哮喘、过敏性哮喘' },
-    { name: '胃痛', desc: '胃炎、胃溃疡、消化不良' },
-    { name: '呕吐', desc: '胃气上逆、脾胃虚弱' },
-    { name: '呃逆', desc: '打嗝、膈肌痉挛' },
-    { name: '腹痛', desc: '腹部不适、肠痉挛' },
-    { name: '腹泻', desc: '急慢性腹泻、肠炎' },
-    { name: '便秘', desc: '排便困难、肠道功能紊乱' },
-    { name: '不寐', desc: '失眠、多梦、易醒' },
-    { name: '心悸', desc: '心慌、心律不齐' },
-    { name: '眩晕', desc: '头晕、血压异常' },
-    { name: '头痛', desc: '偏头痛、紧张性头痛' },
-    { name: '郁证', desc: '抑郁、焦虑、情绪问题' },
-    { name: '癫病', desc: '癫痫发作、神志异常' },
-    { name: '狂病', desc: '精神躁狂、神志失常' },
-    { name: '痫病', desc: '癫痫抽搐、口吐白沫' },
-    { name: '痴呆', desc: '认知障碍、老年痴呆' },
-    { name: '嗜睡', desc: '过度困倦、精神不振' },
-    { name: '消渴', desc: '糖尿病、多饮多尿' },
-    { name: '阳强', desc: '阴茎异常勃起' },
-  ]},
-  { key: '骨伤科', emoji: '🦴', count: 12, symptoms: [
-    { name: '腰痛', desc: '腰肌劳损、腰椎间盘突出' },
-    { name: '坐骨神经痛', desc: '下肢放射性疼痛' },
-    { name: '肩周炎', desc: '五十肩、肩关节活动受限' },
-    { name: '膝痛', desc: '膝关节炎、韧带损伤' },
-    { name: '踝扭伤', desc: '急性踝关节扭伤' },
-    { name: '颈椎病', desc: '颈椎骨质增生、脖子僵硬' },
-    { name: '痹病', desc: '关节疼痛、类风湿关节炎' },
-    { name: '面瘫', desc: '面神经麻痹、口眼歪斜' },
-    { name: '面痛', desc: '三叉神经痛、面部抽搐' },
-    { name: '手腕痛', desc: '网球肘、腕管综合征' },
-    { name: '落枕', desc: '颈项强直、睡姿不良' },
-    { name: '急性腰扭伤', desc: '腰骶部急性损伤' },
-  ]},
-  { key: '皮外科', emoji: '🦠', count: 9, symptoms: [
-    { name: '斑秃', desc: '脱发、斑片状脱发' },
-    { name: '神经性皮炎', desc: '慢性瘙痒性皮肤病' },
-    { name: '扁平疣', desc: '病毒性疣状增生' },
-    { name: '疖疮', desc: '毛囊炎、疖肿' },
-    { name: '丹毒', desc: '链球菌感染、皮肤红肿' },
-    { name: '痔疮', desc: '内外痔、肛门疾患' },
-    { name: '湿疹', desc: '过敏性皮肤炎' },
-    { name: '带状疱疹', desc: '蛇串疮、神经痛' },
-    { name: '脱肛', desc: '直肠脱出' },
-  ]},
-  { key: '五官科', emoji: '👁️', count: 14, symptoms: [
-    { name: '目赤肿痛', desc: '结膜炎、眼睛红肿' },
-    { name: '麦粒肿', desc: '睑腺炎、眼睑脓肿' },
-    { name: '眼睑下垂', desc: '重症肌无力眼型' },
-    { name: '鼻炎', desc: '过敏性鼻炎、鼻塞' },
-    { name: '鼻衄', desc: '鼻出血' },
-    { name: '咽喉肿痛', desc: '急性扁桃体炎、咽炎' },
-    { name: '牙痛', desc: '龋齿、牙髓炎' },
-    { name: '口疮', desc: '口腔溃疡、鹅口疮' },
-    { name: '耳鸣耳聋', desc: '神经性耳鸣、听力减退' },
-    { name: '肥胖', desc: '单纯性肥胖、代谢综合征' },
-    { name: '阳痿', desc: '勃起功能障碍' },
-    { name: '早泄', desc: '射精过早' },
-    { name: '阳强', desc: '阴茎异常勃起' },
-    { name: '眩晕（五官）', desc: '梅尼埃病、前庭功能紊乱' },
-  ]},
-  { key: '急症', emoji: '🚨', count: 7, symptoms: [
-    { name: '晕厥', desc: '短暂意识丧失' },
-    { name: '虚脱', desc: '循环衰竭、血压下降' },
-    { name: '高热', desc: '高烧不退、体温过高' },
-    { name: '抽搐', desc: '癫痫大发作、破伤风' },
-    { name: '内脏绞痛', desc: '心绞痛、胆绞痛、肾绞痛' },
-    { name: '出血', desc: '吐血、咯血、便血、尿血' },
-    { name: '溺水', desc: '窒息急救' },
-  ]},
-]
-
-// === 大眾模式 ===
-const POPULAR_TW = [
-  { key: '身體部位', emoji: '🧍', children: [
-    { name: '頭部', desc: '頭痛、眩暈、失眠、耳鳴' },
-    { name: '胸背部', desc: '咳嗽、哮喘、胸悶、心悸' },
-    { name: '腹部', desc: '胃痛、腹瀉、便祕、嘔吐' },
-    { name: '腰腿', desc: '腰痛、坐骨神經痛、膝痛' },
-    { name: '四肢', desc: '肩周炎、踝扭傷、手腕痛' },
-  ]},
-  { key: '常見症狀', emoji: '🏥', children: [
-    { name: '感冒咳嗽', desc: '發燒、咳嗽、鼻塞、流涕' },
-    { name: '失眠問題', desc: '失眠、多夢、易醒、嗜睡' },
-    { name: '腸胃不適', desc: '胃痛、嘔吐、腹瀉、便祕' },
-    { name: '疼痛問題', desc: '頭痛、腰痛、關節痛、神經痛' },
-    { name: '情緒問題', desc: '郁證、眩暈、記憶力減退' },
-  ]},
-  { key: '人生階段', emoji: '👶', children: [
-    { name: '兒科', desc: '發燒、驚風、疳積、遺尿' },
-    { name: '婦科', desc: '月經問題、痛經、不孕' },
-    { name: '產科', desc: '妊娠反應、胎位不正、產後' },
-    { name: '老年', desc: '腰腿痛、痴呆、視力退化' },
-  ]},
-]
-
-const POPULAR_CN = [
-  { key: '身体部位', emoji: '🧍', children: [
-    { name: '头部', desc: '头痛、眩晕、失眠、耳鸣' },
-    { name: '胸背部', desc: '咳嗽、哮喘、胸闷、心悸' },
-    { name: '腹部', desc: '胃痛、腹泻、便秘、呕吐' },
-    { name: '腰腿', desc: '腰痛、坐骨神经痛、膝痛' },
-    { name: '四肢', desc: '肩周炎、踝扭伤、手腕痛' },
-  ]},
-  { key: '常见症状', emoji: '🏥', children: [
-    { name: '感冒咳嗽', desc: '发烧、咳嗽、鼻塞、流涕' },
-    { name: '失眠问题', desc: '失眠、多梦、易醒、嗜睡' },
-    { name: '肠胃不适', desc: '胃痛、呕吐、腹泻、便秘' },
-    { name: '疼痛问题', desc: '头痛、腰痛、关节痛、神经痛' },
-    { name: '情绪问题', desc: '郁证、眩晕、记忆力减退' },
-  ]},
-  { key: '人生阶段', emoji: '👶', children: [
-    { name: '儿科', desc: '发烧、惊风、疳积、遗尿' },
-    { name: '妇科', desc: '月经问题、痛经、不孕' },
-    { name: '产科', desc: '妊娠反应、胎位不正、产后' },
-    { name: '老年', desc: '腰腿痛、痴呆、视力退化' },
-  ]},
-]
-
-const QUICK_TW = [
-  { name: '感冒咳嗽', emoji: '😷' },
-  { name: '失眠', emoji: '😴' },
-  { name: '胃痛', emoji: '🤢' },
-  { name: '腰痛', emoji: '💪' },
-  { name: '月經', emoji: '🩸' },
-]
-
-const QUICK_CN = [
-  { name: '感冒咳嗽', emoji: '😷' },
-  { name: '失眠', emoji: '😴' },
-  { name: '胃痛', emoji: '🤢' },
-  { name: '腰痛', emoji: '💪' },
-  { name: '月经', emoji: '🩸' },
-]
 
 const L_TW = {
   title: '症狀大全', expert: '專家', popular: '大眾',
   menuBtn: '選單', navHome: '首頁', navAcupuncture: '針灸大全',
   navFormula: '方劑大全', navSymptoms: '症狀大全',
-  symptomsCount: (n: number) => `${n} 個症狀`,
+  symptomsCount: (n: number) => `${n} 個疾病`,
   langToggle: '繁體 / 簡體', langCurrent: '繁',
   noRx: '針灸治療方案研究中', noRxDesc: '敬請期待，更多症狀治療數據即將上線',
-  sections: { 治法: '治法', 主穴: '主穴', 配穴: '配穴', 方義: '方義', 操作: '操作' },
+  sections: { 治法: '治法', 主穴: '主穴', 配穴: '配穴', 方義: '方義', 操作: '操作', 辨證: '辨證分型', 症狀: '常見症狀', 舌脈: '舌脈象', 概述: '概述' },
   menu: {
     login: '👤 登錄 / 註冊', font: '🔤 字體 ±', manual: '📋 使用說明',
     disclaimer: '⚠️ 免責聲明', about: 'ℹ️ 關於本站', contact: '📩 聯絡我們',
@@ -238,16 +23,26 @@ const L_TW = {
   about: '📖 醫道中醫大全是一個開源的中醫藥知識庫，收錄了針灸穴位、經典方劑等中醫藥資料。\n\n🎯 目標：讓中醫藥知識更容易被查詢和學習。\n\n❤️ 製作給所有中醫藥愛好者。',
   contact: '如有問題或建議，歡迎透過以下方式聯絡：\n\n📧 請在 GitHub 倉庫提交 Issue\n🔗 github.com/realtcmweb/tcm-knowledge-base',
   close: '關閉', searchResults: '🔍 搜尋「{q}」的相關症狀',
+  内科: '內科', 外科: '外科', 妇科: '婦科', 儿科: '兒科',
+  肺系: '肺系', 心系: '心系', 脑系: '腦系', 脾胃系: '脾胃系',
+  肝胆系: '肝膽系', 肾系: '腎系', 气血津液: '氣血津液', 肢体经络: '肢體經絡',
+  疮疡: '瘡疡', 乳房: '乳房', 皮肤: '皮膚', 肛肠: '肛腸',
+  泌尿男性: '泌尿男性', 肿瘤: '腫瘤', 其他: '其他',
+  月经: '月經', 带下: '帶下', 妊娠: '妊娠', 产后: '產後',
+  新生儿: '新生兒', 肺系病: '肺系', 脾胃病: '脾胃', 传染病: '傳染病', 心肝: '心肝',
+  辨證分型: '辨證分型', 中藥方劑: '中藥方劑',
+  has_treatment: '有針灸方案', no_treatment: '治療方案研究中',
+  loading: '載入中...', overview: '中醫內科學原文',
 }
 
 const L_CN = {
   title: '症状大全', expert: '专家', popular: '大众',
   menuBtn: '菜单', navHome: '首页', navAcupuncture: '针灸大全',
   navFormula: '方剂大全', navSymptoms: '症状大全',
-  symptomsCount: (n: number) => `${n} 个症状`,
+  symptomsCount: (n: number) => `${n} 个疾病`,
   langToggle: '繁体 / 简体', langCurrent: '简',
   noRx: '针灸治疗方案研究中', noRxDesc: '敬请期待，更多症状治疗数据即将上线',
-  sections: { 治法: '治法', 主穴: '主穴', 配穴: '配穴', 方義: '方义', 操作: '操作' },
+  sections: { 治法: '治法', 主穴: '主穴', 配穴: '配穴', 方義: '方义', 操作: '操作', 辨證: '辨证分型', 症狀: '常见症状', 舌脈: '舌脉象', 概述: '概述' },
   menu: {
     login: '👤 登录 / 注册', font: '🔤 字体 ±', manual: '📋 使用说明',
     disclaimer: '⚠️ 免责声明', about: 'ℹ️ 关于本站', contact: '📩 联系我们',
@@ -255,13 +50,42 @@ const L_CN = {
   disclaimer: '本资料库内容仅供学术参考，不作商业用途。有病请寻求合法的医师，非中医师请勿擅自处方服药。\n\n本站所收录的中医药知识来源于公开文献整理，编者已尽可能核实内容准确性，但不保证所有信息完全正确、及时或完整。读者依此行事需自行承担风险。',
   about: '📖 医道中医大全是一个开源的中医药知识库，收录了针灸穴位、经典方剂等中医药资料。\n\n🎯 目标：让中医药知识更容易被查询和学习。\n\n❤️ 制作给所有中医药爱好者。',
   contact: '如有问题或建议，欢迎通过以下方式联络：\n\n📧 请在 GitHub 仓库提交 Issue\n🔗 github.com/realtcmweb/tcm-knowledge-base',
-  close: '关闭', searchResults: '🔍 搜索「{q}」的相关症状',
+  close: '关闭', searchResults: '🔍 搜索「{q}」的相关疾病',
+  内科: '内科', 外科: '外科', 妇科: '妇科', 儿科: '儿科',
+  肺系: '肺系', 心系: '心系', 脑系: '脑系', 脾胃系: '脾胃系',
+  肝胆系: '肝胆系', 肾系: '肾系', 气血津液: '气血津液', 肢体经络: '肢体经络',
+  疮疡: '疮疡', 乳房: '乳房', 皮肤: '皮肤', 肛肠: '肛肠',
+  泌尿男性: '泌尿男性', 肿瘤: '肿瘤', 其他: '其他',
+  月经: '月经', 带下: '带下', 妊娠: '妊娠', 产后: '产后',
+  新生儿: '新生儿', 肺系病: '肺系', 脾胃病: '脾胃', 传染病: '传染病', 心肝: '心肝',
+  辨證分型: '辨证分型', 中藥方劑: '中药方剂',
+  has_treatment: '有针灸方案', no_treatment: '治疗方案研究中',
+  loading: '载入中...', overview: '中医内科学原文',
 }
 
-interface Prescription {
-  name: string; page: number; main: string
-  paired: Record<string, string> | null
-  zhifa: string; fangyi: string | null; caozuo: string | null
+type SpecialtyKey = '內科' | '外科' | '婦科' | '兒科'
+type SubKey = string
+
+interface Disease {
+  name: string
+  synonyms: string[]
+  syndromes: string[]
+  treatment_available: boolean
+}
+
+const SPECIALTY_TABS: Record<Lang, { key: SpecialtyKey; emoji: string; subKeys: SubKey[] }[]> = {
+  tw: [
+    { key: '內科', emoji: '🧠', subKeys: ['肺系', '心系', '腦系', '脾胃系', '肝膽系', '腎系', '氣血津液', '肢體經絡'] },
+    { key: '外科', emoji: '🦴', subKeys: ['瘡疡', '乳房', '皮膚', '肛腸', '泌尿男性', '腫瘤', '其他'] },
+    { key: '婦科', emoji: '👩', subKeys: ['月經', '帶下', '妊娠', '產後', '腫瘤', '其他'] },
+    { key: '兒科', emoji: '👶', subKeys: ['新生兒', '肺系病', '脾胃病', '傳染病', '心肝'] },
+  ],
+  cn: [
+    { key: '内科', emoji: '🧠', subKeys: ['肺系', '心系', '脑系', '脾胃系', '肝胆系', '肾系', '气血津液', '肢体经络'] },
+    { key: '外科', emoji: '🦴', subKeys: ['疮疡', '乳房', '皮肤', '肛肠', '泌尿男性', '肿瘤', '其他'] },
+    { key: '妇科', emoji: '👩', subKeys: ['月经', '带下', '妊娠', '产后', '肿瘤', '其他'] },
+    { key: '儿科', emoji: '👶', subKeys: ['新生儿', '肺系病', '脾胃病', '传染病', '心肝'] },
+  ],
 }
 
 export default function SymptomsPage() {
@@ -270,31 +94,32 @@ export default function SymptomsPage() {
   const [fontSize, setFontSize] = useState(14)
   const [modalContent, setModalContent] = useState<{title: string; body: string} | null>(null)
   const [mode, setMode] = useState<'expert' | 'popular'>('expert')
-  const [selectedCat, setSelectedCat] = useState('內科')
-  const [expandedQuick, setExpandedQuick] = useState<string | null>(null)
-  const [prescriptions, setPrescriptions] = useState<Prescription[]>([])
-  const [selectedSymptom, setSelectedSymptom] = useState<{name: string; desc: string; prescription?: Prescription} | null>(null)
+  const [selectedSpecialty, setSelectedSpecialty] = useState<SpecialtyKey>('內科')
+  const [selectedSub, setSelectedSub] = useState<SubKey>('肺系')
+  const [selectedDisease, setSelectedDisease] = useState<{disease: Disease; syndromeData?: any; overview?: string} | null>(null)
+  const [loadingOverview, setLoadingOverview] = useState(false)
 
   const T = lang === 'tw' ? L_TW : L_CN
-  const expertCats = lang === 'tw' ? EXPERT_TW : EXPERT_CN
-  const popularCats = lang === 'tw' ? POPULAR_TW : POPULAR_CN
-  const quick = lang === 'tw' ? QUICK_TW : QUICK_CN
+
+  const specialtyTabs = SPECIALTY_TABS[lang]
 
   useEffect(() => {
     const saved = localStorage.getItem(LANG_KEY) as Lang | null
-    if (saved) setLang(saved)
-  }, [])
-
-  useEffect(() => {
-    fetch('/data/symptom_prescriptions.json').then(r => r.json()).then(setPrescriptions)
+    if (saved) {
+      setLang(saved)
+      const tabs = SPECIALTY_TABS[saved]
+      setSelectedSpecialty(tabs[0].key)
+      setSelectedSub(tabs[0].subKeys[0])
+    }
   }, [])
 
   const toggleLang = () => {
     const next: Lang = lang === 'tw' ? 'cn' : 'tw'
     setLang(next)
     localStorage.setItem(LANG_KEY, next)
-    setSelectedCat(next === 'tw' ? '內科' : '内科')
-    setExpandedQuick(null)
+    const tabs = SPECIALTY_TABS[next]
+    setSelectedSpecialty(tabs[0].key)
+    setSelectedSub(tabs[0].subKeys[0])
   }
 
   const handleMenuAction = (action: string) => {
@@ -310,16 +135,80 @@ export default function SymptomsPage() {
     }
   }
 
-  const activeCat = expertCats.find(c => c.key === selectedCat) || expertCats[0]
-  const activePopular = popularCats.find(c => c.key === selectedCat) || popularCats[0]
+  // Get diseases for current selection
+  const currentDiseases = useMemo(() => {
+    const specialtyKey = lang === 'cn' ? selectedSpecialty : selectedSpecialty
+    const specialtyMap: Record<string, Record<string, Disease[]>> = diseasesData.diseases as any
 
-  const getRx = (name: string) => prescriptions.find(p => p.name === name)
+    const specialtyMapTW: Record<string, any> = {
+      '內科': diseasesData.diseases['內科'] || diseasesData.diseases['内科'],
+      '外科': diseasesData.diseases['外科'],
+      '婦科': diseasesData.diseases['婦科'],
+      '兒科': diseasesData.diseases['兒科'],
+    }
+    const specialtyMapCN: Record<string, any> = {
+      '内科': diseasesData.diseases['內科'] || diseasesData.diseases['内科'],
+      '外科': diseasesData.diseases['外科'],
+      '妇科': diseasesData.diseases['婦科'],
+      '儿科': diseasesData.diseases['兒科'],
+    }
+
+    const map = lang === 'cn' ? specialtyMapCN : specialtyMapTW
+    const sp = map[selectedSpecialty]
+    if (!sp) return []
+
+    const subMap = sp as Record<string, Disease[]>
+
+    // Try to find the sub key (handle both tw/cn)
+    let subDiseases = subMap[selectedSub]
+    if (!subDiseases && lang === 'cn') {
+      // Try TW key
+      const reverseMap: Record<string, string> = {
+        '肺系': '肺系', '心系': '心系', '脑系': '腦系', '脾胃系': '脾胃系',
+        '肝胆系': '肝膽系', '肾系': '腎系', '气血津液': '氣血津液', '肢体经络': '肢體經絡',
+        '疮疡': '瘡疡', '乳房': '乳房', '皮肤': '皮膚', '肛肠': '肛腸',
+        '泌尿男性': '泌尿男性', '肿瘤': '腫瘤', '其他': '其他',
+        '月经': '月經', '带下': '帶下', '妊娠': '妊娠', '产后': '產後',
+        '新生儿': '新生兒', '肺系病': '肺系', '脾胃病': '脾胃', '传染病': '傳染病', '心肝': '心肝',
+      }
+      const twKey = reverseMap[selectedSub]
+      if (twKey) subDiseases = subMap[twKey]
+    }
+
+    return subDiseases || []
+  }, [selectedSpecialty, selectedSub, lang])
+
+  const handleDiseaseClick = async (disease: Disease) => {
+    setSelectedDisease({ disease })
+    setLoadingOverview(true)
+
+    // Fetch overview from backend
+    try {
+      const res = await fetch(`/api/search/diagnosis?q=${encodeURIComponent(disease.name)}`)
+      const data = await res.json()
+      const overview = data.results?.[0]?.content?.slice(0, 500) || ''
+      setSelectedDisease({ disease, overview })
+    } catch {
+      setSelectedDisease({ disease })
+    } finally {
+      setLoadingOverview(false)
+    }
+  }
+
+  const handleSyndromeClick = (syndromeName: string) => {
+    const syndromeData = diseasesData.syndromes_map?.[syndromeName]
+    if (syndromeData) {
+      setSelectedDisease(prev => prev ? { ...prev, syndromeData } : null)
+    }
+  }
 
   const navItems = [
     { href: '/acu', label: T.navAcupuncture, emoji: '💉', active: false },
     { href: '/db', label: T.navFormula, emoji: '🍵', active: false },
     { href: '/symptoms', label: T.navSymptoms, emoji: '🩺', active: true },
   ]
+
+  const currentSpecialtyTab = specialtyTabs.find(t => t.key === selectedSpecialty) || specialtyTabs[0]
 
   return (
     <div style={{
@@ -349,7 +238,6 @@ export default function SymptomsPage() {
 
             {showMenu && (
               <div style={{ position: 'absolute', right: 0, top: 'calc(100% + 8px)', width: '220px', backgroundColor: '#FFFEF9', borderRadius: '14px', boxShadow: '0 8px 24px rgba(0,0,0,0.18)', overflow: 'hidden', zIndex: 300, border: '1px solid #E8E4DC' }}>
-                {/* Lang Toggle */}
                 <button onClick={() => { toggleLang(); setShowMenu(false) }} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '13px 16px', color: '#1a2C24', background: 'none', border: 'none', cursor: 'pointer', fontSize: '13px', fontWeight: 700, width: '100%', borderBottom: '1px solid #F0EDE5' }}
                   onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#F5F2EB')}
                   onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}>
@@ -357,14 +245,12 @@ export default function SymptomsPage() {
                   <span style={{ flex: 1 }}>{T.langToggle}</span>
                   <span style={{ fontSize: '10px', backgroundColor: '#1a3A2C', color: '#FFFEF9', padding: '2px 6px', borderRadius: '8px' }}>{T.langCurrent}</span>
                 </button>
-                {/* Font */}
                 <button onClick={() => { handleMenuAction('font') }} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '13px 16px', color: '#1a2C24', background: 'none', border: 'none', cursor: 'pointer', fontSize: '13px', fontWeight: 700, width: '100%', borderBottom: '1px solid #F0EDE5' }}
                   onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#F5F2EB')}
                   onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}>
                   <span style={{ fontSize: '15px' }}>🔤</span>
                   <span style={{ flex: 1 }}>{T.menu.font}</span>
                 </button>
-                {/* Static items */}
                 {[
                   { emoji: '📋', label: T.menu.manual },
                   { emoji: '⚠️', label: T.menu.disclaimer, action: 'disclaimer' },
@@ -383,7 +269,7 @@ export default function SymptomsPage() {
           </div>
         </div>
 
-        {/* 3-Tab */}
+        {/* 3-Tab Nav */}
         <div style={{ display: 'flex', padding: '12px 14px 0', gap: '7px' }}>
           {navItems.map(tab => (
             <Link key={tab.label} href={tab.href} style={{ flex: 1, padding: '10px 4px', backgroundColor: tab.active ? '#FFFEF9' : 'rgba(255,254,249,0.12)', color: tab.active ? '#1a3A2C' : 'rgba(255,254,249,0.8)', border: 'none', borderRadius: '12px', textDecoration: 'none', fontSize: '11px', fontWeight: 700, textAlign: 'center' }}>
@@ -394,32 +280,63 @@ export default function SymptomsPage() {
         </div>
       </div>
 
-      {/* Category Pills */}
-      {mode === 'popular' && (
-        <div style={{ padding: '14px 14px 0' }}>
-          <div style={{ display: 'flex', gap: '7px', overflowX: 'auto', paddingBottom: '4px' }}>
-            {quick.map(q => (
-              <button key={q.name} onClick={() => setExpandedQuick(expandedQuick === q.name ? null : q.name)} style={{ flexShrink: 0, padding: '8px 14px', borderRadius: '20px', border: 'none', cursor: 'pointer', fontSize: '12px', fontWeight: 700, backgroundColor: expandedQuick === q.name ? '#1a3A2C' : '#FFFEF9', color: expandedQuick === q.name ? '#FFFEF9' : '#1a3A2C', boxShadow: '0 1px 4px rgba(0,0,0,0.08)', whiteSpace: 'nowrap' }}>
-                <span style={{ marginRight: '5px' }}>{q.emoji}</span>{q.name}
-              </button>
-            ))}
+      {/* Expert Mode: Specialty + Sub tabs */}
+      {mode === 'expert' && (
+        <>
+          {/* Specialty tabs */}
+          <div style={{ padding: '12px 14px 0' }}>
+            <div style={{ display: 'flex', gap: '6px', overflowX: 'auto', paddingBottom: '4px' }}>
+              {specialtyTabs.map(tab => (
+                <button key={tab.key} onClick={() => {
+                  setSelectedSpecialty(tab.key)
+                  setSelectedSub(tab.subKeys[0])
+                }} style={{ flexShrink: 0, padding: '7px 13px', borderRadius: '20px', border: 'none', cursor: 'pointer', fontSize: '11px', fontWeight: 700, backgroundColor: selectedSpecialty === tab.key ? '#FFFEF9' : '#E8E4DC', color: selectedSpecialty === tab.key ? '#1a3A2C' : '#4A3A2C', whiteSpace: 'nowrap', border: selectedSpecialty === tab.key ? '1.5px solid transparent' : '1.5px solid #D8D4CC' }}>
+                  <span style={{ fontSize: '14px', marginRight: '4px' }}>{tab.emoji}</span>{tab.key}
+                </button>
+              ))}
+            </div>
           </div>
-          <div style={{ display: 'flex', gap: '6px', overflowX: 'auto', padding: '10px 0 4px' }}>
-            {popularCats.map(cat => (
-              <button key={cat.key} onClick={() => setSelectedCat(cat.key)} style={{ flexShrink: 0, padding: '7px 13px', borderRadius: '20px', border: 'none', cursor: 'pointer', fontSize: '11px', fontWeight: 700, backgroundColor: selectedCat === cat.key ? '#FFFEF9' : '#E8E4DC', color: selectedCat === cat.key ? '#1a3A2C' : '#4A3A2C', whiteSpace: 'nowrap', border: selectedCat === cat.key ? '1.5px solid transparent' : '1.5px solid #D8D4CC' }}>
-                <span style={{ fontSize: '14px', marginRight: '4px' }}>{cat.emoji}</span>{cat.key}
-              </button>
-            ))}
+
+          {/* Sub tabs */}
+          <div style={{ padding: '10px 14px 0' }}>
+            <div style={{ display: 'flex', gap: '5px', overflowX: 'auto', paddingBottom: '4px' }}>
+              {currentSpecialtyTab.subKeys.map(sub => (
+                <button key={sub} onClick={() => setSelectedSub(sub)} style={{ flexShrink: 0, padding: '6px 12px', borderRadius: '16px', border: 'none', cursor: 'pointer', fontSize: '11px', fontWeight: 700, backgroundColor: selectedSub === sub ? '#1a3A2C' : '#FFFEF9', color: selectedSub === sub ? '#FFFEF9' : '#5A5A4A', whiteSpace: 'nowrap', boxShadow: selectedSub === sub ? '0 1px 4px rgba(0,0,0,0.15)' : '0 1px 2px rgba(0,0,0,0.06)' }}>
+                  {sub}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+        </>
       )}
 
-      {mode === 'expert' && (
+      {/* Popular mode */}
+      {mode === 'popular' && (
         <div style={{ padding: '12px 14px 0' }}>
-          <div style={{ display: 'flex', gap: '6px', overflowX: 'auto', paddingBottom: '4px' }}>
-            {expertCats.map(cat => (
-              <button key={cat.key} onClick={() => setSelectedCat(cat.key)} style={{ flexShrink: 0, padding: '7px 13px', borderRadius: '20px', border: 'none', cursor: 'pointer', fontSize: '11px', fontWeight: 700, backgroundColor: selectedCat === cat.key ? '#FFFEF9' : '#E8E4DC', color: selectedCat === cat.key ? '#1a3A2C' : '#4A3A2C', whiteSpace: 'nowrap', border: selectedCat === cat.key ? '1.5px solid transparent' : '1.5px solid #D8D4CC' }}>
-                <span style={{ fontSize: '14px', marginRight: '4px' }}>{cat.emoji}</span>{cat.key}<span style={{ marginLeft: '4px', opacity: 0.7 }}>({cat.count})</span>
+          <div style={{ backgroundColor: '#EEF4F0', border: '1.5px solid #D8E4DC', borderRadius: '14px', padding: '14px 16px', marginBottom: '12px' }}>
+            <div style={{ fontSize: '13px', color: '#4A6A5A', fontWeight: 600, textAlign: 'center', lineHeight: 1.6 }}>
+              👉 選擇上方科別查看疾病，或點擊下方熱門症狀
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: '5px', overflowX: 'auto', paddingBottom: '4px' }}>
+            {[
+              { name: '感冒', emoji: '😷' }, { name: '咳嗽', emoji: '🤧' },
+              { name: '頭痛', emoji: '🤕' }, { name: '失眠', emoji: '😴' },
+              { name: '胃痛', emoji: '🤢' }, { name: '腰痛', emoji: '💪' },
+              { name: '月經失調', emoji: '🩸' }, { name: '便祕', emoji: '🚽' },
+            ].map(q => (
+              <button key={q.name} onClick={() => {
+                // Find disease
+                const allDiseases = [
+                  ...Object.values(diseasesData.diseases['內科'] || {}).flat(),
+                  ...Object.values(diseasesData.diseases['外科'] || {}).flat(),
+                  ...Object.values(diseasesData.diseases['婦科'] || {}).flat(),
+                  ...Object.values(diseasesData.diseases['兒科'] || {}).flat(),
+                ] as Disease[]
+                const found = allDiseases.find(d => d.name.includes(q.name.replace('月經失調', '崩漏').replace('便祕', '便秘')) || q.name.includes(d.name))
+                if (found) handleDiseaseClick(found)
+              }} style={{ flexShrink: 0, padding: '8px 14px', borderRadius: '20px', border: 'none', cursor: 'pointer', fontSize: '12px', fontWeight: 700, backgroundColor: '#FFFEF9', color: '#1a3A2C', boxShadow: '0 1px 4px rgba(0,0,0,0.08)', whiteSpace: 'nowrap' }}>
+                <span style={{ marginRight: '5px' }}>{q.emoji}</span>{q.name}
               </button>
             ))}
           </div>
@@ -430,48 +347,68 @@ export default function SymptomsPage() {
       <div style={{ padding: '14px 14px 100px' }}>
         {mode === 'expert' && (
           <>
-            <div style={{ fontSize: '12px', color: '#7A7A6A', marginBottom: '12px' }}>{T.symptomsCount(activeCat.count)}</div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              {activeCat.symptoms.map((s, i) => (
-                <button key={i} onClick={() => setSelectedSymptom({ name: s.name, desc: s.desc, prescription: getRx(s.name) })} style={{ backgroundColor: '#FFFEF9', border: '1.5px solid #E8E4DC', borderRadius: '14px', padding: '13px 16px', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', width: '100%', cursor: 'pointer', textAlign: 'left' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <div>
-                      <div style={{ fontSize: '15px', fontWeight: 700, color: '#1a2C24', marginBottom: '3px' }}>{s.name}</div>
-                      <div style={{ fontSize: '11px', color: '#8A8A7A' }}>{s.desc}</div>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      {getRx(s.name) && <span style={{ fontSize: '10px', padding: '2px 8px', borderRadius: '10px', backgroundColor: '#EEF4F0', color: '#2C4A3E', fontWeight: 700 }}>💉</span>}
-                      <span style={{ color: '#8A8A7A', fontSize: '14px' }}>›</span>
-                    </div>
-                  </div>
-                </button>
-              ))}
+            <div style={{ fontSize: '12px', color: '#7A7A6A', marginBottom: '12px' }}>
+              {T.symptomsCount(currentDiseases.length)} · {selectedSpecialty} · {selectedSub}
             </div>
-          </>
-        )}
-
-        {mode === 'popular' && (
-          <>
-            {expandedQuick && (
-              <div style={{ backgroundColor: '#EEF4F0', border: '1.5px solid #D8E4DC', borderRadius: '14px', padding: '14px 16px', marginBottom: '14px' }}>
-                <div style={{ fontSize: '14px', fontWeight: 700, color: '#1a3A2C', marginBottom: '10px' }}>{T.searchResults.replace('{q}', expandedQuick)}</div>
-                {prescriptions.filter(p => p.name.includes(expandedQuick) || (p.paired && JSON.stringify(p.paired).includes(expandedQuick))).map(p => (
-                  <button key={p.name} onClick={() => setSelectedSymptom({ name: p.name, desc: '', prescription: p })} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 0', borderBottom: '1px solid #D8E4DC', width: '100%', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}>
-                    <span style={{ fontSize: '14px' }}>💉</span>
-                    <div>
-                      <div style={{ fontSize: '14px', fontWeight: 600, color: '#1a2C24' }}>{p.name}</div>
-                      <div style={{ fontSize: '11px', color: '#5A8A6A' }}>{T.sections.主穴} {p.main.slice(0, 15)}...</div>
+            {currentDiseases.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '40px 0', color: '#8A8A7A' }}>
+                <div style={{ fontSize: '40px', marginBottom: '8px' }}>📋</div>
+                <div style={{ fontSize: '14px' }}>{T.loading}</div>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {currentDiseases.map((disease, i) => (
+                  <button key={i} onClick={() => handleDiseaseClick(disease)} style={{ backgroundColor: '#FFFEF9', border: '1.5px solid #E8E4DC', borderRadius: '14px', padding: '13px 16px', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', width: '100%', cursor: 'pointer', textAlign: 'left' }}>
+                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                          <div style={{ fontSize: '15px', fontWeight: 700, color: '#1a2C24' }}>{disease.name}</div>
+                          <span style={{ fontSize: '10px', padding: '2px 7px', borderRadius: '8px', backgroundColor: disease.treatment_available ? '#EEF4F0' : '#F0EDE5', color: disease.treatment_available ? '#2C4A3E' : '#8A8A7A', fontWeight: 700 }}>
+                            {disease.treatment_available ? '💉' : '📖'}
+                          </span>
+                        </div>
+                        {disease.synonyms.length > 0 && (
+                          <div style={{ fontSize: '11px', color: '#8A8A7A', marginBottom: '5px', lineHeight: 1.4 }}>
+                            {disease.synonyms.slice(0, 4).join('、')}
+                          </div>
+                        )}
+                        <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                          {disease.syndromes.slice(0, 3).map((s, si) => (
+                            <span key={si} style={{ fontSize: '10px', padding: '2px 7px', borderRadius: '10px', backgroundColor: '#F7F5F0', color: '#5A5A4A', border: '1px solid #E8E4DC', fontWeight: 600 }}>
+                              {s}
+                            </span>
+                          ))}
+                          {disease.syndromes.length > 3 && (
+                            <span style={{ fontSize: '10px', color: '#8A8A7A', fontWeight: 600, alignSelf: 'center' }}>
+                              +{disease.syndromes.length - 3}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <span style={{ color: '#8A8A7A', fontSize: '16px', marginLeft: '8px', flexShrink: 0 }}>›</span>
                     </div>
                   </button>
                 ))}
               </div>
             )}
-            <div style={{ fontSize: '12px', color: '#7A7A6A', marginBottom: '12px' }}>{activePopular.key}</div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              {activePopular.children.map((c, i) => (
-                <button key={i} onClick={() => { const m = prescriptions.find(p => p.name.includes(c.name) || c.name.includes(p.name)); if (m) setSelectedSymptom({ name: m.name, desc: c.desc, prescription: m }) }} style={{ backgroundColor: '#FFFEF9', border: '1.5px solid #E8E4DC', borderRadius: '14px', padding: '13px 16px', cursor: 'pointer', textAlign: 'left', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', width: '100%' }}>
-                  <div style={{ fontSize: '15px', fontWeight: 700, color: '#1a2C24', marginBottom: '3px' }}>{c.name}</div>
-                  <div style={{ fontSize: '11px', color: '#8A8A7A' }}>{c.desc}</div>
+          </>
+        )}
+
+        {mode === 'popular' && (
+          <>
+            <div style={{ fontSize: '12px', color: '#7A7A6A', marginBottom: '12px' }}>
+              {T.title}
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+              {specialtyTabs.map((tab, i) => (
+                <button key={tab.key} onClick={() => {
+                  setMode('expert')
+                  setSelectedSpecialty(tab.key)
+                  setSelectedSub(tab.subKeys[0])
+                }} style={{ backgroundColor: '#FFFEF9', border: '1.5px solid #E8E4DC', borderRadius: '16px', padding: '16px 12px', cursor: 'pointer', textAlign: 'center', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+                  <div style={{ fontSize: '28px', marginBottom: '6px' }}>{tab.emoji}</div>
+                  <div style={{ fontSize: '14px', fontWeight: 700, color: '#1a2C24' }}>{tab.key}</div>
+                  <div style={{ fontSize: '10px', color: '#8A8A7A', marginTop: '2px' }}>查看全部疾病</div>
                 </button>
               ))}
             </div>
@@ -480,61 +417,104 @@ export default function SymptomsPage() {
       </div>
 
       {/* Bottom Sheet */}
-      {selectedSymptom && (
+      {selectedDisease && (
         <>
-          <div onClick={() => setSelectedSymptom(null)} style={{ position: 'fixed', inset: 0, zIndex: 200, backgroundColor: 'rgba(0,0,0,0.4)' }} />
-          <div onClick={e => e.stopPropagation()} style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 201, backgroundColor: '#FFFEF9', borderRadius: '20px 20px 0 0', padding: '20px 20px 40px', maxHeight: '85vh', overflowY: 'auto', boxShadow: '0 -8px 32px rgba(0,0,0,0.2)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
+          <div onClick={() => setSelectedDisease(null)} style={{ position: 'fixed', inset: 0, zIndex: 200, backgroundColor: 'rgba(0,0,0,0.4)' }} />
+          <div onClick={e => e.stopPropagation()} style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 201, backgroundColor: '#FFFEF9', borderRadius: '20px 20px 0 0', padding: '20px 20px 40px', maxHeight: '88vh', overflowY: 'auto', boxShadow: '0 -8px 32px rgba(0,0,0,0.2)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px', position: 'sticky', top: 0, backgroundColor: '#FFFEF9', paddingBottom: '8px' }}>
               <div>
-                <div style={{ fontSize: '20px', fontWeight: 900, color: '#1a2C24', marginBottom: '4px' }}>{selectedSymptom.name}</div>
-                {selectedSymptom.desc && <div style={{ fontSize: '12px', color: '#8A8A7A' }}>{selectedSymptom.desc}</div>}
+                <div style={{ fontSize: '20px', fontWeight: 900, color: '#1a2C24', marginBottom: '4px' }}>{selectedDisease.disease.name}</div>
+                <div style={{ fontSize: '11px', color: selectedDisease.disease.treatment_available ? '#2C4A3E' : '#8A8A7A', fontWeight: 700 }}>
+                  {selectedDisease.disease.treatment_available ? T.has_treatment : T.no_treatment}
+                </div>
               </div>
-              <button onClick={() => setSelectedSymptom(null)} style={{ background: '#E8E4DC', border: 'none', borderRadius: '50%', width: '28px', height: '28px', cursor: 'pointer', fontSize: '14px', color: '#7A7A6A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+              <button onClick={() => setSelectedDisease(null)} style={{ background: '#E8E4DC', border: 'none', borderRadius: '50%', width: '28px', height: '28px', cursor: 'pointer', fontSize: '14px', color: '#7A7A6A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
             </div>
 
-            {selectedSymptom.prescription ? (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                {selectedSymptom.prescription.zhifa && (
-                  <div style={{ backgroundColor: '#F7F5F0', borderRadius: '12px', padding: '12px 14px' }}>
-                    <div style={{ fontSize: '11px', fontWeight: 700, color: '#5A8A6A', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{T.sections.治法}</div>
-                    <div style={{ fontSize: '13px', color: '#1a2C24', lineHeight: 1.5 }}>{selectedSymptom.prescription.zhifa}</div>
-                  </div>
-                )}
-                <div style={{ backgroundColor: '#EEF4F0', borderRadius: '12px', padding: '12px 14px' }}>
-                  <div style={{ fontSize: '11px', fontWeight: 700, color: '#2C4A3E', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{T.sections.主穴}</div>
-                  <div style={{ fontSize: '14px', fontWeight: 700, color: '#1a2C24', lineHeight: 1.5 }}>{selectedSymptom.prescription.main.split(/(?=[A-Z\u4e00-\u9fa5])/).join('、')}</div>
+            {/* Synonyms */}
+            {selectedDisease.disease.synonyms.length > 0 && (
+              <div style={{ marginBottom: '12px' }}>
+                <div style={{ fontSize: '11px', color: '#8A8A7A', marginBottom: '5px', fontWeight: 600 }}>別名</div>
+                <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
+                  {selectedDisease.disease.synonyms.map((syn, i) => (
+                    <span key={i} style={{ fontSize: '12px', padding: '3px 10px', borderRadius: '12px', backgroundColor: '#F0EDE5', color: '#5A5A4A', fontWeight: 600 }}>{syn}</span>
+                  ))}
                 </div>
-                {selectedSymptom.prescription.paired && Object.keys(selectedSymptom.prescription.paired).length > 0 && (
-                  <div style={{ backgroundColor: '#FDF3E7', borderRadius: '12px', padding: '12px 14px' }}>
-                    <div style={{ fontSize: '11px', fontWeight: 700, color: '#8A5A3A', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{T.sections.配穴}</div>
-                    {Object.entries(selectedSymptom.prescription.paired).filter(([k]) => k).map(([cond, pts]) => (
-                      <div key={cond} style={{ display: 'flex', gap: '8px' }}>
-                        <span style={{ fontSize: '11px', color: '#8A5A3A', minWidth: '60px' }}>{cond}</span>
-                        <span style={{ fontSize: '13px', color: '#1a2C24', fontWeight: 600 }}>→ {pts.split(',').join('、')}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-                {selectedSymptom.prescription.fangyi && (
-                  <div style={{ backgroundColor: '#F3EEF7', borderRadius: '12px', padding: '12px 14px' }}>
-                    <div style={{ fontSize: '11px', fontWeight: 700, color: '#6A4A8A', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{T.sections.方義}</div>
-                    <div style={{ fontSize: '12px', color: '#3A3A2A', lineHeight: 1.6 }}>{selectedSymptom.prescription.fangyi}</div>
-                  </div>
-                )}
-                {selectedSymptom.prescription.caozuo && (
-                  <div style={{ backgroundColor: '#F0F4E0', borderRadius: '12px', padding: '12px 14px' }}>
-                    <div style={{ fontSize: '11px', fontWeight: 700, color: '#5A6A1A', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{T.sections.操作}</div>
-                    <div style={{ fontSize: '12px', color: '#3A3A2A', lineHeight: 1.5 }}>{selectedSymptom.prescription.caozuo}</div>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div style={{ textAlign: 'center', padding: '20px 0', color: '#8A8A7A' }}>
-                <div style={{ fontSize: '40px', marginBottom: '8px' }}>🔬</div>
-                <div style={{ fontSize: '14px', fontWeight: 600, color: '#5A5A4A', marginBottom: '4px' }}>{T.noRx}</div>
-                <div style={{ fontSize: '12px' }}>{T.noRxDesc}</div>
               </div>
             )}
+
+            {/* Overview from backend */}
+            {loadingOverview ? (
+              <div style={{ textAlign: 'center', padding: '20px 0', color: '#8A8A7A', fontSize: '13px' }}>{T.loading}</div>
+            ) : selectedDisease.overview ? (
+              <div style={{ backgroundColor: '#F7F5F0', borderRadius: '12px', padding: '12px 14px', marginBottom: '12px' }}>
+                <div style={{ fontSize: '11px', fontWeight: 700, color: '#5A8A6A', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{T.overview}</div>
+                <div style={{ fontSize: '12px', color: '#3A3A2A', lineHeight: 1.8 }}>{selectedDisease.overview}</div>
+              </div>
+            ) : null}
+
+            {/* Syndrome pills + detail */}
+            <div style={{ marginBottom: '12px' }}>
+              <div style={{ fontSize: '11px', fontWeight: 700, color: '#5A8A6A', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{T.辨證分型}</div>
+              <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                {selectedDisease.disease.syndromes.map((s, i) => {
+                  const hasData = !!diseasesData.syndromes_map?.[s]
+                  return (
+                    <button key={i} onClick={() => hasData && handleSyndromeClick(s)} style={{ fontSize: '12px', padding: '5px 12px', borderRadius: '14px', border: hasData ? '1.5px solid #C8D8CC' : '1.5px solid #D8D4CC', cursor: hasData ? 'pointer' : 'default', fontWeight: 700, backgroundColor: hasData ? '#EEF4F0' : '#F0EDE5', color: hasData ? '#2C4A3E' : '#8A8A7A' }}>
+                      {s}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* Syndrome detail */}
+            {selectedDisease.syndromeData && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                {selectedDisease.syndromeData.symptoms?.length > 0 && (
+                  <div style={{ backgroundColor: '#EEF4F0', borderRadius: '12px', padding: '12px 14px' }}>
+                    <div style={{ fontSize: '11px', fontWeight: 700, color: '#2C4A3E', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{T.sections.症狀}</div>
+                    <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
+                      {selectedDisease.syndromeData.symptoms.map((s: string, i: number) => (
+                        <span key={i} style={{ fontSize: '12px', padding: '3px 10px', borderRadius: '10px', backgroundColor: '#FFFEF9', color: '#3A5A4A', fontWeight: 600 }}>{s}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {selectedDisease.syndromeData.tongueSigns?.length > 0 && (
+                  <div style={{ backgroundColor: '#F7F5F0', borderRadius: '12px', padding: '12px 14px' }}>
+                    <div style={{ fontSize: '11px', fontWeight: 700, color: '#8A5A3A', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{T.sections.舌脈}</div>
+                    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                      <span style={{ fontSize: '12px', color: '#3A3A2A', fontWeight: 600 }}>👅 {selectedDisease.syndromeData.tongueSigns.join('、')}</span>
+                      <span style={{ fontSize: '12px', color: '#3A3A2A', fontWeight: 600 }}>💓 {selectedDisease.syndromeData.pulseTypes?.join('、')}</span>
+                    </div>
+                  </div>
+                )}
+                {selectedDisease.syndromeData.zhifa && (
+                  <div style={{ backgroundColor: '#E8F0F8', borderRadius: '12px', padding: '12px 14px' }}>
+                    <div style={{ fontSize: '11px', fontWeight: 700, color: '#2A4A6A', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{T.sections.治法}</div>
+                    <div style={{ fontSize: '13px', color: '#1a2C24', fontWeight: 600, lineHeight: 1.5 }}>{selectedDisease.syndromeData.zhifa}</div>
+                  </div>
+                )}
+                {selectedDisease.syndromeData.main_points && (
+                  <div style={{ backgroundColor: '#EEF4F0', borderRadius: '12px', padding: '12px 14px' }}>
+                    <div style={{ fontSize: '11px', fontWeight: 700, color: '#2C4A3E', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{T.sections.主穴}</div>
+                    <div style={{ fontSize: '14px', color: '#1a2C24', fontWeight: 700, lineHeight: 1.5 }}>{selectedDisease.syndromeData.main_points}</div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* TCM Formula Link */}
+            <div style={{ marginTop: '16px', padding: '12px 14px', backgroundColor: '#F3EEF7', borderRadius: '12px' }}>
+              <Link href="/db" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', textDecoration: 'none', color: '#6A4A8A' }}>
+                <div>
+                  <div style={{ fontSize: '13px', fontWeight: 700 }}>🍵 {T.中藥方劑}</div>
+                  <div style={{ fontSize: '11px', opacity: 0.8 }}>查看經典方劑大全</div>
+                </div>
+                <span style={{ fontSize: '16px' }}>›</span>
+              </Link>
+            </div>
           </div>
         </>
       )}
