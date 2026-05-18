@@ -47,7 +47,7 @@ const MENU_ITEMS = [
 
 export default function FormulasPage() {
   const [searchQuery, setSearchQuery] = useState('')
-  const [selectedCat, setSelectedCat] = useState('')
+  const [selectedCat, setSelectedCat] = useState('解表劑')
   const [selectedFormula, setSelectedFormula] = useState<Formula | null>(null)
   const [formulas, setFormulas] = useState<Formula[]>([])
   const [loading, setLoading] = useState(true)
