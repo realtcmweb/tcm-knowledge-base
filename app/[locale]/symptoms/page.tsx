@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 
 // === 專家模式：依照針灸治療學分類 ===
@@ -63,11 +63,11 @@ const EXPERT_CATEGORIES = [
     { name: '牙痛', desc: '齲齒、牙髓炎' },
     { name: '口瘡', desc: '口腔潰疡、鵝口瘡' },
     { name: '耳鳴耳聾', desc: '神經性耳鳴、聽力減退' },
-    { name: '眩暈（五官）', desc: '梅尼埃病、前庭功能紊亂' },
     { name: '肥胖', desc: '單純性肥胖、代謝綜合徵' },
     { name: '陽痿', desc: '勃起功能障礙' },
     { name: '早泄', desc: '射精過早' },
     { name: '陽強', desc: '陰莖異常勃起' },
+    { name: '眩暈（五官）', desc: '梅尼埃病、前庭功能紊亂' },
   ]},
   { key: '急症', label: '急症', emoji: '🚨', count: 7, symptoms: [
     { name: '暈厥', desc: '短暫意識喪失' },
@@ -80,7 +80,7 @@ const EXPERT_CATEGORIES = [
   ]},
 ]
 
-// === 大眾模式：依照身體部位 ===
+// === 大眾模式 ===
 const POPULAR_CATEGORIES = [
   { key: '身體部位', label: '身體部位', emoji: '🧍', children: [
     { name: '頭部', desc: '頭痛、眩暈、失眠、耳鳴' },
@@ -104,7 +104,6 @@ const POPULAR_CATEGORIES = [
   ]},
 ]
 
-// 大眾快捷入口
 const POPULAR_QUICK = [
   { name: '感冒咳嗽', emoji: '😷' },
   { name: '失眠', emoji: '😴' },
@@ -122,6 +121,16 @@ const MENU_ITEMS = [
   { label: '📩 聯絡我們', href: '#', action: 'contact' },
 ]
 
+interface Prescription {
+  name: string
+  page: number
+  main: string
+  paired: Record<string, string> | null
+  zhifa: string
+  fangyi: string | null
+  caozuo: string | null
+}
+
 export default function SymptomsPage() {
   const [showMenu, setShowMenu] = useState(false)
   const [fontSize, setFontSize] = useState(14)
@@ -130,6 +139,14 @@ export default function SymptomsPage() {
   const [selectedExpertCat, setSelectedExpertCat] = useState('內科')
   const [selectedPopularCat, setSelectedPopularCat] = useState('身體部位')
   const [expandedQuick, setExpandedQuick] = useState<string | null>(null)
+  const [prescriptions, setPrescriptions] = useState<Prescription[]>([])
+  const [selectedSymptom, setSelectedSymptom] = useState<{name: string; desc: string; prescription?: Prescription} | null>(null)
+
+  useEffect(() => {
+    fetch('/data/symptom_prescriptions.json').then(r => r.json()).then((data: Prescription[]) => {
+      setPrescriptions(data)
+    })
+  }, [])
 
   const handleMenuAction = (action: string) => {
     setShowMenu(false)
@@ -146,6 +163,15 @@ export default function SymptomsPage() {
 
   const activeExpert = EXPERT_CATEGORIES.find(c => c.key === selectedExpertCat) || EXPERT_CATEGORIES[0]
   const activePopularCat = POPULAR_CATEGORIES.find(c => c.key === selectedPopularCat) || POPULAR_CATEGORIES[0]
+
+  const getPrescription = (symptomName: string) => {
+    return prescriptions.find(p => p.name === symptomName)
+  }
+
+  const handleSymptomClick = (symptom: { name: string; desc: string }) => {
+    const rx = getPrescription(symptom.name)
+    setSelectedSymptom({ ...symptom, prescription: rx })
+  }
 
   return (
     <div style={{
@@ -264,10 +290,9 @@ export default function SymptomsPage() {
         </div>
       </div>
 
-      {/* Mode-dependent content */}
+      {/* Category Pills */}
       {mode === 'popular' && (
         <>
-          {/* 大眾快捷入口 */}
           <div style={{ padding: '14px 14px 0' }}>
             <div style={{ display: 'flex', gap: '7px', overflowX: 'auto', paddingBottom: '4px' }}>
               {POPULAR_QUICK.map(q => (
@@ -291,7 +316,6 @@ export default function SymptomsPage() {
             </div>
           </div>
 
-          {/* 大眾分類 */}
           <div style={{ padding: '10px 14px 0' }}>
             <div style={{ display: 'flex', gap: '6px', overflowX: 'auto', paddingBottom: '4px' }}>
               {POPULAR_CATEGORIES.map(cat => (
@@ -303,9 +327,9 @@ export default function SymptomsPage() {
                     borderRadius: '20px', border: 'none', cursor: 'pointer',
                     fontSize: '11px', fontWeight: 700,
                     backgroundColor: selectedPopularCat === cat.key ? '#FFFEF9' : '#E8E4DC',
-                  color: selectedPopularCat === cat.key ? '#1a3A2C' : '#4A3A2C',
-                  border: selectedPopularCat === cat.key ? '1.5px solid transparent' : '1.5px solid #D8D4CC',
+                    color: selectedPopularCat === cat.key ? '#1a3A2C' : '#4A3A2C',
                     whiteSpace: 'nowrap',
+                    border: selectedPopularCat === cat.key ? '1.5px solid transparent' : '1.5px solid #D8D4CC',
                   }}
                 >
                   <span style={{ fontSize: '14px', marginRight: '4px' }}>{cat.emoji}</span>
@@ -318,7 +342,6 @@ export default function SymptomsPage() {
       )}
 
       {mode === 'expert' && (
-        /* 專家分類 Pills */
         <div style={{ padding: '12px 14px 0' }}>
           <div style={{ display: 'flex', gap: '6px', overflowX: 'auto', paddingBottom: '4px' }}>
             {EXPERT_CATEGORIES.map(cat => (
@@ -331,8 +354,8 @@ export default function SymptomsPage() {
                   fontSize: '11px', fontWeight: 700,
                   backgroundColor: selectedExpertCat === cat.key ? '#FFFEF9' : '#E8E4DC',
                   color: selectedExpertCat === cat.key ? '#1a3A2C' : '#4A3A2C',
-                  border: selectedExpertCat === cat.key ? '1.5px solid transparent' : '1.5px solid #D8D4CC',
                   whiteSpace: 'nowrap',
+                  border: selectedExpertCat === cat.key ? '1.5px solid transparent' : '1.5px solid #D8D4CC',
                 }}
               >
                 <span style={{ fontSize: '14px', marginRight: '4px' }}>{cat.emoji}</span>
@@ -348,19 +371,37 @@ export default function SymptomsPage() {
       <div style={{ padding: '14px 14px 100px' }}>
         {mode === 'expert' && (
           <>
-            <div style={{ fontSize: '12px', color: 'rgba(255,254,249,0.65)', marginBottom: '12px' }}>
+            <div style={{ fontSize: '12px', color: '#7A7A6A', marginBottom: '12px' }}>
               {activeExpert.count} 個症狀
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               {activeExpert.symptoms.map((s, i) => (
-                <div key={i} style={{
-                  backgroundColor: '#FFFEF9', border: '1.5px solid #E8E4DC',
-                  borderRadius: '14px', padding: '13px 16px',
-                  boxShadow: '0 1px 4px rgba(0,0,0,0.05)',
-                }}>
-                  <div style={{ fontSize: '15px', fontWeight: 700, color: '#1a2C24', marginBottom: '4px' }}>{s.name}</div>
-                  {s.desc && <div style={{ fontSize: '11px', color: '#8A8A7A', lineHeight: 1.5 }}>{s.desc}</div>}
-                </div>
+                <button
+                  key={i}
+                  onClick={() => handleSymptomClick(s)}
+                  style={{
+                    backgroundColor: '#FFFEF9', border: '1.5px solid #E8E4DC',
+                    borderRadius: '14px', padding: '13px 16px',
+                    boxShadow: '0 1px 4px rgba(0,0,0,0.05)', width: '100%',
+                    cursor: 'pointer', textAlign: 'left',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <div>
+                      <div style={{ fontSize: '15px', fontWeight: 700, color: '#1a2C24', marginBottom: '3px' }}>{s.name}</div>
+                      <div style={{ fontSize: '11px', color: '#8A8A7A' }}>{s.desc}</div>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      {getPrescription(s.name) && (
+                        <span style={{
+                          fontSize: '10px', padding: '2px 8px', borderRadius: '10px',
+                          backgroundColor: '#EEF4F0', color: '#2C4A3E', fontWeight: 700,
+                        }}>針灸</span>
+                      )}
+                      <span style={{ color: '#8A8A7A', fontSize: '14px' }}>›</span>
+                    </div>
+                  </div>
+                </button>
               ))}
             </div>
           </>
@@ -368,47 +409,47 @@ export default function SymptomsPage() {
 
         {mode === 'popular' && (
           <>
-            <div style={{ fontSize: '12px', color: '#7A7A6A', marginBottom: '12px' }}>
-              {activePopularCat.label}
-            </div>
-            {/* Expanded quick search results */}
             {expandedQuick && (
               <div style={{
                 backgroundColor: '#EEF4F0', border: '1.5px solid #D8E4DC',
                 borderRadius: '14px', padding: '14px 16px', marginBottom: '14px',
               }}>
-                <div style={{ fontSize: '14px', fontWeight: 700, color: '#1a3A2C', marginBottom: '8px' }}>
+                <div style={{ fontSize: '14px', fontWeight: 700, color: '#1a3A2C', marginBottom: '10px' }}>
                   🔍 搜尋「{expandedQuick}」的相關症狀
                 </div>
-                {/* Match from all categories */}
-                {EXPERT_CATEGORIES.map(cat => (
-                  cat.symptoms.filter(s => s.name.includes(expandedQuick) || (s.desc && s.desc.includes(expandedQuick))).map((s, i) => (
-                    <div key={`${cat.key}-${i}`} style={{
-                      display: 'flex', alignItems: 'center', gap: '8px',
-                      padding: '8px 0', borderBottom: '1px solid #D8E4DC',
-                    }}>
-                      <span style={{ fontSize: '14px' }}>{cat.emoji}</span>
+                {prescriptions
+                  .filter(p => p.name.includes(expandedQuick) || (p.paired && JSON.stringify(p.paired).includes(expandedQuick)))
+                  .map(p => (
+                    <button
+                      key={p.name}
+                      onClick={() => setSelectedSymptom({ name: p.name, desc: '', prescription: p })}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: '8px',
+                        padding: '10px 0', borderBottom: '1px solid #D8E4DC', width: '100%',
+                        background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left',
+                      }}
+                    >
+                      <span style={{ fontSize: '14px' }}>💉</span>
                       <div>
-                        <div style={{ fontSize: '14px', fontWeight: 600, color: '#1a2C24' }}>{s.name}</div>
-                        <div style={{ fontSize: '11px', color: '#5A8A6A' }}>{cat.label} · {s.desc}</div>
+                        <div style={{ fontSize: '14px', fontWeight: 600, color: '#1a2C24' }}>{p.name}</div>
+                        <div style={{ fontSize: '11px', color: '#5A8A6A' }}>主穴 {p.main.slice(0, 15)}...</div>
                       </div>
-                    </div>
-                  ))
-                ))}
+                    </button>
+                  ))}
               </div>
             )}
-            {/* Category children */}
+
+            <div style={{ fontSize: '12px', color: '#7A7A6A', marginBottom: '12px' }}>
+              {activePopularCat.label}
+            </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               {activePopularCat.children.map((c, i) => (
                 <button
                   key={i}
                   onClick={() => {
-                    // Find matching symptoms in expert categories and expand quick
-                    const match = EXPERT_CATEGORIES.flatMap(cat =>
-                      cat.symptoms.filter(s => s.name.includes(c.name) || c.name.includes(s.name))
-                    )
-                    if (match.length > 0) {
-                      setExpandedQuick(c.name)
+                    const match = prescriptions.find(p => p.name.includes(c.name) || c.name.includes(p.name))
+                    if (match) {
+                      setSelectedSymptom({ name: match.name, desc: c.desc, prescription: match })
                     }
                   }}
                   style={{
@@ -426,6 +467,105 @@ export default function SymptomsPage() {
           </>
         )}
       </div>
+
+      {/* Symptom Detail Bottom Sheet */}
+      {selectedSymptom && (
+        <>
+          <div
+            onClick={() => setSelectedSymptom(null)}
+            style={{
+              position: 'fixed', inset: 0, zIndex: 200,
+              backgroundColor: 'rgba(0,0,0,0.4)',
+            }}
+          />
+          <div style={{
+            position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 201,
+            backgroundColor: '#FFFEF9', borderRadius: '20px 20px 0 0',
+            padding: '20px 20px 40px', maxHeight: '85vh', overflowY: 'auto',
+            boxShadow: '0 -8px 32px rgba(0,0,0,0.2)',
+          }}
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
+              <div>
+                <div style={{ fontSize: '20px', fontWeight: 900, color: '#1a2C24', marginBottom: '4px' }}>
+                  {selectedSymptom.name}
+                </div>
+                {selectedSymptom.desc && (
+                  <div style={{ fontSize: '12px', color: '#8A8A7A' }}>{selectedSymptom.desc}</div>
+                )}
+              </div>
+              <button
+                onClick={() => setSelectedSymptom(null)}
+                style={{
+                  background: '#E8E4DC', border: 'none', borderRadius: '50%',
+                  width: '28px', height: '28px', cursor: 'pointer',
+                  fontSize: '14px', color: '#7A7A6A', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}
+              >✕</button>
+            </div>
+
+            {/* Treatment Data */}
+            {selectedSymptom.prescription ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {/* 治法 */}
+                {selectedSymptom.prescription.zhifa && (
+                  <div style={{ backgroundColor: '#F7F5F0', borderRadius: '12px', padding: '12px 14px' }}>
+                    <div style={{ fontSize: '11px', fontWeight: 700, color: '#5A8A6A', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>治法</div>
+                    <div style={{ fontSize: '13px', color: '#1a2C24', lineHeight: 1.5 }}>{selectedSymptom.prescription.zhifa}</div>
+                  </div>
+                )}
+
+                {/* 主穴 */}
+                <div style={{ backgroundColor: '#EEF4F0', borderRadius: '12px', padding: '12px 14px' }}>
+                  <div style={{ fontSize: '11px', fontWeight: 700, color: '#2C4A3E', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>主穴</div>
+                  <div style={{ fontSize: '14px', fontWeight: 700, color: '#1a2C24', lineHeight: 1.5 }}>
+                    {selectedSymptom.prescription.main.split(/(?=[A-Z\u4e00-\u9fa5])/).join('、')}
+                  </div>
+                </div>
+
+                {/* 配穴 */}
+                {selectedSymptom.prescription.paired && Object.keys(selectedSymptom.prescription.paired).length > 0 && (
+                  <div style={{ backgroundColor: '#FDF3E7', borderRadius: '12px', padding: '12px 14px' }}>
+                    <div style={{ fontSize: '11px', fontWeight: 700, color: '#8A5A3A', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>配穴</div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      {Object.entries(selectedSymptom.prescription.paired).filter(([k]) => k).map(([condition, points]) => (
+                        <div key={condition} style={{ display: 'flex', gap: '8px' }}>
+                          <span style={{ fontSize: '11px', color: '#8A5A3A', minWidth: '60px' }}>{condition}</span>
+                          <span style={{ fontSize: '13px', color: '#1a2C24', fontWeight: 600 }}>→ {points.split(',').join('、')}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* 方義 */}
+                {selectedSymptom.prescription.fangyi && (
+                  <div style={{ backgroundColor: '#F3EEF7', borderRadius: '12px', padding: '12px 14px' }}>
+                    <div style={{ fontSize: '11px', fontWeight: 700, color: '#6A4A8A', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>方義</div>
+                    <div style={{ fontSize: '12px', color: '#3A3A2A', lineHeight: 1.6 }}>{selectedSymptom.prescription.fangyi}</div>
+                  </div>
+                )}
+
+                {/* 操作 */}
+                {selectedSymptom.prescription.caozuo && (
+                  <div style={{ backgroundColor: '#F0F4E0', borderRadius: '12px', padding: '12px 14px' }}>
+                    <div style={{ fontSize: '11px', fontWeight: 700, color: '#5A6A1A', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>操作</div>
+                    <div style={{ fontSize: '12px', color: '#3A3A2A', lineHeight: 1.5 }}>{selectedSymptom.prescription.caozuo}</div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div style={{ textAlign: 'center', padding: '20px 0', color: '#8A8A7A' }}>
+                <div style={{ fontSize: '40px', marginBottom: '8px' }}>🔬</div>
+                <div style={{ fontSize: '14px', fontWeight: 600, color: '#5A5A4A', marginBottom: '4px' }}>針灸治療方案研究中</div>
+                <div style={{ fontSize: '12px' }}>敬請期待，更多症狀治療數據即將上線</div>
+              </div>
+            )}
+          </div>
+        </>
+      )}
 
       {/* Modal */}
       {modalContent && (
