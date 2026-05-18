@@ -740,52 +740,7 @@ interface ResultData {
 }
 
 
-// ============================================
-// FAQ折疊元件
-// ============================================
-function FaqAccordion() {
-  const faqs = [
-    { q: '這個分析準確嗎？', a: '基於中醫十問歌、八綱辨證、臟腑辨證等千年臨床框架，AI模型由資深中醫師監督校準，準確率高於一般商業體質測驗。' },
-    { q: '我的隱私安全嗎？', a: '您的舌苔、面容照片僅用於本次分析，不會保存或分享。問卷結果存在您自己的瀏覽器裡。' },
-    { q: '和去看中醫有什麼不同？', a: '線上分析僅供參考，不能取代中醫師面診。如有明顯症狀，建議就近諮詢中醫師。' },
-  ]
-  return (
-    <div className="mb-6">
-      {/* Zen section header */}
-      <div className="flex items-center gap-3 mb-4">
-        <div style={{ width: '24px', height: '1px', background: '#E5E2DA' }} />
-        <p className="text-xs tracking-widest" style={{ color: '#A3B5A0', letterSpacing: '0.15em' }}>常見問題</p>
-        <div style={{ width: '24px', height: '1px', background: '#E5E2DA' }} />
-      </div>
-      {faqs.map((faq, i) => <FaqItem key={i} faq={faq} />)}
-    </div>
-  )
-}
-
-function FaqItem({ faq }: { faq: { q: string; a: string } }) {
-  const [open, setOpen] = useState(false)
-  return (
-    <div className="mb-2">
-      <button onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between px-4 py-3 text-left text-sm transition-all duration-200 rounded-xl"
-        style={{ background: open ? 'rgba(44,74,62,0.04)' : '#FFFFFF', border: open ? '1px solid #2C4A3E' : '1px solid #E5E2DA', color: open ? '#2C4A3E' : '#3A3A32' }}
-        onMouseEnter={e => { if (!open) { e.currentTarget.style.borderColor = '#A3B5A0' } }}
-        onMouseLeave={e => { if (!open) { e.currentTarget.style.borderColor = '#E5E2DA' } }}>
-        <span style={{ fontWeight: open ? '500' : '400', letterSpacing: '0.02em' }}>{faq.q}</span>
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
-          style={{ color: open ? '#2C4A3E' : '#A3B5A0', transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s ease' }}>
-          <path d="M3 5l4 4 4-4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-      </button>
-      {open && (
-        <div className="mt-1 px-4 py-3 rounded-xl text-sm leading-relaxed"
-          style={{ background: '#FAFAF7', border: '1px solid #E5E2DA', color: '#4A4A42', letterSpacing: '0.02em' }}>
-          {faq.a}
-        </div>
-      )}
-    </div>
-  )
-}
+// Error Boundary}
 
 
 // ============================================
@@ -831,8 +786,7 @@ export default function Home() {
   const menuRef = useRef<HTMLDivElement>(null)
   const [step, setStep] = useState<Step>('mode')
   const [resultTab, setResultTab] = useState<'detail'|'herbs'|'food'|'acupoints'|'lifestyle'>('detail')
-  const [testimonialIndex, setTestimonialIndex] = useState(0)
-  const [helpedCount] = useState(12847)
+
   const [freeText, setFreeText] = useState('')
   const [freeSearchLoading, setFreeSearchLoading] = useState(false)
   const [freeSearchResult, setFreeSearchResult] = useState<FreeSearchResult | null>(null)
@@ -1884,59 +1838,9 @@ interface FreeSearchResult {
             </button>
           </div>
 
-          {/* ── Social Proof Counter ── */}
-          <div className="text-center mb-8">
-            <p className="text-xs" style={{ color: '#A3B5A0', letterSpacing: '0.06em' }}>
-              已幫助 <span style={{ color: '#2C4A3E', fontWeight: 500 }}>{helpedCount.toLocaleString()}</span> 人了解自己的體質
-            </p>
-          </div>
 
-          {/* ── Testimonials Carousel (P0-1) ── */}
-          <div className="mb-8">
-            <div
-              className="rounded-2xl px-5 py-5 relative"
-              style={{ background: '#FAFAF7', border: '1px solid #E5E2DA', minHeight: '120px' }}
-            >
-              {/* Testimonials data */}
-              {[
-                { text: '做了分析才知道自己是氣虛體質，照著建議調整了一個月，明顯覺得精神好多了。', author: '台北，陳小姐，42歲', rating: 5 },
-                { text: '中醫師看完我的報告說很準！特別是氣鬱那一段，完全說中我的狀態。', author: '香港，周先生，35歲', rating: 5 },
-                { text: '舌象拍攝功能很酷，沒想到看中醫也能那麼科技感，而且中藥建議真的適合我的體質。', author: '新加坡，林小姐，28歲', rating: 5 },
-              ].map((t, idx) => (
-                <div key={idx} style={{ display: idx === testimonialIndex ? 'block' : 'none', textAlign: 'center' }}>
-                  {/* Stars */}
-                  <div className="flex justify-center gap-1 mb-3">
-                    {Array.from({ length: t.rating }).map((_, si) => (
-                      <svg key={si} width="12" height="12" viewBox="0 0 12 12" fill="none">
-                        <path d="M6 1l1.5 3 3.5.5-2.5 2.5.5 3.5L6 9l-3 1.5.5-3.5L1 4.5l3.5-.5L6 1z" fill="#8B6E5A"/>
-                      </svg>
-                    ))}
-                  </div>
-                  <p className="text-sm leading-relaxed mb-2" style={{ color: '#4A4A42', lineHeight: 1.8 }}>
-                    「{t.text}」
-                  </p>
-                  <p className="text-xs" style={{ color: '#A3B5A0' }}>— {t.author}</p>
-                </div>
-              ))}
 
-              {/* Carousel dots */}
-              <div className="flex justify-center gap-2 mt-4">
-                {[0, 1, 2].map(idx => (
-                  <button key={idx}
-                    onClick={() => setTestimonialIndex(idx)}
-                    style={{
-                      width: testimonialIndex === idx ? '20px' : '6px',
-                      height: '6px',
-                      borderRadius: '3px',
-                      background: testimonialIndex === idx ? '#2C4A3E' : '#E5E2DA',
-                      border: 'none',
-                      transition: 'all 0.3s ease',
-                      cursor: 'pointer',
-                    }} />
-                ))}
-              </div>
-            </div>
-          </div>
+
 
           {/* ── Privacy + Medical Disclaimer ── */}
           <div className="rounded-2xl px-4 py-3.5 mb-6"
@@ -1952,7 +1856,7 @@ interface FreeSearchResult {
             </div>
           </div>
 
-          <FaqAccordion />
+
         </main>
       )}      {/* ── 基本資料 ── */}
       {step === 'basic' && BASIC_QUESTIONS[qIndex] && (
