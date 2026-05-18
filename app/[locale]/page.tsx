@@ -178,7 +178,6 @@ export default function HomePage() {
           </Link>
         </div>
       </div>
-      </div>
 
       {/* 12 Meridian Quick Access */}
       <div style={{ padding: '0 16px 16px' }}>
