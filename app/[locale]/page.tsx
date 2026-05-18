@@ -92,90 +92,92 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* 4 Sections on Homepage */}
-      <div style={{ padding: '16px' }}>
-        <h2 style={{ fontSize: '15px', fontWeight: 700, color: '#1a2C24', marginBottom: '12px', paddingLeft: '4px' }}>中醫資料庫</h2>
+      {/* 4 Sections 2x2 Grid */}
+      <div style={{ padding: '12px 14px' }}>
+        <h2 style={{ fontSize: '12px', fontWeight: 700, color: '#8A8A7A', marginBottom: '8px', paddingLeft: '4px', letterSpacing: '0.06em', textTransform: 'uppercase' }}>中醫資料庫</h2>
 
-        {/* 針灸大全 */}
-        <Link href="/acu" style={{ display: 'block', marginBottom: '10px', padding: '16px 16px 14px', backgroundColor: '#EEF4F0', borderRadius: '18px', border: '1.5px solid #D8E4DC', textDecoration: 'none' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-            <div style={{ fontSize: '32px', lineHeight: 1 }}>💉</div>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: '16px', fontWeight: 800, color: '#1a2C24', marginBottom: '2px' }}>針灸大全</div>
-              <div style={{ fontSize: '11px', color: '#5A8A6A', fontWeight: 600 }}>{loading ? '...' : acupointsCount} 個穴位 · WHO 國際標準</div>
+        {/* Row 1 */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '8px' }}>
+          {/* 針灸大全 */}
+          <Link href="/acu" style={{ display: 'flex', flexDirection: 'column', padding: '14px 14px 12px', backgroundColor: '#EEF4F0', borderRadius: '16px', border: '1.5px solid #D8E4DC', textDecoration: 'none' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+              <div style={{ fontSize: '28px', lineHeight: 1 }}>💉</div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: '14px', fontWeight: 800, color: '#1a2C24', marginBottom: '1px' }}>針灸大全</div>
+                <div style={{ fontSize: '10px', color: '#5A8A6A', fontWeight: 600 }}>{loading ? '...' : acupointsCount} 穴位</div>
+              </div>
             </div>
-            <div style={{ fontSize: '18px', color: '#2C4A3E' }}>→</div>
-          </div>
-          <div style={{ fontSize: '12px', color: '#5A5A4A', lineHeight: 1.6, marginBottom: '10px' }}>
-            收录十二經絡、督脈、任脈、經外奇穴等全部374個針灸穴位。可依經絡篩選，也可依穴性（井穴、滎穴、輸穴、合穴、絡穴、郄穴等）查詢。
-          </div>
-          <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
-            {['十二經絡', '督脈', '任脈', '經外奇穴', '依經絡篩選', '依穴性篩選'].map(tag => (
-              <span key={tag} style={{ fontSize: '10px', color: '#2C4A3E', backgroundColor: 'rgba(44,74,62,0.1)', padding: '2px 9px', borderRadius: '10px', fontWeight: 600 }}>{tag}</span>
-            ))}
-          </div>
-        </Link>
+            <div style={{ fontSize: '11px', color: '#5A5A4A', lineHeight: 1.5, marginBottom: '8px', flex: 1 }}>
+              十二經絡、督脈任脈、經外奇穴374穴，可依經絡或穴性篩選
+            </div>
+            <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+              {['經絡', '穴性', 'WHO'].map(tag => (
+                <span key={tag} style={{ fontSize: '9px', color: '#2C4A3E', backgroundColor: 'rgba(44,74,62,0.1)', padding: '2px 7px', borderRadius: '8px', fontWeight: 600 }}>{tag}</span>
+              ))}
+            </div>
+          </Link>
 
-        {/* 方劑大全 */}
-        <Link href="/db" style={{ display: 'block', marginBottom: '10px', padding: '16px 16px 14px', backgroundColor: '#FDF3E7', borderRadius: '18px', border: '1.5px solid #E8DDD0', textDecoration: 'none' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-            <div style={{ fontSize: '32px', lineHeight: 1 }}>🍵</div>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: '16px', fontWeight: 800, color: '#1a2C24', marginBottom: '2px' }}>方劑大全</div>
-              <div style={{ fontSize: '11px', color: '#8A5A3A', fontWeight: 600 }}>{loading ? '...' : formulasCount} 首方劑 · 按功效18分類</div>
+          {/* 方劑大全 */}
+          <Link href="/db" style={{ display: 'flex', flexDirection: 'column', padding: '14px 14px 12px', backgroundColor: '#FDF3E7', borderRadius: '16px', border: '1.5px solid #E8DDD0', textDecoration: 'none' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+              <div style={{ fontSize: '28px', lineHeight: 1 }}>🍵</div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: '14px', fontWeight: 800, color: '#1a2C24', marginBottom: '1px' }}>方劑大全</div>
+                <div style={{ fontSize: '10px', color: '#8A5A3A', fontWeight: 600 }}>{loading ? '...' : formulasCount} 首方劑</div>
+              </div>
             </div>
-            <div style={{ fontSize: '18px', color: '#8B4513' }}>→</div>
-          </div>
-          <div style={{ fontSize: '12px', color: '#5A5A4A', lineHeight: 1.6, marginBottom: '10px' }}>
-            收錄《傷寒論》《金匱要略》《太平惠民和劑局方》等經典方劑205首。按功效分為解表、清熱、補益、祛痰、活血等18類，方便依症找方。
-          </div>
-          <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
-            {['解表劑', '清熱劑', '補益劑', '瀉下劑', '和解劑', '祛痰劑'].map(tag => (
-              <span key={tag} style={{ fontSize: '10px', color: '#8B4513', backgroundColor: 'rgba(139,69,19,0.1)', padding: '2px 9px', borderRadius: '10px', fontWeight: 600 }}>{tag}</span>
-            ))}
-            <span style={{ fontSize: '10px', color: '#8A8A7A', backgroundColor: '#F0EDE5', padding: '2px 9px', borderRadius: '10px' }}>等18類</span>
-          </div>
-        </Link>
+            <div style={{ fontSize: '11px', color: '#5A5A4A', lineHeight: 1.5, marginBottom: '8px', flex: 1 }}>
+              《傷寒論》《金匱》经典方劑，按功效18分類，方便依症找方
+            </div>
+            <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+              {['解表', '清熱', '補益', '更多'].map(tag => (
+                <span key={tag} style={{ fontSize: '9px', color: '#8B4513', backgroundColor: 'rgba(139,69,19,0.1)', padding: '2px 7px', borderRadius: '8px', fontWeight: 600 }}>{tag}</span>
+              ))}
+            </div>
+          </Link>
+        </div>
 
-        {/* 症狀 */}
-        <Link href="/symptoms" style={{ display: 'block', marginBottom: '10px', padding: '16px 16px 14px', backgroundColor: '#F3EEF7', borderRadius: '18px', border: '1.5px solid #E0D8EC', textDecoration: 'none', opacity: 0.75, cursor: 'default' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-            <div style={{ fontSize: '32px', lineHeight: 1 }}>🩺</div>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: '16px', fontWeight: 800, color: '#1a2C24', marginBottom: '2px' }}>症狀大全</div>
-              <div style={{ fontSize: '11px', color: '#6A4A8A', fontWeight: 600 }}>辯證思路 · 即將上線</div>
+        {/* Row 2 */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+          {/* 症狀 */}
+          <Link href="/symptoms" style={{ display: 'flex', flexDirection: 'column', padding: '14px 14px 12px', backgroundColor: '#F3EEF7', borderRadius: '16px', border: '1.5px solid #E0D8EC', textDecoration: 'none', opacity: 0.8 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+              <div style={{ fontSize: '28px', lineHeight: 1 }}>🩺</div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: '14px', fontWeight: 800, color: '#1a2C24', marginBottom: '1px' }}>症狀大全</div>
+                <div style={{ fontSize: '10px', color: '#6A4A8A', fontWeight: 600 }}>即將上線</div>
+              </div>
             </div>
-            <div style={{ fontSize: '18px', color: '#7A6A9A' }}>→</div>
-          </div>
-          <div style={{ fontSize: '12px', color: '#5A5A4A', lineHeight: 1.6, marginBottom: '10px' }}>
-            輸入症狀（如頭痛、咳嗽、失眠），根據中醫理論分析可能證型，提供辯證要點、治法建議。是學習中醫臨床思維的好幫手。
-          </div>
-          <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
-            {['辯證論治', '證型分析', '治法建議', '思路參考'].map(tag => (
-              <span key={tag} style={{ fontSize: '10px', color: '#6A4A8A', backgroundColor: 'rgba(106,74,138,0.1)', padding: '2px 9px', borderRadius: '10px', fontWeight: 600 }}>{tag}</span>
-            ))}
-          </div>
-        </Link>
+            <div style={{ fontSize: '11px', color: '#5A5A4A', lineHeight: 1.5, marginBottom: '8px', flex: 1 }}>
+              輸入症狀找中醫證型，含辯證要點、治法建議
+            </div>
+            <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+              {['辯證', '治法'].map(tag => (
+                <span key={tag} style={{ fontSize: '9px', color: '#6A4A8A', backgroundColor: 'rgba(106,74,138,0.1)', padding: '2px 7px', borderRadius: '8px', fontWeight: 600 }}>{tag}</span>
+              ))}
+            </div>
+          </Link>
 
-        {/* 中藥大全 */}
-        <Link href="/herbs" style={{ display: 'block', marginBottom: '10px', padding: '16px 16px 14px', backgroundColor: '#F0F4E0', borderRadius: '18px', border: '1.5px solid #D8E0C8', textDecoration: 'none', opacity: 0.75, cursor: 'default' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-            <div style={{ fontSize: '32px', lineHeight: 1 }}>🌿</div>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: '16px', fontWeight: 800, color: '#1a2C24', marginBottom: '2px' }}>中藥大全</div>
-              <div style={{ fontSize: '11px', color: '#5A6A1A', fontWeight: 600 }}>三百餘味 · 正在整理</div>
+          {/* 中藥大全 */}
+          <Link href="/herbs" style={{ display: 'flex', flexDirection: 'column', padding: '14px 14px 12px', backgroundColor: '#F0F4E0', borderRadius: '16px', border: '1.5px solid #D8E0C8', textDecoration: 'none', opacity: 0.8 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+              <div style={{ fontSize: '28px', lineHeight: 1 }}>🌿</div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: '14px', fontWeight: 800, color: '#1a2C24', marginBottom: '1px' }}>中藥大全</div>
+                <div style={{ fontSize: '10px', color: '#5A6A1A', fontWeight: 600 }}>三百餘味</div>
+              </div>
             </div>
-            <div style={{ fontSize: '18px', color: '#6A7A2A' }}>→</div>
-          </div>
-          <div style={{ fontSize: '12px', color: '#5A5A4A', lineHeight: 1.6, marginBottom: '10px' }}>
-            收錄中藥材的性味、歸經、功效、主治、配伍禁忌等。來源於《中藥學》十三五規劃教材，共三百餘味常用中藥。
-          </div>
-          <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
-            {['性味', '歸經', '功效', '主治', '配伍禁忌'].map(tag => (
-              <span key={tag} style={{ fontSize: '10px', color: '#5A6A1A', backgroundColor: 'rgba(90,106,26,0.1)', padding: '2px 9px', borderRadius: '10px', fontWeight: 600 }}>{tag}</span>
-            ))}
-          </div>
-        </Link>
+            <div style={{ fontSize: '11px', color: '#5A5A4A', lineHeight: 1.5, marginBottom: '8px', flex: 1 }}>
+              性味、歸經、功效主治，配伍禁忌等中藥知識
+            </div>
+            <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+              {['性味', '歸經'].map(tag => (
+                <span key={tag} style={{ fontSize: '9px', color: '#5A6A1A', backgroundColor: 'rgba(90,106,26,0.1)', padding: '2px 7px', borderRadius: '8px', fontWeight: 600 }}>{tag}</span>
+              ))}
+            </div>
+          </Link>
+        </div>
+      </div>
       </div>
 
       {/* 12 Meridian Quick Access */}
