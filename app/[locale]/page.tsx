@@ -46,7 +46,7 @@ export default function HomePage() {
     } else if (item.action === 'about') {
       setModalContent({
         title: 'ℹ️ 關於本站',
-        body: '醫道中醫大全是一個開源的中醫藥知識庫，收錄了針灸穴位、經典方劑等中醫藥資料。\n\n🎯 目標：讓中醫藥知識更容易被查詢和學習。\n\n📊 目前收錄：\n• 374 個針灸穴位（WHO 國際標準）\n• 205 首經典方劑\n• 更多內容持續更新中\n\n❤️ 製作給所有中醫藥愛好者。',
+        body: '📖 醫道中醫大全是一個開源的中醫藥知識庫，收錄了針灸穴位、經典方劑等中醫藥資料。\n\n🎯 目標：讓中醫藥知識更容易被查詢和學習。\n\n📊 目前收錄：\n• 374 個針灸穴位（WHO 國際標準）\n• 205 首經典方劑\n• 更多內容持續更新中\n\n❤️ 製作給所有中醫藥愛好者。',
       })
     } else if (item.action === 'contact') {
       setModalContent({
@@ -122,7 +122,6 @@ export default function HomePage() {
                   >
                     <span style={{ fontSize: '15px' }}>{item.label.split(' ')[0]}</span>
                     <span style={{ flex: 1 }}>{item.label.split(' ').slice(1).join(' ')}</span>
-                    {item.external && <span style={{ fontSize: '11px', color: '#8A8A7A' }}>↗</span>}
                   </a>
                 ))}
               </div>
@@ -187,29 +186,26 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* 4-Tab Navigation */}
+      {/* 3-Tab Navigation */}
       <div style={{ padding: '14px 16px 0' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '7px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '7px' }}>
           {[
-            { href: '/', label: '首頁', emoji: '🏠', active: true },
-            { href: '/db', label: '針灸大全', emoji: '💉', active: false },
-            { href: '/db', label: '方劑大全', emoji: '🍵', active: false },
-            { href: '/db', label: '中藥大全', emoji: '🌿', active: false, upcoming: true },
+            { href: '/acu', label: '針灸大全', emoji: '💉' },
+            { href: '/db', label: '方劑大全', emoji: '🍵' },
+            { href: '/symptoms', label: '症狀', emoji: '🩺' },
           ].map(tab => (
             <Link
               key={tab.label}
-              href={tab.upcoming ? '#' : tab.href}
+              href={tab.href}
               style={{
                 display: 'flex', flexDirection: 'column', alignItems: 'center',
                 padding: '12px 4px',
-                backgroundColor: tab.active ? '#1a3A2C' : '#FFFEF9',
-                color: tab.active ? '#FFFEF9' : '#1a2C24',
+                backgroundColor: '#FFFEF9',
+                color: '#1a2C24',
                 borderRadius: '14px', textDecoration: 'none',
-                border: `1.5px solid ${tab.active ? '#1a3A2C' : '#E8E4DC'}`,
+                border: '1.5px solid #E8E4DC',
                 boxShadow: '0 1px 4px rgba(0,0,0,0.05)',
-                opacity: tab.upcoming ? 0.6 : 1, cursor: tab.upcoming ? 'default' : 'pointer',
               }}
-              onClick={e => tab.upcoming && e.preventDefault()}
             >
               <div style={{ fontSize: '20px', marginBottom: '3px' }}>{tab.emoji}</div>
               <div style={{ fontSize: '11px', fontWeight: 700, textAlign: 'center', lineHeight: 1.2 }}>{tab.label}</div>
@@ -225,13 +221,20 @@ export default function HomePage() {
             emoji: '💉', title: '針灸大全', sub: '針灸穴位',
             desc: `${loading ? '...' : acupointsCount} 個穴位，WHO 國際標準編碼`,
             tags: ['十二經絡', '奇經八脈', '經外奇穴'],
-            color: '#2C4A3E', bg: '#EEF4F0',
+            color: '#2C4A3E', bg: '#EEF4F0', href: '/acu',
           },
           {
             emoji: '🍵', title: '方劑大全', sub: '經典方劑',
             desc: `${loading ? '...' : formulasCount} 首方劑，出自《傷寒論》《金匱》`,
             tags: ['解表劑', '清熱劑', '補益劑', '更多'],
-            color: '#8B4513', bg: '#FDF3E7',
+            color: '#8B4513', bg: '#FDF3E7', href: '/db',
+          },
+          {
+            emoji: '🩺', title: '症狀大全', sub: '症狀查詢',
+            desc: '根據症狀找到可能的中醫證型與治療方向',
+            tags: ['辯證', '論治', '思路參考'],
+            color: '#5A3A8A', bg: '#F3EEF7',
+            upcoming: true,
           },
           {
             emoji: '🌿', title: '中藥大全', sub: '中藥材',
@@ -243,7 +246,7 @@ export default function HomePage() {
         ].map((card, i) => (
           <Link
             key={i}
-            href={card.upcoming ? '#' : '/db'}
+            href={card.upcoming ? '#' : card.href}
             style={{
               display: 'block', marginBottom: '10px',
               padding: '16px 16px 12px',
@@ -290,7 +293,7 @@ export default function HomePage() {
           ].map(m => (
             <Link
               key={m.code}
-              href="/db"
+              href="/acu"
               style={{
                 display: 'flex', flexDirection: 'column', alignItems: 'center',
                 padding: '10px 4px', backgroundColor: '#FFFEF9',

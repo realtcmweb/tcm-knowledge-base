@@ -46,7 +46,7 @@ const MENU_ITEMS = [
 ]
 
 export default function DatabasePage() {
-  const [activeTab, setActiveTab] = useState<'acupoints' | 'formulas' | 'herbs'>('formulas')
+  // activeTab is now the page itself - no longer needed
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCat, setSelectedCat] = useState('')
   const [selectedFormula, setSelectedFormula] = useState<Formula | null>(null)
@@ -213,9 +213,9 @@ export default function DatabasePage() {
         {/* 3-Tab */}
         <div style={{ display: 'flex', padding: '12px 14px 0', gap: '7px' }}>
           {[
-            { key: 'acupoints', label: '針灸大全', emoji: '💉', count: '374' },
-            { key: 'formulas', label: '方劑大全', emoji: '🍵', count: '205' },
-            { key: 'herbs', label: '中藥大全', emoji: '🌿', count: '?', upcoming: true },
+            { key: 'acupoints', label: '針灸大全', emoji: '💉', count: '374', href: '/acu' },
+            { key: 'formulas', label: '方劑大全', emoji: '🍵', count: '205', active: true },
+            { key: 'symptoms', label: '症狀', emoji: '🩺', href: '/symptoms' },
           ].map(tab => (
             <button
               key={tab.key}
