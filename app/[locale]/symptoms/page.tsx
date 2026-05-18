@@ -230,7 +230,7 @@ function toTC(s: string): string {
 }
 
 function toDisplay(s: string): string {
-  return lang === 'tc' ? toTC(s) : s
+  return langSetting === 'tc' ? toTC(s) : s
 }
 
 const MENU_ITEMS = [
@@ -256,7 +256,7 @@ interface Prescription {
 export default function SymptomsPage() {
   const [showMenu, setShowMenu] = useState(false)
   const [fontSize, setFontSize] = useState(14)
-  const [lang, setLang] = useState<'tc' | 'sc'>('tc')
+  const [langSetting, setLangSetting] = useState<'tc' | 'sc'>('tc')
   const [modalContent, setModalContent] = useState<{title: string; body: string} | null>(null)
   const [mode, setMode] = useState<'expert' | 'popular'>('expert')
   const [selectedExpertCat, setSelectedExpertCat] = useState('內科')
@@ -276,7 +276,7 @@ export default function SymptomsPage() {
     if (action === 'font') {
       setFontSize(fontSize >= 20 ? 12 : fontSize + 2)
     } else if (action === 'lang') {
-      setLang(l => l === 'tc' ? 'sc' : 'tc')
+      setLangSetting(l => l === 'tc' ? 'sc' : 'tc')
     } else if (action === 'disclaimer') {
       setModalContent({ title: '⚠️ 免責聲明', body: '本資料庫內容僅供學術參考，不作商業用途。有病請尋求合法的醫師，非中醫師請勿擅自處方服藥。\n\n本站所收錄的中醫藥知識來源於公開文獻整理，編者在編輯過程中已盡可能核實內容準確性，但不保證所有資訊完全正確、及時或完整。讀者依此行事需自行承擔風險。' })
     } else if (action === 'about') {
