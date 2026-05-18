@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation'
 
 const MENU_ITEMS = [
   { label: '📋 使用說明', href: '#' },
-  { label: '🔗 醫砭 yibian.hopto.org', href: 'https://yibian.hopto.org/db/', external: true },
   { label: '⚠️ 免責聲明', href: '#', action: 'disclaimer' },
   { label: 'ℹ️ 關於本站', href: '#', action: 'about' },
   { label: '📩 聯絡我們', href: '#', action: 'contact' },
