@@ -87,7 +87,7 @@ export default function DatabasePage() {
     } else if (item.action === 'about') {
       setModalContent({
         title: 'ℹ️ 關於本站',
-        body: '📖 中醫大全是一個開源的中醫藥知識庫，收錄了針灸穴位、經典方劑等中醫藥資料。\n\n🎯 目標：讓中醫藥知識更容易被查詢和學習。\n\n📊 目前收錄：\n• 374 個針灸穴位（WHO 國際標準）\n• 205 首經典方劑\n• 更多內容持續更新中\n\n❤️ 製作給所有中醫藥愛好者。',
+        body: '醫道中醫大全是一個開源的中醫藥知識庫，收錄了針灸穴位、經典方劑等中醫藥資料。\n\n🎯 目標：讓中醫藥知識更容易被查詢和學習。\n\n📊 目前收錄：\n• 374 個針灸穴位（WHO 國際標準）\n• 205 首經典方劑\n• 更多內容持續更新中\n\n❤️ 製作給所有中醫藥愛好者。',
       })
     } else if (item.action === 'contact') {
       setModalContent({
@@ -119,7 +119,7 @@ export default function DatabasePage() {
             <span>首頁</span>
           </Link>
           <div style={{ flex: 1, textAlign: 'center', fontSize: '15px', fontWeight: 700, letterSpacing: '0.03em' }}>
-            📖 中醫大全
+            醫道中醫大全
           </div>
 
           {/* Menu Dropdown */}
