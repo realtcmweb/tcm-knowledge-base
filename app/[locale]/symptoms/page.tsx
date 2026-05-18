@@ -125,7 +125,7 @@ export default function SymptomsPage() {
       minHeight: '100vh', backgroundColor: '#F7F5F0',
       fontFamily: '-apple-system, BlinkMacSystemFont, "PingFang TC", "Microsoft JhengHei", sans-serif',
       fontSize: `${fontSize}px`,
-    }}
+    }}>
       {/* Header */}
       <div style={{
         background: '#1a3A2C', color: '#FFFEF9',
