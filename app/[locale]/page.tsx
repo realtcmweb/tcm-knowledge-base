@@ -19,6 +19,7 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true)
   const [acupointsCount, setAcupointsCount] = useState(0)
   const [formulasCount, setFormulasCount] = useState(0)
+  const [herbsCount, setHerbsCount] = useState(0)
   const [showMenu, setShowMenu] = useState(false)
   const [fontSize, setFontSize] = useState(14)
   const [modalContent, setModalContent] = useState<{title: string; body: string} | null>(null)
@@ -27,9 +28,11 @@ export default function HomePage() {
     Promise.all([
       fetch('/data/acupoints.json').then(r => r.json()),
       fetch('/data/formulas.json').then(r => r.json()),
-    ]).then(([a, f]) => {
+      fetch('/data/herbs.json').then(r => r.json()),
+    ]).then(([a, f, h]) => {
       setAcupointsCount(a.length)
       setFormulasCount(f.length)
+      setHerbsCount(h.length)
       setLoading(false)
     })
   }, [])
@@ -45,7 +48,7 @@ export default function HomePage() {
     else if (action === 'about') setModalContent({ title: 'ℹ️ 關於本站', body: '📖 醫道中醫大全是一個開源的中醫藥知識庫，收錄了針灸穴位、經典方劑等中醫藥資料。\n\n🎯 目標：讓中醫藥知識更容易被查詢和學習。\n\n📊 目前收錄：\n• 374 個針灸穴位（WHO 國際標準）\n• 205 首經典方劑\n• 更多內容持續更新中\n\n❤️ 製作給所有中醫藥愛好者。' })
     else if (action === 'contact') setModalContent({ title: '📩 聯絡我們', body: '📧 請在 GitHub 倉庫提交 Issue\n🔗 github.com/realtcmweb/tcm-knowledge-base\n\n我們會盡快回覆您。' })
     else if (action === 'font') setFontSize(fontSize >= 20 ? 12 : fontSize + 2)
-    else if (action === 'guide') setModalContent({ title: '📋 使用說明', body: '📖 本資料庫分為四大專區：\n\n💉 針灸大全：收錄WHO國際標準穴位374個，可依經絡、穴性篩選。\n\n🍵 方劑大全：收錄205首經典方劑，按功效18分類。\n\n🩺 症狀區：輸入症狀找到可能的中醫證型。\n\n🌿 中藥大全：三百餘味中藥，正在整理中。\n\n🔍 搜尋：支援名稱、功效、分類等多種方式。' })
+    else if (action === 'guide') setModalContent({ title: '📋 使用說明', body: '📖 本資料庫分為四大專區：\n\n💉 針灸大全：收錄WHO國際標準穴位374個，可依經絡、穴性篩選。\n\n🍵 方劑大全：收錄205首經典方劑，按功效18分類。\n\n🩺 症狀區：輸入症狀找到可能的中醫證型。\n\n🌿 中藥大全：收錄422味中藥，按功效22分類，含药性、功效、应用、用量等。\n\n🔍 搜尋：支援名稱、功效、分類等多種方式。' })
   }
 
   return (
@@ -86,7 +89,7 @@ export default function HomePage() {
 
         {/* Stats */}
         <div style={{ display: 'flex', justifyContent: 'center', gap: '24px', marginTop: '16px' }}>
-          {[{ emoji: '💉', count: loading ? '...' : acupointsCount, label: '穴位' }, { emoji: '🍵', count: loading ? '...' : formulasCount, label: '方劑' }, { emoji: '🩺', count: '—', label: '症狀' }, { emoji: '🌿', count: '—', label: '中藥' }].map((s, i) => (
+          {[{ emoji: '💉', count: loading ? '...' : acupointsCount, label: '穴位' }, { emoji: '🍵', count: loading ? '...' : formulasCount, label: '方劑' }, { emoji: '🩺', count: '—', label: '症狀' }, { emoji: '🌿', count: loading ? '...' : herbsCount, label: '中藥' }].map((s, i) => (
             <div key={i} style={{ textAlign: 'center' }}>
               <div style={{ fontSize: '16px', marginBottom: '1px' }}>{s.emoji}</div>
               <div style={{ fontSize: '16px', fontWeight: 800 }}>{s.count}</div>
@@ -163,7 +166,7 @@ export default function HomePage() {
           </Link>
 
           {/* 中藥大全 */}
-          <Link href="/herbs" style={{ display: 'flex', flexDirection: 'column', padding: '14px 14px 12px', backgroundColor: '#F0F4E0', borderRadius: '16px', border: '1.5px solid #D8E0C8', textDecoration: 'none', opacity: 0.8 }}>
+          <Link href="/herbs" style={{ display: 'flex', flexDirection: 'column', padding: '14px 14px 12px', backgroundColor: '#F0F4E0', borderRadius: '16px', border: '1.5px solid #D8E0C8', textDecoration: 'none' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
               <div style={{ fontSize: '28px', lineHeight: 1 }}>🌿</div>
               <div style={{ flex: 1 }}>
