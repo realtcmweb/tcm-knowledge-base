@@ -180,8 +180,9 @@ export default function SymptomsPage() {
               style={{
                 padding: '5px 10px', borderRadius: '14px', border: 'none',
                 fontSize: '11px', fontWeight: 700, cursor: 'pointer',
-                backgroundColor: mode === 'expert' ? '#FFFEF9' : 'rgba(255,254,249,0.15)',
+                backgroundColor: mode === 'expert' ? '#FFFEF9' : 'rgba(255,254,249,0.25)',
                 color: mode === 'expert' ? '#1a3A2C' : '#FFFEF9',
+                border: mode === 'expert' ? '1.5px solid transparent' : '1.5px solid rgba(255,254,249,0.4)',
               }}
             >專家</button>
             <button
@@ -189,8 +190,9 @@ export default function SymptomsPage() {
               style={{
                 padding: '5px 10px', borderRadius: '14px', border: 'none',
                 fontSize: '11px', fontWeight: 700, cursor: 'pointer',
-                backgroundColor: mode === 'popular' ? '#FFFEF9' : 'rgba(255,254,249,0.15)',
+                backgroundColor: mode === 'popular' ? '#FFFEF9' : 'rgba(255,254,249,0.25)',
                 color: mode === 'popular' ? '#1a3A2C' : '#FFFEF9',
+                border: mode === 'popular' ? '1.5px solid transparent' : '1.5px solid rgba(255,254,249,0.4)',
               }}
             >大眾</button>
           </div>
@@ -300,8 +302,9 @@ export default function SymptomsPage() {
                     flexShrink: 0, padding: '7px 13px',
                     borderRadius: '20px', border: 'none', cursor: 'pointer',
                     fontSize: '11px', fontWeight: 700,
-                    backgroundColor: selectedPopularCat === cat.key ? '#FFFEF9' : 'rgba(255,254,249,0.15)',
+                    backgroundColor: selectedPopularCat === cat.key ? '#FFFEF9' : 'rgba(255,254,249,0.25)',
                     color: selectedPopularCat === cat.key ? '#1a3A2C' : '#FFFEF9',
+                    border: selectedPopularCat === cat.key ? '1.5px solid transparent' : '1.5px solid rgba(255,254,249,0.35)',
                     whiteSpace: 'nowrap',
                   }}
                 >
@@ -326,8 +329,9 @@ export default function SymptomsPage() {
                   flexShrink: 0, padding: '7px 13px',
                   borderRadius: '20px', border: 'none', cursor: 'pointer',
                   fontSize: '11px', fontWeight: 700,
-                  backgroundColor: selectedExpertCat === cat.key ? '#FFFEF9' : 'rgba(255,254,249,0.15)',
+                  backgroundColor: selectedExpertCat === cat.key ? '#FFFEF9' : 'rgba(255,254,249,0.25)',
                   color: selectedExpertCat === cat.key ? '#1a3A2C' : '#FFFEF9',
+                  border: selectedExpertCat === cat.key ? '1.5px solid transparent' : '1.5px solid rgba(255,254,249,0.35)',
                   whiteSpace: 'nowrap',
                 }}
               >
