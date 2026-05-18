@@ -13,13 +13,18 @@ export async function POST(req: NextRequest) {
     
     const res = await fetch(`${API_URL}/api/ask`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(body),  // passthrough: question + answers + context + suspected_syndromes
     })
+    
+    if (!res.ok) {
+      throw new Error(`Backend responded with HTTP ${res.status}`)
+    }
     
     const data = await res.json()
     return NextResponse.json(data)
   } catch (err) {
+    console.error('[/api/ask route error]', err)
     return NextResponse.json({ ok: false, error: '後端服務目前無法使用，請稍後再試' }, { status: 503 })
   }
 }
