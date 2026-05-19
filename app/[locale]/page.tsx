@@ -474,7 +474,7 @@ export default function ConsultPage() {
       <header className="bg-white/90 backdrop-blur-sm border-b border-stone-200 sticky top-0 z-50">
         <div className="max-w-lg mx-auto px-4 py-3 flex items-center justify-between">
           <div>
-            <h1 className="text-lg font-light tracking-wide text-stone-700">🔴 中醫智能問診（首頁TEST）</h1>
+            <h1 className="text-lg font-light tracking-wide text-stone-700">中醫智能問診（首頁）</h1>
             <p className="text-xs text-stone-400 tracking-widest">AI 輔助養生參考</p>
           </div>
           <div className="flex items-center gap-2">
