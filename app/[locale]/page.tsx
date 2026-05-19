@@ -45,7 +45,7 @@ export default function HomePage() {
   const handleMenuAction = (action: string) => {
     setShowMenu(false)
     if (action === 'disclaimer') setModalContent({ title: '⚠️ 免責聲明', body: '本資料庫內容僅供學術參考，不作商業用途。有病請尋求合法的醫師，非中醫師請勿擅自處方服藥。\n\n本站所收錄的中醫藥知識來源於公開文獻整理，編者在編輯過程中已盡可能核實內容準確性，但不保證所有資訊完全正確、及時或完整。讀者依此行事需自行承擔風險。' })
-    else if (action === 'about') setModalContent({ title: 'ℹ️ 關於本站', body: '📖 醫道中醫大全是一個開源的中醫藥知識庫，收錄了針灸穴位、經典方劑等中醫藥資料。\n\n🎯 目標：讓中醫藥知識更容易被查詢和學習。\n\n📊 目前收錄：\n• 374 個針灸穴位（WHO 國際標準）\n• 205 首經典方劑\n• 更多內容持續更新中\n\n❤️ 製作給所有中醫藥愛好者。' })
+    else if (action === 'about') setModalContent({ title: 'ℹ️ 關於本站', body: `📖 醫道中醫大全是一個開源的中醫藥知識庫，收錄了針灸穴位、經典方劑等中醫藥資料。\n\n🎯 目標：讓中醫藥知識更容易被查詢和學習。\n\n📊 目前收錄：\n• ${acupointsCount} 個針灸穴位（WHO 國際標準）\n• ${formulasCount} 首經典方劑\n• ${herbsCount} 味中藥\n• 更多內容持續更新中\n\n❤️ 製作給所有中醫藥愛好者。` })
     else if (action === 'contact') setModalContent({ title: '📩 聯絡我們', body: '📧 請在 GitHub 倉庫提交 Issue\n🔗 github.com/realtcmweb/tcm-knowledge-base\n\n我們會盡快回覆您。' })
     else if (action === 'font') setFontSize(fontSize >= 20 ? 12 : fontSize + 2)
     else if (action === 'guide') setModalContent({ title: '📋 使用說明', body: '📖 本資料庫分為四大專區：\n\n💉 針灸大全：收錄WHO國際標準穴位374個，可依經絡、穴性篩選。\n\n🍵 方劑大全：收錄205首經典方劑，按功效18分類。\n\n🩺 症狀區：輸入症狀找到可能的中醫證型。\n\n🌿 中藥大全：收錄422味中藥，按功效22分類，含药性、功效、应用、用量等。\n\n🔍 搜尋：支援名稱、功效、分類等多種方式。' })
@@ -115,7 +115,7 @@ export default function HomePage() {
               </div>
             </div>
             <div style={{ fontSize: '11px', color: '#5A5A4A', lineHeight: 1.5, marginBottom: '8px', flex: 1 }}>
-              十二經絡、督脈任脈、經外奇穴374穴，可依經絡或穴性篩選
+              十二經絡、督脈任脈、經外奇穴，可依經絡或穴性篩選
             </div>
             <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
               {['經絡', '穴性', 'WHO'].map(tag => (
@@ -171,7 +171,7 @@ export default function HomePage() {
               <div style={{ fontSize: '28px', lineHeight: 1 }}>🌿</div>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: '20px', fontWeight: 900, color: '#1a2C24', marginBottom: '2px' }}>中藥大全</div>
-                <div style={{ fontSize: '10px', color: '#5A6A1A', fontWeight: 600 }}>三百餘味</div>
+                <div style={{ fontSize: '10px', color: '#5A6A1A', fontWeight: 600 }}>{loading ? '...' : herbsCount} 味</div>
               </div>
             </div>
             <div style={{ fontSize: '11px', color: '#5A5A4A', lineHeight: 1.5, marginBottom: '8px', flex: 1 }}>
