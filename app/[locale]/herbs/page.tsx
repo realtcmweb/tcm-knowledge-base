@@ -141,21 +141,8 @@ export default function HerbsPage() {
           </div>
         </div>
 
-        {/* Search */}
-        <div style={{ padding: '0 16px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, backgroundColor: 'rgba(255,254,249,0.15)', borderRadius: 14, padding: '12px 14px', border: '1.5px solid rgba(255,254,249,0.25)' }}>
-            <span style={{ fontSize: 16, opacity: 0.8 }}>🔍</span>
-            <input ref={searchRef} type="text" placeholder={loading ? '載入中...' : '搜尋中藥名稱、拼音...'} value={search} onChange={e => setSearch(e.target.value)}
-              disabled={loading}
-              style={{ flex: 1, border: 'none', background: 'transparent', outline: 'none', fontSize: 14, color: '#FFFEF9' }} />
-            {search && (
-              <button onClick={() => setSearch('')} style={{ background: 'rgba(255,254,249,0.2)', border: 'none', borderRadius: '50%', width: 20, height: 20, cursor: 'pointer', fontSize: 10, color: '#FFFEF9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
-            )}
-          </div>
-        </div>
-
         {/* 3-Tab Navigation */}
-        <div style={{ display: 'flex', padding: '12px 14px 0', gap: 7 }}>
+        <div style={{ display: 'flex', padding: '10px 14px 0', gap: 7 }}>
           {[
             { href: '/acu', label: '針灸大全', emoji: '💉' },
             { href: '/db', label: '方劑大全', emoji: '🍵' },
@@ -166,6 +153,19 @@ export default function HerbsPage() {
               <div>{tab.label}</div>
             </Link>
           ))}
+        </div>
+
+        {/* Search */}
+        <div style={{ padding: '0 14px 0' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, backgroundColor: 'rgba(255,254,249,0.15)', borderRadius: 14, padding: '11px 14px', border: '1.5px solid rgba(255,254,249,0.25)' }}>
+            <span style={{ fontSize: 16, opacity: 0.8 }}>🔍</span>
+            <input ref={searchRef} type="text" placeholder={loading ? '載入中...' : '搜尋中藥名稱、拼音...'} value={search} onChange={e => setSearch(e.target.value)}
+              disabled={loading}
+              style={{ flex: 1, border: 'none', background: 'transparent', outline: 'none', fontSize: 14, color: '#FFFEF9' }} />
+            {search && (
+              <button onClick={() => setSearch('')} style={{ background: 'rgba(255,254,249,0.2)', border: 'none', borderRadius: '50%', width: 20, height: 20, cursor: 'pointer', fontSize: 10, color: '#FFFEF9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+            )}
+          </div>
         </div>
 
         {/* Category pills */}

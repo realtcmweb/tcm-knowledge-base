@@ -203,12 +203,36 @@ export default function FormulasPage() {
           </div>
         </div>
 
+        {/* 3-Tab Navigation */}
+        <div style={{ display: 'flex', padding: '10px 14px 0', gap: '7px' }}>
+          {[
+            { href: '/acu', label: '針灸大全', emoji: '💉' },
+            { href: '/db', label: '方劑大全', emoji: '🍵' },
+            { href: '/symptoms', label: '症狀', emoji: '🩺' },
+          ].map(tab => (
+            <Link
+              key={tab.label}
+              href={tab.href}
+              style={{
+                flex: 1, padding: '10px 4px',
+                backgroundColor: tab.href === '/db' ? '#FFFEF9' : 'rgba(255,254,249,0.12)',
+                color: tab.href === '/db' ? '#1a3A2C' : 'rgba(255,254,249,0.8)',
+                border: 'none', borderRadius: '12px', textDecoration: 'none',
+                fontSize: '11px', fontWeight: 700, textAlign: 'center',
+              }}
+            >
+              <div style={{ fontSize: '18px', marginBottom: '2px' }}>{tab.emoji}</div>
+              <div>{tab.label}</div>
+            </Link>
+          ))}
+        </div>
+
         {/* Search */}
-        <div style={{ padding: '0 16px' }}>
+        <div style={{ padding: '0 14px 0' }}>
           <div style={{
             display: 'flex', alignItems: 'center', gap: '8px',
             backgroundColor: 'rgba(255,254,249,0.15)',
-            borderRadius: '14px', padding: '12px 14px',
+            borderRadius: '14px', padding: '11px 14px',
             border: '1.5px solid rgba(255,254,249,0.25)',
           }}>
             <span style={{ fontSize: '16px', opacity: 0.8 }}>🔍</span>
@@ -231,30 +255,6 @@ export default function FormulasPage() {
               }}>✕</button>
             )}
           </div>
-        </div>
-
-        {/* 3-Tab Navigation */}
-        <div style={{ display: 'flex', padding: '12px 14px 0', gap: '7px' }}>
-          {[
-            { href: '/acu', label: '針灸大全', emoji: '💉' },
-            { href: '/db', label: '方劑大全', emoji: '🍵' },
-            { href: '/symptoms', label: '症狀', emoji: '🩺' },
-          ].map(tab => (
-            <Link
-              key={tab.label}
-              href={tab.href}
-              style={{
-                flex: 1, padding: '10px 4px',
-                backgroundColor: tab.href === '/db' ? '#FFFEF9' : 'rgba(255,254,249,0.12)',
-                color: tab.href === '/db' ? '#1a3A2C' : 'rgba(255,254,249,0.8)',
-                border: 'none', borderRadius: '12px', textDecoration: 'none',
-                fontSize: '11px', fontWeight: 700, textAlign: 'center',
-              }}
-            >
-              <div style={{ fontSize: '18px', marginBottom: '2px' }}>{tab.emoji}</div>
-              <div>{tab.label}</div>
-            </Link>
-          ))}
         </div>
 
         {/* Category Pills */}

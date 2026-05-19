@@ -270,6 +270,15 @@ export default function SymptomsPage() {
           </div>
         </div>
 
+        {/* Search */}
+        <div style={{ padding: '10px 14px 0' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: 'rgba(255,254,249,0.15)', borderRadius: '14px', padding: '11px 14px', border: '1.5px solid rgba(255,254,249,0.25)' }}>
+            <span style={{ fontSize: '16px', opacity: 0.8 }}>🔍</span>
+            <input type="text" placeholder="搜尋症狀、疾病..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} style={{ flex: 1, border: 'none', backgroundColor: 'transparent', outline: 'none', fontSize: '14px', color: '#FFFEF9' }} />
+            {searchQuery && <button onClick={() => setSearchQuery('')} style={{ background: 'rgba(255,254,249,0.2)', border: 'none', borderRadius: '50%', width: '20px', height: '20px', cursor: 'pointer', fontSize: '10px', color: '#FFFEF9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>}
+          </div>
+        </div>
+
         {/* 3-Tab Nav */}
         <div style={{ display: 'flex', padding: '12px 14px 0', gap: '7px' }}>
           {navItems.map(tab => (
@@ -280,14 +289,7 @@ export default function SymptomsPage() {
           ))}
         </div>
 
-        {/* Search */}
-        <div style={{ padding: '0 16px', marginTop: '12px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: 'rgba(255,254,249,0.15)', borderRadius: '14px', padding: '11px 14px', border: '1.5px solid rgba(255,254,249,0.25)' }}>
-            <span style={{ fontSize: '16px', opacity: 0.8 }}>🔍</span>
-            <input type="text" placeholder="搜尋症狀、疾病..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} style={{ flex: 1, border: 'none', backgroundColor: 'transparent', outline: 'none', fontSize: '14px', color: '#FFFEF9' }} />
-            {searchQuery && <button onClick={() => setSearchQuery('')} style={{ background: 'rgba(255,254,249,0.2)', border: 'none', borderRadius: '50%', width: '20px', height: '20px', cursor: 'pointer', fontSize: '10px', color: '#FFFEF9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>}
-          </div>
-        </div>
+
       </div>
 
       {/* Expert Mode: Specialty + Sub tabs */}
