@@ -334,7 +334,8 @@ export default function FormulasPage() {
         */}</>
         )}
 
-
+      {dbView === 'list' && (
+      <>
       {/* Content */}
       <div style={{ padding: '12px 14px 100px' }}>
         {loading ? (
@@ -385,6 +386,8 @@ export default function FormulasPage() {
           </div>
         )}
       </div>
+      </>
+      )}
 
       {/* Category Sidebar */}
       {showCatSidebar && (

@@ -217,8 +217,7 @@ export default function HerbsPage() {
           {loading ? '載入中...' : `${filtered.length} 味中藥`}
         </div>
 
-        </>
-        )}
+        {/* Content */}
         <div style={{ padding: '12px 14px 100px' }}>
         {loading ? (
           <div style={{ padding: '60px 0', textAlign: 'center', color: '#7A7A6A', fontSize: 14 }}>載入中...</div>
@@ -275,6 +274,8 @@ export default function HerbsPage() {
           </div>
         )}
       </div>
+      </>
+      )}
 
       {/* Bottom Sheet */}
       {selectedHerb && (
