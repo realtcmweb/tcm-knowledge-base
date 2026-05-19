@@ -320,7 +320,7 @@ export default function SymptomsPage() {
       {symptomView === 'home' && (
         <div style={{ padding: '16px 14px 100px' }}>
           {/* 身體部位 */}
-          <div style={{ fontSize: 12, color: 'rgba(255,254,249,0.65)', marginBottom: 8, padding: '0 2px', letterSpacing: '0.05em' }}>🏠 身體部位（大眾）</div>
+          <div style={{ fontSize: 16, fontWeight: 800, color: '#FFFEF9', marginBottom: 10, padding: '0 2px' }}>🏠 身體部位（大眾）</div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 20 }}>
             {[
               { emoji: '🏠', label: '頭部', desc: '頭痛·眩暈·失眠·脫髮', partKey: 'head' },
@@ -338,7 +338,7 @@ export default function SymptomsPage() {
           </div>
 
           {/* 科別系統 */}
-          <div style={{ fontSize: 12, color: 'rgba(255,254,249,0.65)', marginBottom: 8, padding: '0 2px', letterSpacing: '0.05em' }}>🧠 科別系統（專家）</div>
+          <div style={{ fontSize: 16, fontWeight: 800, color: '#FFFEF9', marginBottom: 10, padding: '0 2px' }}>🧠 科別系統（專家）</div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 20 }}>
             {specialtyTabs.map(sp => (
               <button key={sp.key} onClick={() => { setSelectedSpecialty(sp.key); setSelectedSub(sp.subKeys[0]); setSelectedPart(''); setSymptomView('list') }} style={{ backgroundColor: '#FFFEF9', borderRadius: 16, padding: '16px 14px', border: '1.5px solid #E8E4DC', cursor: 'pointer', textAlign: 'left', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', width: '100%' }}>
@@ -350,7 +350,7 @@ export default function SymptomsPage() {
           </div>
 
           {/* 常見健康問題 */}
-          <div style={{ fontSize: 12, color: 'rgba(255,254,249,0.65)', marginBottom: 8, padding: '0 2px', letterSpacing: '0.05em' }}>⭐ 常見健康問題</div>
+          <div style={{ fontSize: 16, fontWeight: 800, color: '#FFFEF9', marginBottom: 10, padding: '0 2px' }}>⭐ 常見健康問題</div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
             {[
               { emoji: '🤧', label: '感冒' },
