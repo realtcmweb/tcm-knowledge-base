@@ -159,7 +159,7 @@ export default function AcupointsPage() {
 
         {/* 3-Tab */}
         <div style={{ display: 'flex', padding: '12px 14px 0', gap: '7px' }}>
-          {[{ href: '/acu', label: '針灸大全', emoji: '💉' }, { href: '/db', label: '方劑大全', emoji: '🍵' }, { href: '/symptoms', label: '症狀', emoji: '🩺' }].map(tab => (
+          {[{ href: '/acu', label: '針灸大全', emoji: '💉' }, { href: '/db', label: '方劑大全', emoji: '🍵' }, { href: '/treat', label: '針灸治療', emoji: '💊' }, { href: '/symptoms', label: '症狀', emoji: '🩺' }].map(tab => (
             <Link key={tab.label} href={tab.href} style={{ flex: 1, padding: '10px 4px', backgroundColor: tab.href === '/acu' ? '#FFFEF9' : 'rgba(255,254,249,0.12)', color: tab.href === '/acu' ? '#1a3A2C' : 'rgba(255,254,249,0.8)', borderRadius: '12px', textDecoration: 'none', fontSize: '11px', fontWeight: 700, textAlign: 'center' }}>
               <div style={{ fontSize: '18px', marginBottom: '2px' }}>{tab.emoji}</div>
               <div>{tab.label}</div>
