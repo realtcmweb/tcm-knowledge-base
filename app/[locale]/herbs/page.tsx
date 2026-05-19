@@ -15,7 +15,6 @@ interface Herb {
 }
 
 const CATEGORIES = [
-  { key: '', label: '全部', emoji: '✨' },
   { key: '解表药', label: '解表藥', emoji: '🌬️' },
   { key: '清热药', label: '清熱藥', emoji: '🔥' },
   { key: '泻下药', label: '瀉下藥', emoji: '💩' },

@@ -17,7 +17,6 @@ interface Formula {
 }
 
 const FORMULA_CATEGORIES = [
-  { key: '', label: '全部', emoji: '✨' },
   { key: '解表劑', label: '感冒發汗', emoji: '🌬️' },
   { key: '清熱劑', label: '清熱降火', emoji: '🔥' },
   { key: '瀉下劑', label: '潤腸通便', emoji: '💩' },
@@ -308,7 +307,31 @@ export default function FormulasPage() {
           </div>
         </div>
 
-        </>
+        {/*
+        <div style={{ display: 'flex', gap: '6px', overflowX: 'auto', padding: '8px 14px 0' }}>
+          <button
+            onClick={() => setSelectedCat('')}
+            style={{
+              padding: '6px 14px', borderRadius: '20px', border: 'none', cursor: 'pointer',
+              fontSize: '11px', fontWeight: 700, whiteSpace: 'nowrap', flexShrink: 0,
+              backgroundColor: selectedCat === '' ? '#FFFEF9' : 'rgba(255,254,249,0.15)',
+              color: selectedCat === '' ? '#1a3A2C' : 'rgba(255,254,249,0.85)',
+            }}
+          >全部</button>
+          {FORMULA_CATEGORIES.filter(c => c.key !== '').map(cat => (
+            <button
+              key={cat.key}
+              onClick={() => setSelectedCat(cat.key)}
+              style={{
+                padding: '6px 14px', borderRadius: '20px', border: 'none', cursor: 'pointer',
+                fontSize: '11px', fontWeight: 700, whiteSpace: 'nowrap', flexShrink: 0,
+                backgroundColor: selectedCat === cat.key ? '#FFFEF9' : 'rgba(255,254,249,0.15)',
+                color: selectedCat === cat.key ? '#1a3A2C' : 'rgba(255,254,249,0.85)',
+              }}
+            >{cat.label}</button>
+          ))}
+        </div>
+        */}</>
         )}
 
 
