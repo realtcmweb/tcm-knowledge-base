@@ -46,12 +46,15 @@ const MENU_ITEMS = [
 
 function getLinkedComposition(composition: string, herbNamesSorted: string[]): React.ReactNode[] {
   if (!composition || !herbNamesSorted.length) return [composition]
+  // Remove spaces for matching (composition has spaces like "麻 黄去节")
+  const normalizedComp = composition.replace(/\s+/g, '')
   const parts: React.ReactNode[] = []
-  let remaining = composition
+  let remaining = normalizedComp
   while (remaining) {
     let matched = false
     for (const hn of herbNamesSorted) {
-      const idx = remaining.indexOf(hn)
+      const hnNorm = hn.replace(/\s+/g, '')
+      const idx = remaining.indexOf(hnNorm)
       if (idx === 0) {
         parts.push(
           <Link
@@ -63,7 +66,7 @@ function getLinkedComposition(composition: string, herbNamesSorted: string[]): R
             {hn}
           </Link>
         )
-        remaining = remaining.slice(hn.length)
+        remaining = remaining.slice(hnNorm.length)
         matched = true
         break
       }
@@ -71,7 +74,6 @@ function getLinkedComposition(composition: string, herbNamesSorted: string[]): R
     if (!matched) {
       const next = remaining.search(/[\u4e00-\u9fa5]/)
       if (next === 0) {
-        // Chinese char not matched, take one char
         parts.push(remaining[0])
         remaining = remaining.slice(1)
       } else if (next > 0) {
