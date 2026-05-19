@@ -98,6 +98,7 @@ export default function SymptomsPage() {
   const [selectedSub, setSelectedSub] = useState<SubKey>('肺系')
   const [selectedDisease, setSelectedDisease] = useState<{disease: Disease; syndromeData?: any; overview?: string} | null>(null)
   const [loadingOverview, setLoadingOverview] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
 
   const T = lang === 'tw' ? L_TW : L_CN
 
@@ -277,6 +278,14 @@ export default function SymptomsPage() {
               <div>{tab.label}</div>
             </Link>
           ))}
+        </div>
+
+        {/* Search Bar */}
+        <div style={{ padding: '10px 14px 0' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: 'rgba(255,254,249,0.15)', borderRadius: '14px', padding: '11px 14px', border: '1.5px solid rgba(255,254,249,0.25)' }}>
+            <span style={{ fontSize: '16px', opacity: 0.8 }}>🔍</span>
+            <input type="text" placeholder="搜尋症狀、疾病..." style={{ flex: 1, border: 'none', backgroundColor: 'transparent', outline: 'none', fontSize: '14px', color: '#FFFEF9' }} />
+          </div>
         </div>
       </div>
 
