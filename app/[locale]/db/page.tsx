@@ -204,7 +204,7 @@ export default function FormulasPage() {
         </div>
 
         {/* Search */}
-        <div style={{ padding: '0 14px 0' }}>
+        <div style={{ padding: '10px 14px 0' }}>
           <div style={{
             display: 'flex', alignItems: 'center', gap: '8px',
             backgroundColor: 'rgba(255,254,249,0.15)',
