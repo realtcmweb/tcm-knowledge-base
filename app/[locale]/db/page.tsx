@@ -96,6 +96,7 @@ export default function FormulasPage() {
   const [showCatSidebar, setShowCatSidebar] = useState(false)
   const [showMenu, setShowMenu] = useState(false)
   const [modalContent, setModalContent] = useState<{title: string; body: string} | null>(null)
+  const [dbView, setDbView] = useState<'home' | 'list'>('home')
 
   const [herbNames, setHerbNames] = useState<string[]>([])
   const herbNamesSorted = useMemo(() => [...herbNames].sort((a, b) => b.length - a.length), [herbNames])
@@ -259,6 +260,32 @@ export default function FormulasPage() {
         </div>
 
         {/* Category Pills */}
+      </div>
+
+      {dbView === 'home' && (
+        <div style={{ padding: '16px 14px 100px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+            {FORMULA_CATEGORIES.filter(c => c.key !== '').map(cat => (
+              <button key={cat.key} onClick={() => { setSelectedCat(cat.key); setDbView('list') }} style={{
+                backgroundColor: '#FFFEF9', borderRadius: 16, padding: '16px 14px',
+                border: '1.5px solid #E8E4DC', cursor: 'pointer', textAlign: 'left',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+              }}>
+                <div style={{ fontSize: 14, fontWeight: 800, color: '#1a2C24' }}>{cat.label}</div>
+              </button>
+            ))}
+          </div>
+          </div>
+        </div>
+      {dbView === 'list' && (
+      <>
+        <button onClick={() => setDbView('home')} style={{
+          display: 'flex', alignItems: 'center', gap: 4,
+          padding: '8px 14px 0', background: 'none', border: 'none', cursor: 'pointer',
+          fontSize: 11, color: 'rgba(255,254,249,0.65)', fontWeight: 600,
+        }}>← 返回首頁</button>
+
+        {/* Category Pills */}
         <div style={{ padding: '10px 14px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
           <button
             onClick={() => setShowCatSidebar(true)}
@@ -278,7 +305,9 @@ export default function FormulasPage() {
             {loading ? '...' : `${filteredFormulas.length} 個方劑`}
           </div>
         </div>
-      </div>
+
+        </>
+        )}
 
       {/* Content */}
       <div style={{ padding: '12px 14px 100px' }}>

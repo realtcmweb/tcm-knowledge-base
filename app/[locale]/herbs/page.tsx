@@ -69,6 +69,7 @@ export default function HerbsPage() {
   const [selectedCat, setSelectedCat] = useState('')
   const [selectedHerb, setSelectedHerb] = useState<Herb | null>(null)
   const [showMenu, setShowMenu] = useState(false)
+  const [herbView, setHerbView] = useState<'home' | 'list'>('home')
   const [modalContent, setModalContent] = useState<{title: string; body: string} | null>(null)
   const searchRef = useRef<HTMLInputElement>(null)
 
@@ -168,6 +169,33 @@ export default function HerbsPage() {
             </Link>
           ))}
         </div>
+      </div>
+
+      {herbView === 'home' && (
+        <div style={{ padding: '16px 14px 100px' }}>
+          <div style={{ fontSize: 13, color: 'rgba(255,254,249,0.65)', marginBottom: 12, padding: '0 2px' }}>🌿 按功效主治分類</div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+            {CATEGORIES.filter(cc => cc.key !== '').map(cc => (
+              <button key={cc.key} onClick={() => { setSelectedCat(cc.key); setHerbView('list') }} style={{
+                backgroundColor: '#FFFEF9', borderRadius: 16, padding: '16px 14px',
+                border: '1.5px solid #E8E4DC', cursor: 'pointer', textAlign: 'left',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+              }}>
+                <div style={{ fontSize: 22, marginBottom: 6 }}>{cc.emoji}</div>
+                <div style={{ fontSize: 14, fontWeight: 800, color: '#1a2C24', marginBottom: 3 }}>{cc.label}</div>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {herbView === 'list' && (
+      <>
+        <button onClick={() => setHerbView('home')} style={{
+          display: 'flex', alignItems: 'center', gap: 4,
+          padding: '8px 14px 0', background: 'none', border: 'none', cursor: 'pointer',
+          fontSize: 11, color: 'rgba(255,254,249,0.65)', fontWeight: 600,
+        }}>← 返回首頁</button>
 
         {/* Category pills */}
         <div style={{ padding: '10px 14px 0', overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
@@ -189,10 +217,10 @@ export default function HerbsPage() {
         <div style={{ padding: '8px 16px 0', fontSize: 12, color: 'rgba(255,254,249,0.65)' }}>
           {loading ? '載入中...' : `${filtered.length} 味中藥`}
         </div>
-      </div>
 
-      {/* Content */}
-      <div style={{ padding: '12px 14px 100px' }}>
+        </>
+        )}
+        <div style={{ padding: '12px 14px 100px' }}>
         {loading ? (
           <div style={{ padding: '60px 0', textAlign: 'center', color: '#7A7A6A', fontSize: 14 }}>載入中...</div>
         ) : filtered.length === 0 ? (

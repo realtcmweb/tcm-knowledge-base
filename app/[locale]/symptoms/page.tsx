@@ -94,6 +94,7 @@ export default function SymptomsPage() {
   const [fontSize, setFontSize] = useState(14)
   const [modalContent, setModalContent] = useState<{title: string; body: string} | null>(null)
   const [mode, setMode] = useState<'expert' | 'popular'>('expert')
+  const [symptomView, setSymptomView] = useState<'home' | 'list'>('home')
   const [selectedSpecialty, setSelectedSpecialty] = useState<SpecialtyKey>('內科')
   const [selectedSub, setSelectedSub] = useState<SubKey>('肺系')
   const [selectedDisease, setSelectedDisease] = useState<{disease: Disease; syndromeData?: any; overview?: string} | null>(null)
@@ -293,6 +294,33 @@ export default function SymptomsPage() {
 
       </div>
 
+      {symptomView === 'home' && (
+        <div style={{ padding: '16px 14px 100px' }}>
+          <div style={{ fontSize: 13, color: 'rgba(255,254,249,0.65)', marginBottom: 12, padding: '0 2px' }}>🩺 按專科分類</div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+            {specialtyTabs.map(sp => (
+              <button key={sp.key} onClick={() => { setSelectedSpecialty(sp.key); setSelectedSub(sp.subKeys[0]); setSymptomView('list') }} style={{
+                backgroundColor: '#FFFEF9', borderRadius: 16, padding: '18px 14px',
+                border: '1.5px solid #E8E4DC', cursor: 'pointer', textAlign: 'left',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+              }}>
+                <div style={{ fontSize: 28, marginBottom: 8 }}>{sp.emoji}</div>
+                <div style={{ fontSize: 14, fontWeight: 800, color: '#1a2C24', marginBottom: 4 }}>{sp.key}</div>
+                <div style={{ fontSize: 11, color: '#8A8A7A' }}>{sp.subKeys.slice(0, 3).join(' · ')}{sp.subKeys.length > 3 ? '...' : ''}</div>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {symptomView === 'list' && (
+      <>
+        <button onClick={() => setSymptomView('home')} style={{
+          display: 'flex', alignItems: 'center', gap: 4,
+          padding: '8px 14px 0', background: 'none', border: 'none', cursor: 'pointer',
+          fontSize: 11, color: 'rgba(255,254,249,0.65)', fontWeight: 600,
+        }}>← 返回首頁</button>
+
       {/* Expert Mode: Specialty + Sub tabs */}
       {mode === 'expert' && (
         <>
@@ -429,6 +457,8 @@ export default function SymptomsPage() {
         )}
       </div>
 
+        </>
+        )}
       {/* Bottom Sheet */}
       {selectedDisease && (
         <>
