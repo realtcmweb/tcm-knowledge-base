@@ -188,7 +188,8 @@ export default function AcupointsPage() {
           {[
             { href: '/acu', label: '針灸大全', emoji: '💉' },
             { href: '/db', label: '方劑大全', emoji: '🍵' },
-            { href: '/symptoms', label: '症狀大全', emoji: '🩺' },
+            { href: '/herbs', label: '中藥大全', emoji: '🌿' },
+            { href: '/symptoms', label: '症狀', emoji: '🩺' },
           ].map(tab => (
             <Link key={tab.href} href={tab.href} style={{
               flex: 1, padding: '10px 4px',
