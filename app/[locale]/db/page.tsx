@@ -331,14 +331,11 @@ export default function FormulasPage() {
             >{cat.label}</button>
           ))}
         </div>
-        */}</>
-        )}
+        */}
 
-      {dbView === 'list' && (
-      <>
-      {/* Content */}
-      <div style={{ padding: '12px 14px 100px' }}>
-        {loading ? (
+        {/* Content */}
+        <div style={{ padding: '12px 14px 100px' }}>
+          {loading ? (
           <div style={{ padding: '60px 0', textAlign: 'center', color: '#7A7A6A', fontSize: '14px' }}>載入中...</div>
         ) : filteredFormulas.length === 0 ? (
           <div style={{ padding: '60px 0', textAlign: 'center', color: '#7A7A6A' }}>
