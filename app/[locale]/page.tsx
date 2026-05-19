@@ -474,7 +474,7 @@ export default function ConsultPage() {
       <header className="bg-white/90 backdrop-blur-sm border-b border-stone-200 sticky top-0 z-50">
         <div className="max-w-lg mx-auto px-4 py-3 flex items-center justify-between">
           <div>
-            <h1 className="text-lg font-light tracking-wide text-stone-700">中醫智能問診</h1>
+            <h1 className="text-lg font-light tracking-wide text-stone-700">中醫智能問診（首頁）</h1>
             <p className="text-xs text-stone-400 tracking-widest">AI 輔助養生參考</p>
           </div>
           <div className="flex items-center gap-2">
@@ -496,7 +496,7 @@ export default function ConsultPage() {
         <main className="max-w-lg mx-auto px-4 py-10 min-h-[75vh] flex flex-col justify-center">
           <div className="text-center mb-8">
             <div className="text-5xl mb-4">🌿</div>
-            <h2 className="text-2xl font-light text-stone-700 mb-2">中醫智能問診</h2>
+            <h2 className="text-2xl font-light text-stone-700 mb-2">中醫智能問診（首頁）</h2>
             <p className="text-sm text-stone-500">由資深中醫師認證，基於千年中醫古籍與現代臨床經驗</p>
           </div>
           <div className="space-y-3 mb-8">
@@ -894,7 +894,7 @@ export default function ConsultPage() {
 
       <footer className="text-center py-6 text-xs text-stone-400 border-t border-stone-200 mt-4">
         <p>本系統僅供奉生參考，不作為醫療診斷依據</p>
-        <p className="mt-1">中醫師認證 · 千古驗方 · 中醫智能問診 © 2026</p>
+        <p className="mt-1">中醫師認證 · 千古驗方 · 中醫智能問診（首頁） © 2026</p>
       </footer>
     </div>
   )
