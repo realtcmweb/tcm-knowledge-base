@@ -238,7 +238,6 @@ export default function FormulasPage() {
           {[
             { href: '/acu', label: '針灸大全', emoji: '💉' },
             { href: '/db', label: '方劑大全', emoji: '🍵' },
-            { href: '/treat', label: '針灸治療', emoji: '💊' },
             { href: '/symptoms', label: '症狀', emoji: '🩺' },
           ].map(tab => (
             <Link

@@ -206,7 +206,6 @@ export default function SymptomsPage() {
   const navItems = [
     { href: '/acu', label: T.navAcupuncture, emoji: '💉', active: false },
     { href: '/db', label: T.navFormula, emoji: '🍵', active: false },
-    { href: '/treat', label: '針灸治療', emoji: '💊', active: false },
     { href: '/symptoms', label: T.navSymptoms, emoji: '🩺', active: true },
   ]
 
