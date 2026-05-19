@@ -44,6 +44,24 @@ const POINT_TYPES = [
   { key: '下合穴', label: '下合穴' },
 ]
 
+const SYMPTOMS = [
+  { key: '頭痛', label: '頭痛' },
+  { key: '腰痛', label: '腰痛' },
+  { key: '失眠', label: '失眠' },
+  { key: '感冒', label: '感冒' },
+  { key: '咳嗽', label: '咳嗽' },
+  { key: '便秘', label: '便秘' },
+  { key: '胃痛', label: '胃痛' },
+  { key: '心悸', label: '心悸' },
+  { key: '眩暈', label: '眩暈' },
+  { key: '耳鳴', label: '耳鳴' },
+  { key: '鼻炎', label: '鼻炎' },
+  { key: '濕疹', label: '濕疹' },
+  { key: '月經', label: '月經失調' },
+  { key: '高血壓', label: '高血壓' },
+  { key: '視力', label: '視力問題' },
+]
+
 const MENU_ITEMS = [
   { label: '📋 使用說明', href: '#', action: 'guide' },
   { label: '⚠️ 免責聲明', href: '#', action: 'disclaimer' },
@@ -63,6 +81,7 @@ export default function AcupointsPage() {
   const [selectedMeridian, setSelectedMeridian] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [selectedPointType, setSelectedPointType] = useState('')
+  const [selectedSymptom, setSelectedSymptom] = useState('')
   const [selectedAcupoint, setSelectedAcupoint] = useState<Acupoint | null>(null)
   const [showMenu, setShowMenu] = useState(false)
   const [modalContent, setModalContent] = useState<{title: string; body: string} | null>(null)
@@ -84,6 +103,7 @@ export default function AcupointsPage() {
     if (selectedMeridian && !a.code.startsWith(selectedMeridian)) return false
     // Point type filter
     if (selectedPointType && !a.specialType.includes(selectedPointType)) return false
+    if (selectedSymptom && !(a.indications && a.indications.includes(selectedSymptom))) return false
     // Search
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase()
@@ -219,11 +239,37 @@ export default function AcupointsPage() {
         ))}
       </div>
 
+      {/* Symptom Pills */}
+      <div style={{ padding: '8px 14px 0', display: 'flex', gap: '5px', overflowX: 'auto' }}>
+        <button
+          onClick={() => setSelectedSymptom('')}
+          style={{
+            padding: '4px 10px', borderRadius: '14px', border: 'none', fontSize: '10px',
+            cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0,
+            backgroundColor: !selectedSymptom ? '#C85000' : '#E8E4DC',
+            color: !selectedSymptom ? '#FFFEF9' : '#5A3010', fontWeight: 600,
+          }}
+        >全部症狀</button>
+        {SYMPTOMS.map(s => (
+          <button
+            key={s.key}
+            onClick={() => setSelectedSymptom(s.key === selectedSymptom ? '' : s.key)}
+            style={{
+              padding: '4px 10px', borderRadius: '14px', border: 'none', fontSize: '10px',
+              cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0,
+              backgroundColor: selectedSymptom === s.key ? '#C85000' : '#E8E4DC',
+              color: selectedSymptom === s.key ? '#FFFEF9' : '#5A3010', fontWeight: 600,
+            }}
+          >{s.label}</button>
+        ))}
+      </div>
+
       {/* Result count */}
       <div style={{ padding: '8px 16px 4px', fontSize: '11px', color: '#8A8A7A' }}>
         {loading ? '...' : `${filteredAcupoints.length} 個穴位`}
         {selectedMeridian && ` · ${MERIDIANS.find(m=>m.code===selectedMeridian)?.name}`}
         {selectedPointType && ` · ${selectedPointType}`}
+        {selectedSymptom && ` · ${selectedSymptom}`}
       </div>
 
       {/* List */}
