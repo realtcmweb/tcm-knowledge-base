@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
 import diseasesData from '@/public/data/diseases.json'
+import BottomNav from '@/components/BottomNav'
 
 type Lang = 'tw' | 'cn'
 const LANG_KEY = 'tcm_lang'
@@ -572,6 +573,7 @@ export default function SymptomsPage() {
       )}
 
       {showMenu && <div style={{ position: 'fixed', inset: 0, zIndex: 99 }} onClick={() => setShowMenu(false)} />}
+    <BottomNav />
     </div>
   )
 }

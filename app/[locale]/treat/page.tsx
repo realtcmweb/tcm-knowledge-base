@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import treatments from '../../../public/data/treatments.json'
+import BottomNav from '@/components/BottomNav'
 
 const navItems = [
   { href: '/acu', label: '針灸大全', emoji: '💉' },
@@ -136,6 +137,7 @@ export default function TreatPage() {
           </Link>
         ))}
       </div>
+    <BottomNav />
     </div>
   )
 }

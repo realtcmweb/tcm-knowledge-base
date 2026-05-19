@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import treatmentsData from '../../../public/data/treatments.json'
+import BottomNav from '@/components/BottomNav'
 
 interface Acupoint {
   code: string
@@ -574,6 +575,7 @@ export default function AcupointsPage() {
       )}
 
       {showMenu && <div style={{ position: 'fixed', inset: 0, zIndex: 99 }} onClick={() => setShowMenu(false)} />}
+    <BottomNav />
     </div>
   )
 }

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import BottomNav from '@/components/BottomNav'
 
 const MENU_ITEMS = [
   { label: '👤 登錄 / 註冊', href: '#', action: 'login' },
@@ -237,6 +238,7 @@ export default function HomePage() {
       )}
 
       {showMenu && <div style={{ position: 'fixed', inset: 0, zIndex: 99 }} onClick={() => setShowMenu(false)} />}
-    </div>
+    <BottomNav />
+  </div>
   )
 }

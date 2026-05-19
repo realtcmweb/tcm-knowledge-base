@@ -1,6 +1,7 @@
 'use client'
 import React, { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
+import BottomNav from '@/components/BottomNav'
 
 interface Herb {
   name: string
@@ -340,6 +341,7 @@ export default function HerbsPage() {
       )}
 
       {showMenu && <div style={{ position: 'fixed', inset: 0, zIndex: 99 }} onClick={() => setShowMenu(false)} />}
+    <BottomNav />
     </div>
   )
 }

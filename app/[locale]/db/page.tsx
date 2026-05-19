@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
+import BottomNav from '@/components/BottomNav'
 
 interface Formula {
   id: number
@@ -519,6 +520,7 @@ export default function FormulasPage() {
       )}
 
       {showMenu && <div style={{ position: 'fixed', inset: 0, zIndex: 99 }} onClick={() => setShowMenu(false)} />}
+    <BottomNav />
     </div>
   )
 }
