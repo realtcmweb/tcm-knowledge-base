@@ -2,7 +2,6 @@
 
 import { useState, useRef, useCallback } from 'react'
 import Link from 'next/link'
-import BottomNav from '@/components/BottomNav'
 
 // ============================================
 // 題目類型
@@ -897,7 +896,6 @@ export default function ConsultPage() {
         <p>本系統僅供奉生參考，不作為醫療診斷依據</p>
         <p className="mt-1">中醫師認證 · 千古驗方 · 中醫智能問診 © 2026</p>
       </footer>
-    <BottomNav />
     </div>
   )
 }
