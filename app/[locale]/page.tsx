@@ -207,6 +207,19 @@ export default function HomePage() {
         </div>
       </div>
 
+      {/* CTA: 中醫問診 */}
+      <div style={{ padding: '0 16px 16px' }}>
+        <Link href="/consult" style={{ display: 'block', padding: '18px 20px', background: 'linear-gradient(135deg, #1a3A2C 0%, #2C4A3E 100%)', borderRadius: '16px', textDecoration: 'none', boxShadow: '0 4px 16px rgba(26,58,44,0.25)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div>
+              <div style={{ fontSize: '15px', fontWeight: 700, color: '#FFFEF9', marginBottom: '3px' }}>🌿 中醫智能問診</div>
+              <div style={{ fontSize: '11px', color: 'rgba(255,254,249,0.65)' }}>上傳舌苔照，AI 分析體質與調養建議</div>
+            </div>
+            <div style={{ fontSize: '20px', color: 'rgba(255,254,249,0.7)' }}>→</div>
+          </div>
+        </Link>
+      </div>
+
       {/* Footer */}
       <div style={{ padding: '16px 24px', borderTop: '1px solid #E8E4DC', textAlign: 'center', fontSize: '11px', color: '#8A8A7A', backgroundColor: '#FFFEF9' }}>
         ⚠️ 本資料庫內容僅供學術參考，不作商業用途。有病請尋求合法的醫師，非中醫師請勿擅自處方服藥。
