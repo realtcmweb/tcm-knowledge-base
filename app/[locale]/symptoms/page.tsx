@@ -414,8 +414,13 @@ export default function SymptomsPage() {
         </div>
         {currentDiseases.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '40px 0', color: '#8A8A7A' }}>
-            <div style={{ fontSize: '40px', marginBottom: '8px' }}>📋</div>
-            <div style={{ fontSize: '14px' }}>{T.loading}</div>
+            <div style={{ fontSize: '40px', marginBottom: '8px' }}>{searchQuery ? '🔍' : '📋'}</div>
+            <div style={{ fontSize: '14px', marginBottom: '4px' }}>
+              {searchQuery ? `找不到「${searchQuery}」相關疾病` : '暫無疾病資料'}
+            </div>
+            {searchQuery && (
+              <div style={{ fontSize: '12px', color: '#AAA' }}>試試其他關鍵字</div>
+            )}
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
