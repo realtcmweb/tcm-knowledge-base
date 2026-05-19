@@ -97,6 +97,7 @@ export default function SymptomsPage() {
   const [symptomView, setSymptomView] = useState<'home' | 'list'>('home')
   const [selectedSpecialty, setSelectedSpecialty] = useState<SpecialtyKey>('內科')
   const [selectedSub, setSelectedSub] = useState<SubKey>('肺系')
+  const [selectedPart, setSelectedPart] = useState('')
   const [selectedDisease, setSelectedDisease] = useState<{disease: Disease; syndromeData?: any; overview?: string} | null>(null)
   const [loadingOverview, setLoadingOverview] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -138,10 +139,41 @@ export default function SymptomsPage() {
   }
 
   // Get diseases for current selection
-  const currentDiseases = useMemo(() => {
-    const specialtyKey = lang === 'cn' ? selectedSpecialty : selectedSpecialty
-    const specialtyMap: Record<string, Record<string, Disease[]>> = diseasesData.diseases as any
+  // Body part -> related disease names mapping
+  const partDiseaseMap: Record<string, string[]> = {
+    head: ['感冒', '頭痛', '眩暈', '失眠', '不寐', '癲狂', '癇證', '痴呆', '多寐', '郁證'],
+    chest: ['咳嗽', '哮病', '喘證', '心悸', '胸痹', '心衰', '感冒', '肺脹', '肺癰', '肺癆'],
+    abdomen: ['胃痛', '胃痞', '嘔吐', '呃逆', '腹痛', '泄瀉', '痢疾', '便秘', '脅痛', '鼓脹', '黃疸', '積證', '聚證', '水腫', '淋證', '癃閉'],
+    limb: ['腰痛', '痹證', '痙證', '痿證', '顫證', '痙證'],
+    skin: ['濕疹', '癬', '疥瘡', '牛皮癬', '帶狀皰疹', '脫髮', '神經性皮炎', '白疕', '扁平疣', '丹毒', '癰', '疔'],
+  }
 
+  const currentDiseases = useMemo(() => {
+    // If searchQuery is set, filter all diseases
+    if (searchQuery.trim()) {
+      const q = searchQuery.trim().toLowerCase()
+      const all: Disease[] = []
+      Object.values(diseasesData.diseases as Record<string, Record<string, Disease[]>>).forEach(sp => {
+        Object.values(sp).forEach(sub => { all.push(...sub) })
+      })
+      return all.filter(d =>
+        d.name.includes(q) ||
+        d.synonyms.some(s => s.includes(q)) ||
+        d.syndromes.some(s => s.includes(q))
+      )
+    }
+
+    // If selectedPart is set, filter by body part
+    if (selectedPart && partDiseaseMap[selectedPart]) {
+      const partNames = partDiseaseMap[selectedPart]
+      const all: Disease[] = []
+      Object.values(diseasesData.diseases as Record<string, Record<string, Disease[]>>).forEach(sp => {
+        Object.values(sp).forEach(sub => { all.push(...sub) })
+      })
+      return all.filter(d => partNames.some(pn => d.name.includes(pn) || d.synonyms.some(s => s.includes(pn))))
+    }
+
+    // Otherwise use specialty + sub
     const specialtyMapTW: Record<string, any> = {
       '內科': diseasesData.diseases['內科'] || diseasesData.diseases['内科'],
       '外科': diseasesData.diseases['外科'],
@@ -154,17 +186,12 @@ export default function SymptomsPage() {
       '妇科': diseasesData.diseases['婦科'],
       '儿科': diseasesData.diseases['兒科'],
     }
-
     const map = lang === 'cn' ? specialtyMapCN : specialtyMapTW
     const sp = map[selectedSpecialty]
     if (!sp) return []
-
     const subMap = sp as Record<string, Disease[]>
-
-    // Try to find the sub key (handle both tw/cn)
     let subDiseases = subMap[selectedSub]
     if (!subDiseases && lang === 'cn') {
-      // Try TW key
       const reverseMap: Record<string, string> = {
         '肺系': '肺系', '心系': '心系', '脑系': '腦系', '脾胃系': '脾胃系',
         '肝胆系': '肝膽系', '肾系': '腎系', '气血津液': '氣血津液', '肢体经络': '肢體經絡',
@@ -176,9 +203,8 @@ export default function SymptomsPage() {
       const twKey = reverseMap[selectedSub]
       if (twKey) subDiseases = subMap[twKey]
     }
-
     return subDiseases || []
-  }, [selectedSpecialty, selectedSub, lang])
+  }, [selectedSpecialty, selectedSub, lang, searchQuery, selectedPart])
 
   const handleDiseaseClick = async (disease: Disease) => {
     setSelectedDisease({ disease })
@@ -228,10 +254,7 @@ export default function SymptomsPage() {
           </Link>
           <div style={{ flex: 1, textAlign: 'center', fontSize: '15px', fontWeight: 700, letterSpacing: '0.03em' }}>{T.title}</div>
 
-          <div style={{ display: 'flex', gap: '4px', marginRight: '8px' }}>
-            <button onClick={() => setMode('expert')} style={{ padding: '5px 10px', borderRadius: '14px', border: 'none', fontSize: '11px', fontWeight: 700, cursor: 'pointer', backgroundColor: mode === 'expert' ? '#FFFEF9' : '#E8E4DC', color: mode === 'expert' ? '#1a3A2C' : '#4A3A2C', border: mode === 'expert' ? '1.5px solid transparent' : '1.5px solid #D8D4CC' }}>{T.expert}</button>
-            <button onClick={() => setMode('popular')} style={{ padding: '5px 10px', borderRadius: '14px', border: 'none', fontSize: '11px', fontWeight: 700, cursor: 'pointer', backgroundColor: mode === 'popular' ? '#FFFEF9' : '#E8E4DC', color: mode === 'popular' ? '#1a3A2C' : '#4A3A2C', border: mode === 'popular' ? '1.5px solid transparent' : '1.5px solid #D8D4CC' }}>{T.popular}</button>
-          </div>
+
 
           {/* Menu */}
           <div style={{ position: 'relative' }}>
@@ -296,17 +319,52 @@ export default function SymptomsPage() {
 
       {symptomView === 'home' && (
         <div style={{ padding: '16px 14px 100px' }}>
-          <div style={{ fontSize: 13, color: 'rgba(255,254,249,0.65)', marginBottom: 12, padding: '0 2px' }}>🩺 按專科分類</div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+          {/* 身體部位 */}
+          <div style={{ fontSize: 12, color: 'rgba(255,254,249,0.65)', marginBottom: 8, padding: '0 2px', letterSpacing: '0.05em' }}>🏠 身體部位（大眾）</div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 20 }}>
+            {[
+              { emoji: '🏠', label: '頭部', desc: '頭痛·眩暈·失眠·脫髮', partKey: 'head' },
+              { emoji: '🫁', label: '胸腔', desc: '咳嗽·氣喘·胸悶·心悸', partKey: 'chest' },
+              { emoji: '👋', label: '腹部', desc: '胃痛·腹瀉·便祕·嘔吐', partKey: 'abdomen' },
+              { emoji: '🦵', label: '四肢', desc: '腰痛·膝痛·關節痛·手腳麻', partKey: 'limb' },
+              { emoji: '🔴', label: '皮膚', desc: '濕疹·蕁麻疹·瘙癢·痘痘', partKey: 'skin' },
+            ].map(part => (
+              <button key={part.partKey} onClick={() => { setSelectedPart(part.partKey); setSymptomView('list') }} style={{ backgroundColor: '#FFFEF9', borderRadius: 16, padding: '16px 14px', border: '1.5px solid #E8E4DC', cursor: 'pointer', textAlign: 'left', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', width: '100%' }}>
+                <div style={{ fontSize: 26, marginBottom: 6 }}>{part.emoji}</div>
+                <div style={{ fontSize: 14, fontWeight: 800, color: '#1a2C24', marginBottom: 3 }}>{part.label}</div>
+                <div style={{ fontSize: 11, color: '#7A7A6A', lineHeight: 1.4 }}>{part.desc}</div>
+              </button>
+            ))}
+          </div>
+
+          {/* 科別系統 */}
+          <div style={{ fontSize: 12, color: 'rgba(255,254,249,0.65)', marginBottom: 8, padding: '0 2px', letterSpacing: '0.05em' }}>🧠 科別系統（專家）</div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 20 }}>
             {specialtyTabs.map(sp => (
-              <button key={sp.key} onClick={() => { setSelectedSpecialty(sp.key); setSelectedSub(sp.subKeys[0]); setSymptomView('list') }} style={{
-                backgroundColor: '#FFFEF9', borderRadius: 16, padding: '18px 14px',
-                border: '1.5px solid #E8E4DC', cursor: 'pointer', textAlign: 'left',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-              }}>
-                <div style={{ fontSize: 28, marginBottom: 8 }}>{sp.emoji}</div>
-                <div style={{ fontSize: 14, fontWeight: 800, color: '#1a2C24', marginBottom: 4 }}>{sp.key}</div>
-                <div style={{ fontSize: 11, color: '#8A8A7A' }}>{sp.subKeys.slice(0, 3).join(' · ')}{sp.subKeys.length > 3 ? '...' : ''}</div>
+              <button key={sp.key} onClick={() => { setSelectedSpecialty(sp.key); setSelectedSub(sp.subKeys[0]); setSelectedPart(''); setSymptomView('list') }} style={{ backgroundColor: '#FFFEF9', borderRadius: 16, padding: '16px 14px', border: '1.5px solid #E8E4DC', cursor: 'pointer', textAlign: 'left', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', width: '100%' }}>
+                <div style={{ fontSize: 26, marginBottom: 6 }}>{sp.emoji}</div>
+                <div style={{ fontSize: 14, fontWeight: 800, color: '#1a2C24', marginBottom: 3 }}>{sp.key}</div>
+                <div style={{ fontSize: 11, color: '#7A7A6A' }}>{sp.subKeys.slice(0, 3).join(' · ')}{sp.subKeys.length > 3 ? '...' : ''}</div>
+              </button>
+            ))}
+          </div>
+
+          {/* 常見健康問題 */}
+          <div style={{ fontSize: 12, color: 'rgba(255,254,249,0.65)', marginBottom: 8, padding: '0 2px', letterSpacing: '0.05em' }}>⭐ 常見健康問題</div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+            {[
+              { emoji: '🤧', label: '感冒' },
+              { emoji: '💨', label: '咳嗽' },
+              { emoji: '😴', label: '失眠' },
+              { emoji: '🤕', label: '頭痛' },
+              { emoji: '🫃', label: '胃痛' },
+              { emoji: '🚽', label: '便祕' },
+              { emoji: '🦿', label: '腰痛' },
+              { emoji: '🩸', label: '月經' },
+            ].map(sym => (
+              <button key={sym.label} onClick={() => { setSearchQuery(sym.label); setSymptomView('list') }} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', backgroundColor: '#FFFEF9', border: '1.5px solid #E8E4DC', borderRadius: 20, cursor: 'pointer', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+                <span style={{ fontSize: 16 }}>{sym.emoji}</span>
+                <span style={{ fontSize: 12, fontWeight: 700, color: '#1a2C24' }}>{sym.label}</span>
               </button>
             ))}
           </div>
@@ -321,144 +379,84 @@ export default function SymptomsPage() {
           fontSize: 11, color: 'rgba(255,254,249,0.65)', fontWeight: 600,
         }}>← 返回首頁</button>
 
-      {/* Expert Mode: Specialty + Sub tabs */}
-      {mode === 'expert' && (
-        <>
-          {/* Specialty tabs */}
-          <div style={{ padding: '12px 14px 0' }}>
-            <div style={{ display: 'flex', gap: '6px', overflowX: 'auto', paddingBottom: '4px' }}>
-              {specialtyTabs.map(tab => (
-                <button key={tab.key} onClick={() => {
-                  setSelectedSpecialty(tab.key)
-                  setSelectedSub(tab.subKeys[0])
-                }} style={{ flexShrink: 0, padding: '7px 13px', borderRadius: '20px', border: 'none', cursor: 'pointer', fontSize: '11px', fontWeight: 700, backgroundColor: selectedSpecialty === tab.key ? '#FFFEF9' : '#E8E4DC', color: selectedSpecialty === tab.key ? '#1a3A2C' : '#4A3A2C', whiteSpace: 'nowrap', border: selectedSpecialty === tab.key ? '1.5px solid transparent' : '1.5px solid #D8D4CC' }}>
-                  <span style={{ fontSize: '14px', marginRight: '4px' }}>{tab.emoji}</span>{tab.key}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Sub tabs */}
-          <div style={{ padding: '10px 14px 0' }}>
-            <div style={{ display: 'flex', gap: '5px', overflowX: 'auto', paddingBottom: '4px' }}>
-              {currentSpecialtyTab.subKeys.map(sub => (
-                <button key={sub} onClick={() => setSelectedSub(sub)} style={{ flexShrink: 0, padding: '6px 12px', borderRadius: '16px', border: 'none', cursor: 'pointer', fontSize: '11px', fontWeight: 700, backgroundColor: selectedSub === sub ? '#1a3A2C' : '#FFFEF9', color: selectedSub === sub ? '#FFFEF9' : '#5A5A4A', whiteSpace: 'nowrap', boxShadow: selectedSub === sub ? '0 1px 4px rgba(0,0,0,0.15)' : '0 1px 2px rgba(0,0,0,0.06)' }}>
-                  {sub}
-                </button>
-              ))}
-            </div>
-          </div>
-        </>
-      )}
-
-      {/* Popular mode */}
-      {mode === 'popular' && (
-        <div style={{ padding: '12px 14px 0' }}>
-          <div style={{ backgroundColor: '#EEF4F0', border: '1.5px solid #D8E4DC', borderRadius: '14px', padding: '14px 16px', marginBottom: '12px' }}>
-            <div style={{ fontSize: '13px', color: '#4A6A5A', fontWeight: 600, textAlign: 'center', lineHeight: 1.6 }}>
-              👉 選擇上方科別查看疾病，或點擊下方熱門症狀
-            </div>
-          </div>
-          <div style={{ display: 'flex', gap: '5px', overflowX: 'auto', paddingBottom: '4px' }}>
-            {[
-              { name: '感冒', emoji: '😷' }, { name: '咳嗽', emoji: '🤧' },
-              { name: '頭痛', emoji: '🤕' }, { name: '失眠', emoji: '😴' },
-              { name: '胃痛', emoji: '🤢' }, { name: '腰痛', emoji: '💪' },
-              { name: '月經失調', emoji: '🩸' }, { name: '便祕', emoji: '🚽' },
-            ].map(q => (
-              <button key={q.name} onClick={() => {
-                // Find disease
-                const allDiseases = [
-                  ...Object.values(diseasesData.diseases['內科'] || {}).flat(),
-                  ...Object.values(diseasesData.diseases['外科'] || {}).flat(),
-                  ...Object.values(diseasesData.diseases['婦科'] || {}).flat(),
-                  ...Object.values(diseasesData.diseases['兒科'] || {}).flat(),
-                ] as Disease[]
-                const found = allDiseases.find(d => d.name.includes(q.name.replace('月經失調', '崩漏').replace('便祕', '便秘')) || q.name.includes(d.name))
-                if (found) handleDiseaseClick(found)
-              }} style={{ flexShrink: 0, padding: '8px 14px', borderRadius: '20px', border: 'none', cursor: 'pointer', fontSize: '12px', fontWeight: 700, backgroundColor: '#FFFEF9', color: '#1a3A2C', boxShadow: '0 1px 4px rgba(0,0,0,0.08)', whiteSpace: 'nowrap' }}>
-                <span style={{ marginRight: '5px' }}>{q.emoji}</span>{q.name}
-              </button>
-            ))}
-          </div>
+      {/* Specialty + Sub tabs */}
+      <div style={{ padding: '12px 14px 0' }}>
+        <div style={{ display: 'flex', gap: '6px', overflowX: 'auto', paddingBottom: '4px' }}>
+          {specialtyTabs.map(tab => (
+            <button key={tab.key} onClick={() => {
+              setSelectedSpecialty(tab.key)
+              setSelectedSub(tab.subKeys[0])
+              setSelectedPart('')
+            }} style={{ flexShrink: 0, padding: '7px 13px', borderRadius: '20px', border: 'none', cursor: 'pointer', fontSize: '11px', fontWeight: 700, backgroundColor: selectedSpecialty === tab.key ? '#FFFEF9' : '#E8E4DC', color: selectedSpecialty === tab.key ? '#1a3A2C' : '#4A3A2C', whiteSpace: 'nowrap', border: selectedSpecialty === tab.key ? '1.5px solid transparent' : '1.5px solid #D8D4CC' }}>
+              <span style={{ fontSize: '14px', marginRight: '4px' }}>{tab.emoji}</span>{tab.key}
+            </button>
+          ))}
         </div>
-      )}
+      </div>
+
+      {/* Sub tabs */}
+      <div style={{ padding: '10px 14px 0' }}>
+        <div style={{ display: 'flex', gap: '5px', overflowX: 'auto', paddingBottom: '4px' }}>
+          {currentSpecialtyTab.subKeys.map(sub => (
+            <button key={sub} onClick={() => setSelectedSub(sub)} style={{ flexShrink: 0, padding: '6px 12px', borderRadius: '16px', border: 'none', cursor: 'pointer', fontSize: '11px', fontWeight: 700, backgroundColor: selectedSub === sub ? '#1a3A2C' : '#FFFEF9', color: selectedSub === sub ? '#FFFEF9' : '#5A5A4A', whiteSpace: 'nowrap', boxShadow: selectedSub === sub ? '0 1px 4px rgba(0,0,0,0.15)' : '0 1px 2px rgba(0,0,0,0.06)' }}>
+              {sub}
+            </button>
+          ))}
+        </div>
+      </div>
+
+
 
       {/* Content */}
       <div style={{ padding: '14px 14px 100px' }}>
-        {mode === 'expert' && (
-          <>
-            <div style={{ fontSize: '12px', color: '#7A7A6A', marginBottom: '12px' }}>
-              {T.symptomsCount(currentDiseases.length)} · {selectedSpecialty} · {selectedSub}
-            </div>
-            {currentDiseases.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '40px 0', color: '#8A8A7A' }}>
-                <div style={{ fontSize: '40px', marginBottom: '8px' }}>📋</div>
-                <div style={{ fontSize: '14px' }}>{T.loading}</div>
-              </div>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                {currentDiseases.map((disease, i) => (
-                  <button key={i} onClick={() => handleDiseaseClick(disease)} style={{ backgroundColor: '#FFFEF9', border: '1.5px solid #E8E4DC', borderRadius: '14px', padding: '13px 16px', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', width: '100%', cursor: 'pointer', textAlign: 'left' }}>
-                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
-                      <div style={{ flex: 1 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                          <div style={{ fontSize: '15px', fontWeight: 700, color: '#1a2C24' }}>{disease.name}</div>
-                          <span style={{ fontSize: '10px', padding: '2px 7px', borderRadius: '8px', backgroundColor: disease.treatment_available ? '#EEF4F0' : '#F0EDE5', color: disease.treatment_available ? '#2C4A3E' : '#8A8A7A', fontWeight: 700 }}>
-                            {disease.treatment_available ? '💉' : '📖'}
-                          </span>
-                        </div>
-                        {disease.synonyms.length > 0 && (
-                          <div style={{ fontSize: '11px', color: '#8A8A7A', marginBottom: '5px', lineHeight: 1.4 }}>
-                            {disease.synonyms.slice(0, 4).join('、')}
-                          </div>
-                        )}
-                        <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
-                          {disease.syndromes.slice(0, 3).map((s, si) => (
-                            <span key={si} style={{ fontSize: '10px', padding: '2px 7px', borderRadius: '10px', backgroundColor: '#F7F5F0', color: '#5A5A4A', border: '1px solid #E8E4DC', fontWeight: 600 }}>
-                              {s}
-                            </span>
-                          ))}
-                          {disease.syndromes.length > 3 && (
-                            <span style={{ fontSize: '10px', color: '#8A8A7A', fontWeight: 600, alignSelf: 'center' }}>
-                              +{disease.syndromes.length - 3}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      <span style={{ color: '#8A8A7A', fontSize: '16px', marginLeft: '8px', flexShrink: 0 }}>›</span>
+        <div style={{ fontSize: '12px', color: '#7A7A6A', marginBottom: '12px' }}>
+          {T.symptomsCount(currentDiseases.length)}{selectedPart ? ` · ${selectedPart === 'head' ? '頭部' : selectedPart === 'chest' ? '胸腔' : selectedPart === 'abdomen' ? '腹部' : selectedPart === 'limb' ? '四肢' : '皮膚'}` : ` · ${selectedSpecialty} · ${selectedSub}`}
+        </div>
+        {currentDiseases.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '40px 0', color: '#8A8A7A' }}>
+            <div style={{ fontSize: '40px', marginBottom: '8px' }}>📋</div>
+            <div style={{ fontSize: '14px' }}>{T.loading}</div>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {currentDiseases.map((disease, i) => (
+              <button key={i} onClick={() => handleDiseaseClick(disease)} style={{ backgroundColor: '#FFFEF9', border: '1.5px solid #E8E4DC', borderRadius: '14px', padding: '13px 16px', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', width: '100%', cursor: 'pointer', textAlign: 'left' }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                      <div style={{ fontSize: '15px', fontWeight: 700, color: '#1a2C24' }}>{disease.name}</div>
+                      <span style={{ fontSize: '10px', padding: '2px 7px', borderRadius: '8px', backgroundColor: disease.treatment_available ? '#EEF4F0' : '#F0EDE5', color: disease.treatment_available ? '#2C4A3E' : '#8A8A7A', fontWeight: 700 }}>
+                        {disease.treatment_available ? '💉' : '📖'}
+                      </span>
                     </div>
-                  </button>
-                ))}
-              </div>
-            )}
-          </>
-        )}
-
-        {mode === 'popular' && (
-          <>
-            <div style={{ fontSize: '12px', color: '#7A7A6A', marginBottom: '12px' }}>
-              {T.title}
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-              {specialtyTabs.map((tab, i) => (
-                <button key={tab.key} onClick={() => {
-                  setMode('expert')
-                  setSelectedSpecialty(tab.key)
-                  setSelectedSub(tab.subKeys[0])
-                }} style={{ backgroundColor: '#FFFEF9', border: '1.5px solid #E8E4DC', borderRadius: '16px', padding: '16px 12px', cursor: 'pointer', textAlign: 'center', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
-                  <div style={{ fontSize: '28px', marginBottom: '6px' }}>{tab.emoji}</div>
-                  <div style={{ fontSize: '14px', fontWeight: 700, color: '#1a2C24' }}>{tab.key}</div>
-                  <div style={{ fontSize: '10px', color: '#8A8A7A', marginTop: '2px' }}>查看全部疾病</div>
-                </button>
-              ))}
-            </div>
-          </>
+                    {disease.synonyms.length > 0 && (
+                      <div style={{ fontSize: '11px', color: '#8A8A7A', marginBottom: '5px', lineHeight: 1.4 }}>
+                        {disease.synonyms.slice(0, 4).join('、')}
+                      </div>
+                    )}
+                    <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                      {disease.syndromes.slice(0, 3).map((s, si) => (
+                        <span key={si} style={{ fontSize: '10px', padding: '2px 7px', borderRadius: '10px', backgroundColor: '#F7F5F0', color: '#5A5A4A', border: '1px solid #E8E4DC', fontWeight: 600 }}>
+                          {s}
+                        </span>
+                      ))}
+                      {disease.syndromes.length > 3 && (
+                        <span style={{ fontSize: '10px', color: '#8A8A7A', fontWeight: 600, alignSelf: 'center' }}>
+                          +{disease.syndromes.length - 3}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <span style={{ color: '#8A8A7A', fontSize: '16px', marginLeft: '8px', flexShrink: 0 }}>›</span>
+                </div>
+              </button>
+            ))}
+          </div>
         )}
       </div>
+      </>
+      )}
 
-        </>
-        )}
       {/* Bottom Sheet */}
       {selectedDisease && (
         <>
