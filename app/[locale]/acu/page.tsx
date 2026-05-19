@@ -129,7 +129,7 @@ export default function AcupointsPage() {
         </div>
 
         {/* Search */}
-        <div style={{ padding: '0 14px 0' }}>
+        <div style={{ padding: '10px 14px 0' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: 'rgba(255,254,249,0.15)', borderRadius: '14px', padding: '11px 14px', border: '1.5px solid rgba(255,254,249,0.25)' }}>
             <span style={{ fontSize: '16px', opacity: 0.8 }}>🔍</span>
             <input type="text" placeholder={loading ? '載入中...' : '搜尋穴位名稱、編碼...'} value={searchQuery} onChange={e => setSearchQuery(e.target.value)} disabled={loading} style={{ flex: 1, border: 'none', backgroundColor: 'transparent', outline: 'none', fontSize: '14px', color: '#FFFEF9' }} />
@@ -138,10 +138,10 @@ export default function AcupointsPage() {
         </div>
 
         {/* 3-Tab */}
-        <div style={{ display: 'flex', padding: '10px 14px 0', gap: '7px' }}>
+        <div style={{ display: 'flex', padding: '12px 14px 0', gap: '7px' }}>
           {[{ href: '/acu', label: '針灸大全', emoji: '💉' }, { href: '/db', label: '方劑大全', emoji: '🍵' }, { href: '/symptoms', label: '症狀', emoji: '🩺' }].map(tab => (
-            <Link key={tab.label} href={tab.href} style={{ flex: 1, padding: '9px 4px', backgroundColor: 'rgba(255,254,249,0.12)', color: 'rgba(255,254,249,0.8)', borderRadius: '12px', textDecoration: 'none', fontSize: '11px', fontWeight: 700, textAlign: 'center' }}>
-              <div style={{ fontSize: '16px', marginBottom: '1px' }}>{tab.emoji}</div>
+            <Link key={tab.label} href={tab.href} style={{ flex: 1, padding: '10px 4px', backgroundColor: tab.href === '/acu' ? '#FFFEF9' : 'rgba(255,254,249,0.12)', color: tab.href === '/acu' ? '#1a3A2C' : 'rgba(255,254,249,0.8)', borderRadius: '12px', textDecoration: 'none', fontSize: '11px', fontWeight: 700, textAlign: 'center' }}>
+              <div style={{ fontSize: '18px', marginBottom: '2px' }}>{tab.emoji}</div>
               <div>{tab.label}</div>
             </Link>
           ))}
