@@ -65,7 +65,7 @@ export default function HerbsPage() {
   const [herbs, setHerbs] = useState<Herb[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
-  const [selectedCat, setSelectedCat] = useState('')
+  const [selectedCat, setSelectedCat] = useState('解表药')
   const [selectedHerb, setSelectedHerb] = useState<Herb | null>(null)
   const [showMenu, setShowMenu] = useState(false)
   const [herbView, setHerbView] = useState<'home' | 'list'>('home')
