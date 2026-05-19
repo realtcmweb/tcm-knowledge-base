@@ -264,6 +264,7 @@ export default function FormulasPage() {
 
       {dbView === 'home' && (
         <div style={{ padding: '16px 14px 100px' }}>
+          <div style={{ fontSize: 13, color: 'rgba(255,254,249,0.65)', marginBottom: 12, padding: '0 2px' }}>🍵 按主治功效分類</div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
             {FORMULA_CATEGORIES.filter(c => c.key !== '').map(cat => (
               <button key={cat.key} onClick={() => { setSelectedCat(cat.key); setDbView('list') }} style={{
@@ -275,8 +276,9 @@ export default function FormulasPage() {
               </button>
             ))}
           </div>
-          </div>
         </div>
+      )}
+
       {dbView === 'list' && (
       <>
         <button onClick={() => setDbView('home')} style={{
@@ -308,6 +310,7 @@ export default function FormulasPage() {
 
         </>
         )}
+
 
       {/* Content */}
       <div style={{ padding: '12px 14px 100px' }}>
