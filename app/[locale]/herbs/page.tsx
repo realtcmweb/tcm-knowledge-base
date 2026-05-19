@@ -69,6 +69,20 @@ export default function HerbsPage() {
   const [selectedHerb, setSelectedHerb] = useState<Herb | null>(null)
   const [showMenu, setShowMenu] = useState(false)
   const [herbView, setHerbView] = useState<'home' | 'list'>('home')
+  // Sync herb from URL params
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const params = new URLSearchParams(window.location.search)
+    const herbParam = params.get('herb')
+    if (herbParam) {
+      const found = herbs.find(h => h.name === herbParam)
+      if (found) {
+        setSelectedHerb(found)
+        setHerbView('list')
+      }
+    }
+  }, [herbs])
+
   const [modalContent, setModalContent] = useState<{title: string; body: string} | null>(null)
   const searchRef = useRef<HTMLInputElement>(null)
 

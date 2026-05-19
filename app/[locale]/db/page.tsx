@@ -56,7 +56,7 @@ function getLinkedComposition(composition: string, herbNamesSorted: string[]): R
         parts.push(
           <Link
             key={`${hn}-${parts.length}`}
-            href="/herbs"
+            href={`/herbs?herb=${encodeURIComponent(hn)}`}
             onClick={e => { e.stopPropagation() }}
             style={{ color: '#2C6B3A', fontWeight: 700, textDecoration: 'underline', textDecorationStyle: 'dotted', textUnderlineOffset: '3px' }}
           >
