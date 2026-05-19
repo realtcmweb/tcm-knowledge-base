@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
 
 interface Formula {
@@ -45,6 +45,48 @@ const MENU_ITEMS = [
   { label: '📩 聯絡我們', href: '#', action: 'contact' },
 ]
 
+function getLinkedComposition(composition: string, herbNamesSorted: string[]): React.ReactNode[] {
+  if (!composition || !herbNamesSorted.length) return [composition]
+  const parts: React.ReactNode[] = []
+  let remaining = composition
+  while (remaining) {
+    let matched = false
+    for (const hn of herbNamesSorted) {
+      const idx = remaining.indexOf(hn)
+      if (idx === 0) {
+        parts.push(
+          <Link
+            key={`${hn}-${parts.length}`}
+            href="/herbs"
+            onClick={e => { e.stopPropagation() }}
+            style={{ color: '#2C6B3A', fontWeight: 700, textDecoration: 'underline', textDecorationStyle: 'dotted', textUnderlineOffset: '3px' }}
+          >
+            {hn}
+          </Link>
+        )
+        remaining = remaining.slice(hn.length)
+        matched = true
+        break
+      }
+    }
+    if (!matched) {
+      const next = remaining.search(/[\u4e00-\u9fa5]/)
+      if (next === 0) {
+        // Chinese char not matched, take one char
+        parts.push(remaining[0])
+        remaining = remaining.slice(1)
+      } else if (next > 0) {
+        parts.push(remaining.slice(0, next))
+        remaining = remaining.slice(next)
+      } else {
+        parts.push(remaining)
+        break
+      }
+    }
+  }
+  return parts
+}
+
 export default function FormulasPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCat, setSelectedCat] = useState('解表劑')
@@ -55,9 +97,16 @@ export default function FormulasPage() {
   const [showMenu, setShowMenu] = useState(false)
   const [modalContent, setModalContent] = useState<{title: string; body: string} | null>(null)
 
+  const [herbNames, setHerbNames] = useState<string[]>([])
+  const herbNamesSorted = useMemo(() => [...herbNames].sort((a, b) => b.length - a.length), [herbNames])
+
   useEffect(() => {
-    fetch('/data/formulas.json').then(r => r.json()).then(d => {
-      setFormulas(d)
+    Promise.all([
+      fetch('/data/formulas.json').then(r => r.json()),
+      fetch('/data/herbs.json').then(r => r.json()),
+    ]).then(([f, h]) => {
+      setFormulas(f)
+      setHerbNames(h.map((x: { name: string }) => x.name))
       setLoading(false)
     })
   }, [])
@@ -363,13 +412,15 @@ export default function FormulasPage() {
             {[
               { label: '💡 功效', value: selectedFormula.effects },
               { label: '📋 主治', value: selectedFormula.indications },
-              { label: '🌿 組成', value: selectedFormula.composition },
+              { label: '🌿 組成', value: getLinkedComposition(selectedFormula.composition, herbNamesSorted) },
               { label: '📖 用法', value: selectedFormula.usage },
               { label: '🎵 方歌', value: selectedFormula.formulaSong },
             ].map(({ label, value }) => value ? (
               <div key={label} style={{ marginBottom: '16px' }}>
                 <div style={{ fontSize: '11px', fontWeight: 700, color: '#2C4A3E', marginBottom: '5px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</div>
-                <div style={{ fontSize: '14px', color: '#2C3428', lineHeight: 1.75 }}>{value}</div>
+                <div style={{ fontSize: '14px', color: '#2C3428', lineHeight: 1.75 }}>
+                  {Array.isArray(value) ? value : value}
+                </div>
               </div>
             ) : null)}
             <div style={{
