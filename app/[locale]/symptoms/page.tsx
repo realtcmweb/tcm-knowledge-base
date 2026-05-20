@@ -320,7 +320,7 @@ export default function SymptomsPage() {
       {symptomView === 'home' && (
         <div style={{ padding: '16px 14px 100px' }}>
           {/* 身體部位 */}
-          <div style={{ fontSize: 16, fontWeight: 800, color: '#FFFEF9', marginBottom: 10, padding: '0 2px' }}>🏠 身體部位（大眾）</div>
+          <div style={{ fontSize: 16, fontWeight: 800, color: '#1a2C24', marginBottom: 10, padding: '0 2px' }}>🏠 身體部位</div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 20 }}>
             {[
               { emoji: '🏠', label: '頭部', desc: '頭痛·眩暈·失眠·脫髮', partKey: 'head' },
@@ -376,7 +376,7 @@ export default function SymptomsPage() {
         <button onClick={() => setSymptomView('home')} style={{
           display: 'flex', alignItems: 'center', gap: 4,
           padding: '8px 14px 0', background: 'none', border: 'none', cursor: 'pointer',
-          fontSize: 11, color: 'rgba(255,254,249,0.65)', fontWeight: 600,
+          fontSize: 11, color: '#2C4A3E', fontWeight: 600,
         }}>← 返回首頁</button>
 
       {/* Specialty + Sub tabs */}

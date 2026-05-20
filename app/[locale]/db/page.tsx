@@ -265,7 +265,7 @@ export default function FormulasPage() {
 
       {dbView === 'home' && (
         <div style={{ padding: '16px 14px 100px' }}>
-          <div style={{ fontSize: 13, color: 'rgba(255,254,249,0.65)', marginBottom: 12, padding: '0 2px' }}>🍵 按主治功效分類</div>
+          <div style={{ fontSize: 13, color: '#2C4A3E', marginBottom: 12, padding: '0 2px' }}>🍵 按主治功效分類</div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
             {FORMULA_CATEGORIES.filter(c => c.key !== '').map(cat => (
               <button key={cat.key} onClick={() => { setSelectedCat(cat.key); setDbView('list') }} style={{
@@ -285,7 +285,7 @@ export default function FormulasPage() {
         <button onClick={() => setDbView('home')} style={{
           display: 'flex', alignItems: 'center', gap: 4,
           padding: '8px 14px 0', background: 'none', border: 'none', cursor: 'pointer',
-          fontSize: 11, color: 'rgba(255,254,249,0.65)', fontWeight: 600,
+          fontSize: 11, color: '#2C4A3E', fontWeight: 600,
         }}>← 返回首頁</button>
 
         {/* Category Pills */}
@@ -304,7 +304,7 @@ export default function FormulasPage() {
             <span>{activeCat.label}</span>
             <span style={{ fontSize: '10px', opacity: 0.8 }}>▾</span>
           </button>
-          <div style={{ fontSize: '11px', color: 'rgba(255,254,249,0.65)', whiteSpace: 'nowrap' }}>
+          <div style={{ fontSize: '11px', color: '#2C4A3E', whiteSpace: 'nowrap' }}>
             {loading ? '...' : `${filteredFormulas.length} 個方劑`}
           </div>
         </div>
@@ -447,8 +447,9 @@ export default function FormulasPage() {
             }}
             onClick={e => e.stopPropagation()}
           >
-            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '16px', position: 'relative' }}>
               <div style={{ width: '40px', height: '4px', borderRadius: '2px', backgroundColor: '#D4D0C8' }} />
+              <button onClick={() => setSelectedFormula(null)} style={{ position: 'absolute', right: 16, top: 12, width: 36, height: 36, borderRadius: 18, backgroundColor: '#E8E4DC', border: 'none', cursor: 'pointer', fontSize: 18, color: '#4A4A3A', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>×</button>
             </div>
             <div style={{ marginBottom: '16px' }}>
               <h2 style={{ fontSize: '22px', fontWeight: 800, color: '#1a2C24', marginBottom: '8px', lineHeight: 1.3 }}>

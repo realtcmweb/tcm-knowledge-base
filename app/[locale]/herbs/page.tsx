@@ -186,7 +186,7 @@ export default function HerbsPage() {
 
       {herbView === 'home' && (
         <div style={{ padding: '16px 14px 100px' }}>
-          <div style={{ fontSize: 13, color: 'rgba(255,254,249,0.65)', marginBottom: 12, padding: '0 2px' }}>🌿 按功效主治分類</div>
+          <div style={{ fontSize: 13, color: '#2C4A3E', marginBottom: 12, padding: '0 2px' }}>🌿 按功效主治分類</div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
             {CATEGORIES.filter(cc => cc.key !== '').map(cc => (
               <button key={cc.key} onClick={() => { setSelectedCat(cc.key); setHerbView('list') }} style={{
@@ -207,7 +207,7 @@ export default function HerbsPage() {
         <button onClick={() => setHerbView('home')} style={{
           display: 'flex', alignItems: 'center', gap: 4,
           padding: '8px 14px 0', background: 'none', border: 'none', cursor: 'pointer',
-          fontSize: 11, color: 'rgba(255,254,249,0.65)', fontWeight: 600,
+          fontSize: 11, color: '#2C4A3E', fontWeight: 600,
         }}>← 返回首頁</button>
 
         {/* Category pills */}
@@ -227,7 +227,7 @@ export default function HerbsPage() {
         </div>
 
         {/* Count */}
-        <div style={{ padding: '8px 16px 0', fontSize: 12, color: 'rgba(255,254,249,0.65)' }}>
+        <div style={{ padding: '8px 16px 0', fontSize: 12, color: '#2C4A3E' }}>
           {loading ? '載入中...' : `${filtered.length} 味中藥`}
         </div>
 
@@ -299,8 +299,9 @@ export default function HerbsPage() {
             backgroundColor: '#FFFEF9', borderRadius: '20px 20px 0 0', padding: '0 0 40px',
             overflowY: 'auto', boxShadow: '0 -8px 40px rgba(0,0,0,0.2)',
           }} onClick={e => e.stopPropagation()}>
-            <div style={{ display: 'flex', justifyContent: 'center', padding: '16px 0 8px' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '12px 0 4px' }}>
               <div style={{ width: 40, height: 4, borderRadius: 2, backgroundColor: '#D4D0C8' }} />
+              <button onClick={() => setSelectedHerb(null)} style={{ position: 'absolute', right: 16, top: 12, width: 36, height: 36, borderRadius: 18, backgroundColor: '#E8E4DC', border: 'none', cursor: 'pointer', fontSize: 18, color: '#4A4A3A', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>×</button>
             </div>
             <div style={{ padding: '0 20px' }}>
               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 12 }}>
