@@ -101,6 +101,31 @@ export default function AcupointsPage() {
   // Shared
   const [showMenu, setShowMenu] = useState(false)
   const [modalContent, setModalContent] = useState<{title: string; body: string} | null>(null)
+  const LANG_KEY = 'tcm_lang'
+  const [lang, setLang] = useState('tw')
+
+  const toggleLang = () => {
+    const next = lang === 'tw' ? 'cn' : 'tw'
+    setLang(next)
+    localStorage.setItem(LANG_KEY, next)
+  }
+
+  useEffect(() => {
+    const saved = localStorage.getItem(LANG_KEY) as 'tw' | 'cn' | null
+    if (saved) setLang(saved)
+  }, [])
+
+  const T_MENU = lang === 'tw'
+    ? { langToggle: '繁體 / 簡體', langCurrent: '繁', guide: '📋 使用說明', disclaimer: '⚠️ 免責聲明', about: 'ℹ️ 關於本站', contact: '📩 聯絡我們' }
+    : { langToggle: '繁体 / 简体', langCurrent: '简', guide: '📋 使用说明', disclaimer: '⚠️ 免责声明', about: 'ℹ️ 关于本站', contact: '📩 联系我们' }
+
+  const MENU_ITEMS = [
+    { label: T_MENU.langToggle, icon: '🌐', action: 'lang' },
+    { label: T_MENU.guide, icon: '📋', action: 'guide' },
+    { label: T_MENU.disclaimer, icon: '⚠️', action: 'disclaimer' },
+    { label: T_MENU.about, icon: 'ℹ️', action: 'about' },
+    { label: T_MENU.contact, icon: '📩', action: 'contact' },
+  ]
 
   useEffect(() => {
     fetch('/data/acupoints.json').then(r => r.json()).then(d => {
@@ -135,7 +160,8 @@ export default function AcupointsPage() {
 
   const handleMenuAction = (action: string) => {
     setShowMenu(false)
-    if (action === 'disclaimer') setModalContent({ title: '⚠️ 免責聲明', body: '本資料庫內容僅供學術參考，不作商業用途。有病請尋求合法的醫師，非中醫師請勿擅自處方服藥。' })
+    if (action === 'lang') { toggleLang(); return }
+    else if (action === 'disclaimer') setModalContent({ title: T_MENU.disclaimer, body: '本資料庫內容僅供學術參考，不作商業用途。有病請尋求合法的醫師，非中醫師請勿擅自處方服藥。' })
     else if (action === 'about') setModalContent({ title: 'ℹ️ 關於本站', body: '📖 醫道中醫大全是一個開源的中醫藥知識庫，收錄了針灸穴位、經典方劑等中醫藥資料。\n\n🎯 目標：讓中醫藥知識更容易被查詢和學習。\n\n📊 目前收錄：\n• 374 個針灸穴位（WHO 國際標準）\n• 205 首經典方劑\n• 39 個針灸治療處方\n• 更多內容持續更新中' })
     else if (action === 'contact') setModalContent({ title: '📩 聯絡我們', body: '📧 請在 GitHub 倉庫提交 Issue\n🔗 github.com/realtcmweb/tcm-knowledge-base' })
     else if (action === 'guide') setModalContent({ title: '📋 使用說明', body: '📖 本資料庫收錄WHO國際標準針灸穴位374個。\n\n🔍 搜尋：輸入穴位名稱或編碼\n\n🏷️ 篩選方式：\n• 按經絡：點上方經絡代碼篩選\n• 按分類：督脈/任脈/經外奇穴\n• 按穴性：井穴/滎穴/輸穴/經穴/合穴/絡穴/郄穴/原穴/募穴\n\n💊 切換至「治療」模式可按症狀查詢針灸處方' })
@@ -156,8 +182,9 @@ export default function AcupointsPage() {
             </button>
             {showMenu && (
               <div style={{ position: 'absolute', right: 0, top: 'calc(100% + 8px)', width: '220px', backgroundColor: '#FFFEF9', borderRadius: '14px', boxShadow: '0 8px 24px rgba(0,0,0,0.18)', overflow: 'hidden', zIndex: 300, border: '1px solid #E8E4DC' }}>
-                {[{ label: '📋 使用說明', action: 'guide' }, { label: '⚠️ 免責聲明', action: 'disclaimer' }, { label: 'ℹ️ 關於本站', action: 'about' }, { label: '📩 聯絡我們', action: 'contact' }].map((item, i) => (
-                  <a key={i} href="#" onClick={e => { e.preventDefault(); if (item.action) handleMenuAction(item.action) }} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '13px 16px', color: '#1a2C24', textDecoration: 'none', fontSize: '13px', fontWeight: 600, borderBottom: i < 3 ? '1px solid #F0EDE5' : 'none' }}>
+                {MENU_ITEMS.map((item, i) => (
+                  <a key={i} href="#" onClick={e => { e.preventDefault(); handleMenuAction(item.action) }} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '13px 16px', color: '#1a2C24', textDecoration: 'none', fontSize: '13px', fontWeight: 600, borderBottom: i < MENU_ITEMS.length - 1 ? '1px solid #F0EDE5' : 'none' }}>
+                    <span style={{ fontSize: '15px' }}>{item.icon}</span>
                     <span style={{ flex: 1 }}>{item.label}</span>
                   </a>
                 ))}

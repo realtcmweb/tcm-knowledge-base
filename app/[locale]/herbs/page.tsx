@@ -39,13 +39,6 @@ const CATEGORIES = [
   { key: '涌吐药', label: '湧吐藥', emoji: '🤮' },
 ]
 
-const MENU_ITEMS = [
-  { label: '📋 使用說明', href: '#', action: 'guide' },
-  { label: '⚠️ 免責聲明', href: '#', action: 'disclaimer' },
-  { label: 'ℹ️ 關於本站', href: '#', action: 'about' },
-  { label: '📩 聯絡我們', href: '#', action: 'contact' },
-]
-
 function getCategory(chapter: string): string {
   if (!chapter) return '其他'
   const parts = chapter.split('　')
@@ -70,6 +63,32 @@ export default function HerbsPage() {
   const [showMenu, setShowMenu] = useState(false)
   const [herbView, setHerbView] = useState<'home' | 'list'>('home')
   const router = useRouter()
+  const LANG_KEY = 'tcm_lang'
+  const [lang, setLang] = useState('tw')
+
+  const toggleLang = () => {
+    const next = lang === 'tw' ? 'cn' : 'tw'
+    setLang(next)
+    localStorage.setItem(LANG_KEY, next)
+  }
+
+  useEffect(() => {
+    const saved = localStorage.getItem(LANG_KEY) as 'tw' | 'cn' | null
+    if (saved) setLang(saved)
+  }, [])
+
+  const T_MENU = lang === 'tw'
+    ? { langToggle: '繁體 / 簡體', langCurrent: '繁', guide: '📋 使用說明', disclaimer: '⚠️ 免責聲明', about: 'ℹ️ 關於本站', contact: '📩 聯絡我們' }
+    : { langToggle: '繁体 / 简体', langCurrent: '简', guide: '📋 使用说明', disclaimer: '⚠️ 免责声明', about: 'ℹ️ 关于本站', contact: '📩 联系我们' }
+
+  const MENU_ITEMS = [
+    { label: T_MENU.langToggle, icon: '🌐', action: 'lang' },
+    { label: T_MENU.guide, icon: '📋', action: 'guide' },
+    { label: T_MENU.disclaimer, icon: '⚠️', action: 'disclaimer' },
+    { label: T_MENU.about, icon: 'ℹ️', action: 'about' },
+    { label: T_MENU.contact, icon: '📩', action: 'contact' },
+  ]
+
   // Sync herb from URL params → redirect to new route
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -101,6 +120,7 @@ export default function HerbsPage() {
 
   const handleMenuAction = (action: string) => {
     setShowMenu(false)
+    if (action === 'lang') { toggleLang(); return }
     if (action === 'disclaimer') setModalContent({ title: '⚠️ 免責聲明', body: '本資料庫內容僅供學術參考，不作商業用途。有病請尋求合法的醫師，非中醫師請勿擅自處方服藥。' })
     else if (action === 'about') setModalContent({ title: 'ℹ️ 關於本站', body: `📖 醫道中醫大全是一個開源的中醫藥知識庫。
 
@@ -140,10 +160,10 @@ export default function HerbsPage() {
             {showMenu && (
               <div style={{ position: 'absolute', right: 0, top: 'calc(100% + 8px)', width: 220, backgroundColor: '#FFFEF9', borderRadius: 14, boxShadow: '0 8px 24px rgba(0,0,0,0.18)', overflow: 'hidden', zIndex: 300, border: '1px solid #E8E4DC' }}>
                 {MENU_ITEMS.map((item, i) => (
-                  <a key={i} href="#" onClick={e => { e.preventDefault(); if (item.action) handleMenuAction(item.action) }}
+                  <a key={i} href="#" onClick={e => { e.preventDefault(); handleMenuAction(item.action) }}
                     style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '13px 16px', color: '#1a2C24', textDecoration: 'none', fontSize: 13, fontWeight: 600, borderBottom: i < MENU_ITEMS.length - 1 ? '1px solid #F0EDE5' : 'none' }}>
-                    <span style={{ fontSize: 15 }}>{item.label.split(' ')[0]}</span>
-                    <span style={{ flex: 1 }}>{item.label.split(' ').slice(1).join(' ')}</span>
+                    <span style={{ fontSize: 15 }}>{item.icon}</span>
+                    <span style={{ flex: 1 }}>{item.label}</span>
                   </a>
                 ))}
               </div>

@@ -38,12 +38,6 @@ const FORMULA_CATEGORIES = [
   { key: '治瘡劑', label: '治瘡消癰', emoji: '🩹' },
 ]
 
-const MENU_ITEMS = [
-  { label: '📋 使用說明', href: '#' },
-  { label: '⚠️ 免責聲明', href: '#', action: 'disclaimer' },
-  { label: 'ℹ️ 關於本站', href: '#', action: 'about' },
-  { label: '📩 聯絡我們', href: '#', action: 'contact' },
-]
 
 function getLinkedComposition(composition: string, herbNamesSorted: string[]): React.ReactNode[] {
   if (!composition || !herbNamesSorted.length) return [composition]
@@ -99,6 +93,31 @@ export default function FormulasPage() {
   const [modalContent, setModalContent] = useState<{title: string; body: string} | null>(null)
   const [dbView, setDbView] = useState<'home' | 'list'>('home')
   const router = useRouter()
+  const LANG_KEY = 'tcm_lang'
+  const [lang, setLang] = useState('tw')
+
+  const toggleLang = () => {
+    const next = lang === 'tw' ? 'cn' : 'tw'
+    setLang(next)
+    localStorage.setItem(LANG_KEY, next)
+  }
+
+  useEffect(() => {
+    const saved = localStorage.getItem(LANG_KEY) as 'tw' | 'cn' | null
+    if (saved) setLang(saved)
+  }, [])
+
+  const T_MENU = lang === 'tw'
+    ? { langToggle: '繁體 / 簡體', langCurrent: '繁', guide: '📋 使用說明', disclaimer: '⚠️ 免責聲明', about: 'ℹ️ 關於本站', contact: '📩 聯絡我們' }
+    : { langToggle: '繁体 / 简体', langCurrent: '简', guide: '📋 使用说明', disclaimer: '⚠️ 免责声明', about: 'ℹ️ 关于本站', contact: '📩 联系我们' }
+
+  const MENU_ITEMS = [
+    { label: T_MENU.langToggle, icon: '🌐', action: 'lang' },
+    { label: T_MENU.guide, icon: '📋', action: 'guide' },
+    { label: T_MENU.disclaimer, icon: '⚠️', action: 'disclaimer' },
+    { label: T_MENU.about, icon: 'ℹ️', action: 'about' },
+    { label: T_MENU.contact, icon: '📩', action: 'contact' },
+  ]
 
   const [herbNames, setHerbNames] = useState<string[]>([])
   const herbNamesSorted = useMemo(() => [...herbNames].sort((a, b) => b.length - a.length), [herbNames])
@@ -130,6 +149,7 @@ export default function FormulasPage() {
 
   const handleMenuAction = (action: string) => {
     setShowMenu(false)
+    if (action === 'lang') { toggleLang(); return }
     if (action === 'disclaimer') {
       setModalContent({ title: '⚠️ 免責聲明', body: '本資料庫內容僅供學術參考，不作商業用途。有病請尋求合法的醫師，非中醫師請勿擅自處方服藥。\n\n本站所收錄的中醫藥知識來源於公開文獻整理，編者在編輯過程中已盡可能核實內容準確性，但不保證所有資訊完全正確、及時或完整。讀者依此行事需自行承擔風險。' })
     } else if (action === 'about') {
@@ -187,7 +207,7 @@ export default function FormulasPage() {
                   <a
                     key={i}
                     href="#"
-                    onClick={e => { e.preventDefault(); if (item.action) handleMenuAction(item.action) }}
+                    onClick={e => { e.preventDefault(); handleMenuAction(item.action) }}
                     style={{
                       display: 'flex', alignItems: 'center', gap: '10px',
                       padding: '13px 16px', color: '#1a2C24', textDecoration: 'none',
@@ -197,8 +217,8 @@ export default function FormulasPage() {
                     onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#F5F2EB')}
                     onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
                   >
-                    <span style={{ fontSize: '15px' }}>{item.label.split(' ')[0]}</span>
-                    <span style={{ flex: 1 }}>{item.label.split(' ').slice(1).join(' ')}</span>
+                    <span style={{ fontSize: '15px' }}>{item.icon}</span>
+                    <span style={{ flex: 1 }}>{item.label}</span>
                   </a>
                 ))}
               </div>
