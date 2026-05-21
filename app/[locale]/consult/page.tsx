@@ -364,7 +364,11 @@ export default function ConsultPage() {
   const [imageLoaded, setImageLoaded] = useState(false)
   const [ageStage, setAgeStage] = useState<'initial' | 'minor' | 'elder' | 'done'>('initial')
   const [tongueError, setTongueError] = useState<string | null>(null)
+  const [debugInfo, setDebugInfo] = useState('')
   const fileRef = useRef<HTMLInputElement>(null)
+
+  // Debug: show current state
+  console.log('[RENDER]', { step, qIndex, totalQ, currentQ: currentQ?.id, currentQText: currentQ?.text?.slice(0, 20) })
 
   const chief = answers.chief || '其他'
   const chiefQuestions: Question[] = FAST_QUESTIONS[chief] || FAST_QUESTIONS['其他'] || []
@@ -378,26 +382,38 @@ export default function ConsultPage() {
   const totalQ = currentQuestions.length
   const progress = totalQ > 0 ? ((qIndex + 1) / totalQ) * 100 : 0
 
+  // Debug: log state changes
   const handleAnswer = useCallback((value: string) => {
-    if (!currentQ) return
+    if (!currentQ) { console.warn('handleAnswer: no currentQ'); return }
     const newAnswers = { ...answers, [currentQ.id]: value }
+    console.log('[handleAnswer BEFORE]', { value, qId: currentQ.id, qIndex, totalQ, step })
     setAnswers(newAnswers)
     setCustomInput('')
+    console.log('[handleAnswer AFTER setAnswers call]', { newAnswers })
+    // Use functional update to avoid stale closure
+    setStep(prevStep => {
+      console.log('[handleAnswer step transition]', { from: step, to: prevStep !== step ? prevStep : step })
+      return prevStep
+    })
     setTimeout(() => {
+      console.log('[handleAnswer setTimeout fired]', { qIndex, totalQ, advancing: qIndex < totalQ - 1, nextStep: qIndex < totalQ - 1 ? qIndex + 1 : 'tongue' })
       if (qIndex < totalQ - 1) {
         setQIndex(qIndex + 1)
       } else {
         setStep('tongue')
       }
     }, 350)
-  }, [answers, qIndex, currentQ, totalQ])
+  }, [answers, qIndex, currentQ, totalQ, step])
 
   const handleInputSubmit = useCallback(() => {
-    if (!customInput.trim() || !currentQ) return
+    if (!customInput.trim() || !currentQ) { console.warn('handleInputSubmit: blocked', { customInput: customInput.length, hasCurrentQ: !!currentQ }); return }
     const newAnswers = { ...answers, [currentQ.id]: customInput }
+    console.log('[handleInputSubmit BEFORE]', { qId: currentQ.id, qIndex, totalQ, customInput: customInput.slice(0, 20) })
     setAnswers(newAnswers)
     setCustomInput('')
+    console.log('[handleInputSubmit AFTER setAnswers call]')
     setTimeout(() => {
+      console.log('[handleInputSubmit setTimeout fired]', { qIndex, totalQ, advancing: qIndex < totalQ - 1 })
       if (qIndex < totalQ - 1) {
         setQIndex(qIndex + 1)
       } else {
@@ -669,6 +685,11 @@ export default function ConsultPage() {
               </span>
             )}
             <h2 className="text-xl font-light text-stone-700 leading-relaxed mt-2">{currentQ.text}</h2>
+          </div>
+
+          {/* DEBUG: show current state on screen */}
+          <div className="mb-3 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs text-yellow-700 font-mono">
+            DEBUG: step={step} qIndex={qIndex}/{totalQ} currentQ={currentQ?.id} type={currentQ?.type}
           </div>
 
           {currentQ.type === 'input_text' ? (
