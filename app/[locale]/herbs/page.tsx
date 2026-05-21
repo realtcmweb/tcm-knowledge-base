@@ -1,6 +1,7 @@
 'use client'
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 interface Herb {
   name: string
@@ -66,25 +67,20 @@ export default function HerbsPage() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [selectedCat, setSelectedCat] = useState('解表药')
-  const [selectedHerb, setSelectedHerb] = useState<Herb | null>(null)
   const [showMenu, setShowMenu] = useState(false)
   const [herbView, setHerbView] = useState<'home' | 'list'>('home')
-  // Sync herb from URL params
+  const router = useRouter()
+  // Sync herb from URL params → redirect to new route
   useEffect(() => {
     if (typeof window === 'undefined') return
     const params = new URLSearchParams(window.location.search)
     const herbParam = params.get('herb')
     if (herbParam) {
-      const found = herbs.find(h => h.name === herbParam)
-      if (found) {
-        setSelectedHerb(found)
-        setHerbView('list')
-      }
+      router.replace(`/herbs/${encodeURIComponent(herbParam)}`)
     }
-  }, [herbs])
+  }, [])
 
   const [modalContent, setModalContent] = useState<{title: string; body: string} | null>(null)
-  const searchRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     fetch('/data/herbs.json')
@@ -159,7 +155,7 @@ export default function HerbsPage() {
         <div style={{ padding: '10px 14px 0' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, backgroundColor: 'rgba(255,254,249,0.15)', borderRadius: 14, padding: '11px 14px', border: '1.5px solid rgba(255,254,249,0.25)' }}>
             <span style={{ fontSize: 16, opacity: 0.8 }}>🔍</span>
-            <input ref={searchRef} type="text" placeholder={loading ? '載入中...' : '搜尋中藥名稱、拼音...'} value={search} onChange={e => setSearch(e.target.value)}
+            <input type="text" placeholder={loading ? '載入中...' : '搜尋中藥名稱、拼音...'} value={search} onChange={e => setSearch(e.target.value)}
               disabled={loading}
               style={{ flex: 1, border: 'none', background: 'transparent', outline: 'none', fontSize: 14, color: '#FFFEF9' }} />
             {search && (
@@ -244,7 +240,7 @@ export default function HerbsPage() {
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {filtered.map(h => (
-              <button key={h.name} onClick={() => setSelectedHerb(h)} style={{
+              <button key={h.name} onClick={() => router.push(`/herbs/${encodeURIComponent(h.name)}`)} style={{
                 backgroundColor: '#FFFEF9', border: '1.5px solid #E8E4DC', borderRadius: 16, padding: '14px 16px',
                 cursor: 'pointer', textAlign: 'left', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', width: '100%',
                 transition: 'all 0.15s ease',
@@ -289,44 +285,6 @@ export default function HerbsPage() {
         )}
       </div>
       </>
-      )}
-
-      {/* Bottom Sheet */}
-      {selectedHerb && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 200, backgroundColor: 'rgba(0,0,0,0.4)' }} onClick={() => setSelectedHerb(null)}>
-          <div style={{
-            position: 'absolute', left: 0, right: 0, bottom: 0, maxHeight: '88vh',
-            backgroundColor: '#FFFEF9', borderRadius: '20px 20px 0 0', padding: '0 0 40px',
-            overflowY: 'auto', boxShadow: '0 -8px 40px rgba(0,0,0,0.2)',
-          }} onClick={e => e.stopPropagation()}>
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '12px 0 4px' }}>
-              <div style={{ width: 40, height: 4, borderRadius: 2, backgroundColor: '#D4D0C8' }} />
-              <button onClick={() => setSelectedHerb(null)} style={{ position: 'absolute', right: 16, top: 12, width: 36, height: 36, borderRadius: 18, backgroundColor: '#E8E4DC', border: 'none', cursor: 'pointer', fontSize: 18, color: '#4A4A3A', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>×</button>
-            </div>
-            <div style={{ padding: '0 20px' }}>
-              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 12 }}>
-                <div>
-                  <h2 style={{ fontSize: 24, fontWeight: 800, color: '#1a2C24', marginBottom: 4, lineHeight: 1.2 }}>{selectedHerb.name}</h2>
-                  <div style={{ fontSize: 13, color: '#7A9A6A' }}>{selectedHerb.pinyin}</div>
-                </div>
-                <span style={{ fontSize: 11, color: '#5A8A5A', backgroundColor: '#EEF4EE', padding: '4px 10px', borderRadius: 8, fontWeight: 700, marginTop: 4 }}>
-                  {getCategory(selectedHerb.chapter)}
-                </span>
-              </div>
-
-              {formatSection('💊 药性', selectedHerb.nature)}
-              {formatSection('✨ 功效', selectedHerb.efficacy)}
-              {formatSection('📋 应用', selectedHerb.applications)}
-              {formatSection('📖 用法用量', selectedHerb.usage)}
-              {formatSection('⚠️ 使用注意', selectedHerb.contraindication)}
-              {formatSection('🔍 辨藥特徵', selectedHerb.identification)}
-
-              <div style={{ marginTop: 20, padding: '12px 14px', backgroundColor: '#F5F2EB', borderRadius: 12, fontSize: 12, color: '#7A7A6A', lineHeight: 1.6, border: '1px solid #E8E4DC' }}>
-                ⚠️ 本資料庫內容僅供學術參考，不作商業用途。有病請尋求合法的醫師，非中醫師請勿擅自處方服藥。
-              </div>
-            </div>
-          </div>
-        </div>
       )}
 
       {/* Modal */}

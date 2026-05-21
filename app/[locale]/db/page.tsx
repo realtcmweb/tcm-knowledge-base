@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 interface Formula {
   id: number
@@ -91,13 +92,13 @@ function getLinkedComposition(composition: string, herbNamesSorted: string[]): R
 export default function FormulasPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCat, setSelectedCat] = useState('解表劑')
-  const [selectedFormula, setSelectedFormula] = useState<Formula | null>(null)
   const [formulas, setFormulas] = useState<Formula[]>([])
   const [loading, setLoading] = useState(true)
   const [showCatSidebar, setShowCatSidebar] = useState(false)
   const [showMenu, setShowMenu] = useState(false)
   const [modalContent, setModalContent] = useState<{title: string; body: string} | null>(null)
   const [dbView, setDbView] = useState<'home' | 'list'>('home')
+  const router = useRouter()
 
   const [herbNames, setHerbNames] = useState<string[]>([])
   const herbNamesSorted = useMemo(() => [...herbNames].sort((a, b) => b.length - a.length), [herbNames])
@@ -350,7 +351,7 @@ export default function FormulasPage() {
             {filteredFormulas.map(f => (
               <button
                 key={f.id}
-                onClick={() => setSelectedFormula(f)}
+                onClick={() => router.push(`/db/${encodeURIComponent(f.name)}`)}
                 style={{
                   backgroundColor: '#FFFEF9', border: '1.5px solid #E8E4DC',
                   borderRadius: '16px', padding: '14px 16px',
@@ -430,65 +431,6 @@ export default function FormulasPage() {
                   </span>
                 </button>
               ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Detail Bottom Sheet */}
-      {selectedFormula && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 200, backgroundColor: 'rgba(0,0,0,0.4)' }} onClick={() => setSelectedFormula(null)}>
-          <div
-            style={{
-              position: 'absolute', left: 0, right: 0, bottom: 0,
-              maxHeight: '88vh', backgroundColor: '#FFFEF9',
-              borderRadius: '24px 24px 0 0', padding: '20px 20px 40px',
-              overflowY: 'auto', boxShadow: '0 -4px 20px rgba(0,0,0,0.15)',
-            }}
-            onClick={e => e.stopPropagation()}
-          >
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '16px', position: 'relative' }}>
-              <div style={{ width: '40px', height: '4px', borderRadius: '2px', backgroundColor: '#D4D0C8' }} />
-              <button onClick={() => setSelectedFormula(null)} style={{ position: 'absolute', right: 16, top: 12, width: 36, height: 36, borderRadius: 18, backgroundColor: '#E8E4DC', border: 'none', cursor: 'pointer', fontSize: 18, color: '#4A4A3A', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>×</button>
-            </div>
-            <div style={{ marginBottom: '16px' }}>
-              <h2 style={{ fontSize: '22px', fontWeight: 800, color: '#1a2C24', marginBottom: '8px', lineHeight: 1.3 }}>
-                {selectedFormula.name}
-              </h2>
-              <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
-                <span style={{
-                  display: 'inline-flex', alignItems: 'center', gap: '4px',
-                  padding: '4px 12px', borderRadius: '20px',
-                  backgroundColor: '#E8E4DC', fontSize: '12px', color: '#2C4A3E', fontWeight: 700,
-                }}>📚 《{selectedFormula.source}》</span>
-                <span style={{
-                  display: 'inline-flex', alignItems: 'center', gap: '4px',
-                  padding: '4px 12px', borderRadius: '20px',
-                  backgroundColor: '#1a3A2C', fontSize: '12px', color: '#FFFEF9', fontWeight: 700,
-                }}>{selectedFormula.categoryLabel}</span>
-              </div>
-            </div>
-            {[
-              { label: '💡 功效', value: selectedFormula.effects },
-              { label: '📋 主治', value: selectedFormula.indications },
-              { label: '🌿 組成', value: getLinkedComposition(selectedFormula.composition, herbNamesSorted) },
-              { label: '📖 用法', value: selectedFormula.usage },
-              { label: '🎵 方歌', value: selectedFormula.formulaSong },
-            ].map(({ label, value }) => value ? (
-              <div key={label} style={{ marginBottom: '16px' }}>
-                <div style={{ fontSize: '11px', fontWeight: 700, color: '#2C4A3E', marginBottom: '5px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</div>
-                <div style={{ fontSize: '14px', color: '#2C3428', lineHeight: 1.75 }}>
-                  {Array.isArray(value) ? value : value}
-                </div>
-              </div>
-            ) : null)}
-            <div style={{
-              marginTop: '20px', padding: '12px 14px',
-              backgroundColor: '#F5F2EB', borderRadius: '12px',
-              fontSize: '12px', color: '#7A7A6A', lineHeight: 1.6,
-              border: '1px solid #E8E4DC',
-            }}>
-              ⚠️ 本資料庫內容僅供學術參考，不作商業用途。有病請尋求合法的醫師，非中醫師請勿擅自處方服藥。
             </div>
           </div>
         </div>
