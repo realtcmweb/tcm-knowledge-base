@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import Link from 'next/link'
 
 // ============================================
@@ -366,6 +366,45 @@ export default function ConsultPage() {
   const [tongueError, setTongueError] = useState<string | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
 
+  // Menu & lang state
+  const [showMenu, setShowMenu] = useState(false)
+  const [modalContent, setModalContent] = useState<{title: string; body: string} | null>(null)
+  const LANG_KEY = 'tcm_lang'
+  const [lang, setLang] = useState('tw')
+
+  const toggleLang = () => {
+    const next = lang === 'tw' ? 'cn' : 'tw'
+    setLang(next)
+    localStorage.setItem(LANG_KEY, next)
+  }
+
+  useEffect(() => {
+    const saved = localStorage.getItem(LANG_KEY) as 'tw' | 'cn' | null
+    if (saved) setLang(saved)
+  }, [])
+
+  const T_MENU = lang === 'tw'
+    ? { langToggle: '繁體 / 簡體', langCurrent: '繁', guide: '📋 使用說明', disclaimer: '⚠️ 免責聲明', about: 'ℹ️ 關於本站', contact: '📩 聯絡我們' }
+    : { langToggle: '繁体 / 简体', langCurrent: '简', guide: '📋 使用说明', disclaimer: '⚠️ 免责声明', about: 'ℹ️ 关于本站', contact: '📩 联系我们' }
+
+  const MENU_ITEMS = [
+    { label: T_MENU.langToggle, icon: '🌐', action: 'lang' },
+    { label: '🔤 字體 ±', icon: '🔤', action: 'font' },
+    { label: T_MENU.guide, icon: '📋', action: 'guide' },
+    { label: T_MENU.disclaimer, icon: '⚠️', action: 'disclaimer' },
+    { label: T_MENU.about, icon: 'ℹ️', action: 'about' },
+    { label: T_MENU.contact, icon: '📩', action: 'contact' },
+  ]
+
+  const handleMenuAction = (action: string) => {
+    setShowMenu(false)
+    if (action === 'lang') { toggleLang(); return }
+    else if (action === 'disclaimer') setModalContent({ title: '⚠️ 免責聲明', body: '本資料庫內容僅供學術參考，不作商業用途。有病請尋求合法的醫師，非中醫師請勿擅自處方服藥。\n\n本站所收錄的中醫藥知識來源於公開文獻整理，編者在編輯過程中已盡可能核實內容準確性，但不保證所有資訊完全正確、及時或完整。讀者依此行事需自行承擔風險。' })
+    else if (action === 'about') setModalContent({ title: 'ℹ️ 關於本站', body: '📖 醫道中醫大全是一個開源的中醫藥知識庫，收錄了針灸穴位、經典方劑等中醫藥資料。\n\n🎯 目標：讓中醫藥知識更容易被查詢和學習。\n\n❤️ 製作給所有中醫藥愛好者。' })
+    else if (action === 'contact') setModalContent({ title: '📩 聯絡我們', body: '📧 請在 GitHub 倉庫提交 Issue\n🔗 github.com/realtcmweb/tcm-knowledge-base' })
+    else if (action === 'guide') setModalContent({ title: '📋 使用說明', body: '📖 中醫智能問診是您的個人中醫體質分析工具。\n\n🌿 快速問診：2分鐘回答核心問題，獲得初步分析\n🔍 詳細問診：5-8分鐘，十問歌全面分析\n\n📋 選擇主要困擾（失眠/疲倦/消化等）\n✅ 回答相關問題\n👅 上傳舌苔照（可跳過）\n💡 獲得個人化體質分析' })
+  }
+
   const chief = answers.chief || '其他'
   const chiefQuestions: Question[] = FAST_QUESTIONS[chief] || FAST_QUESTIONS['其他'] || []
   const ageNum = parseInt(answers.age || '')
@@ -470,26 +509,35 @@ export default function ConsultPage() {
   return (
     <div className="min-h-screen bg-stone-50 text-stone-800" style={{ fontFamily: "'Noto Serif TC', serif" }}>
 
-      {/* Header */}
-      <header className="bg-white/90 backdrop-blur-sm border-b border-stone-200 sticky top-0 z-50">
-        <div className="max-w-lg mx-auto px-4 py-3 flex items-center justify-between">
-          <div>
-            <h1 className="text-lg font-light tracking-wide text-stone-700">中醫智能問診</h1>
-            <p className="text-xs text-stone-400 tracking-widest">AI 輔助養生參考</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Link href="/acu" className="text-xs text-stone-500 hover:text-stone-700">首頁</Link>
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white text-sm font-medium">
-              診
-            </div>
+      {/* Header - 與首頁一致 */}
+      <div style={{ background: '#1a3A2C', color: '#FFFEF9', padding: '0 0 14px', borderRadius: '0 0 20px 20px', boxShadow: '0 2px 12px rgba(0,0,0,0.15)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', padding: '0 8px 0 4px', height: '50px' }}>
+          <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '8px 12px', color: '#FFFEF9', textDecoration: 'none', fontSize: '13px', fontWeight: 600, opacity: 0.9 }}>
+            <span style={{ fontSize: '15px' }}>🏠</span><span>首頁</span>
+          </Link>
+          <div style={{ flex: 1, textAlign: 'center', fontSize: '15px', fontWeight: 700 }}>中醫智能問診</div>
+          <div style={{ position: 'relative' }}>
+            <button onClick={() => setShowMenu(v => !v)} style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '7px 12px', color: '#FFFEF9', backgroundColor: showMenu ? 'rgba(255,254,249,0.2)' : 'rgba(255,254,249,0.12)', border: 'none', borderRadius: '20px', cursor: 'pointer', fontSize: '13px', fontWeight: 600 }}>
+              ☰ <span style={{ fontSize: '11px' }}>選單</span>
+            </button>
+            {showMenu && (
+              <div style={{ position: 'absolute', right: 0, top: 'calc(100% + 8px)', width: '220px', backgroundColor: '#FFFEF9', borderRadius: '14px', boxShadow: '0 8px 24px rgba(0,0,0,0.18)', overflow: 'hidden', zIndex: 300, border: '1px solid #E8E4DC' }}>
+                {MENU_ITEMS.map((item, i) => (
+                  <a key={i} href="#" onClick={e => { e.preventDefault(); handleMenuAction(item.action) }} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '13px 16px', color: '#1a2C24', textDecoration: 'none', fontSize: '13px', fontWeight: 600, borderBottom: i < MENU_ITEMS.length - 1 ? '1px solid #F0EDE5' : 'none' }}>
+                    <span style={{ fontSize: '15px' }}>{item.icon}</span>
+                    <span style={{ flex: 1 }}>{item.label}</span>
+                  </a>
+                ))}
+              </div>
+            )}
           </div>
         </div>
         {(step === 'questionnaire' || step === 'basic') && (
-          <div className="h-0.5 bg-stone-100">
-            <div className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-500" style={{ width: `${progress}%` }} />
+          <div style={{ height: '3px', background: 'rgba(255,255,255,0.15)', margin: '0 14px', borderRadius: '2px' }}>
+            <div style={{ height: '100%', background: 'linear-gradient(to right, #10b981, #14b8a6)', transition: 'width 0.5s', width: `${progress}%`, borderRadius: '2px' }} />
           </div>
         )}
-      </header>
+      </div>
 
       {/* ── 模式選擇 ── */}
       {step === 'mode' && (
@@ -896,6 +944,19 @@ export default function ConsultPage() {
         <p>本系統僅供奉生參考，不作為醫療診斷依據</p>
         <p className="mt-1">中醫師認證 · 千古驗方 · 中醫智能問診 © 2026</p>
       </footer>
+
+      {/* Modal */}
+      {modalContent && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 400, backgroundColor: 'rgba(0,0,0,0.4)' }} onClick={() => setModalContent(null)}>
+          <div style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)', width: '90vw', maxWidth: '380px', backgroundColor: '#FFFEF9', borderRadius: '20px', padding: '24px 20px 28px', boxShadow: '0 12px 40px rgba(0,0,0,0.2)' }} onClick={e => e.stopPropagation()}>
+            <h2 style={{ fontSize: '17px', fontWeight: 700, color: '#1a2C24', marginBottom: '14px', textAlign: 'center' }}>{modalContent.title}</h2>
+            <div style={{ fontSize: '13px', color: '#3A3A2A', lineHeight: 1.9, whiteSpace: 'pre-wrap', textAlign: 'center' }}>{modalContent.body}</div>
+            <button onClick={() => setModalContent(null)} style={{ display: 'block', width: '100%', marginTop: '20px', padding: '12px', backgroundColor: '#1a3A2C', color: '#FFFEF9', border: 'none', borderRadius: '12px', cursor: 'pointer', fontSize: '14px', fontWeight: 700 }}>關閉</button>
+          </div>
+        </div>
+      )}
+
+      {showMenu && <div style={{ position: 'fixed', inset: 0, zIndex: 99 }} onClick={() => setShowMenu(false)} />}
     </div>
   )
 }
