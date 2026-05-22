@@ -4,14 +4,7 @@ import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
-const MENU_ITEMS = [
-  { label: '🌐 繁體 / 簡體', icon: '🌐', action: 'lang' },
-  { label: '🔤 字體 ±', icon: '🔤', action: 'font' },
-  { label: '📋 使用說明', icon: '📋', action: 'guide' },
-  { label: '⚠️ 免責聲明', icon: '⚠️', action: 'disclaimer' },
-  { label: 'ℹ️ 關於本站', icon: 'ℹ️', action: 'about' },
-  { label: '📩 聯絡我們', icon: '📩', action: 'contact' },
-]
+// MENU_ITEMS is defined below after T_MENU (uses lang-aware text)
 
 export default function HomePage() {
   const router = useRouter()
@@ -232,19 +225,6 @@ export default function HomePage() {
             </Link>
           ))}
         </div>
-      </div>
-
-      {/* CTA: 中醫問診 */}
-      <div style={{ padding: '0 16px 16px' }}>
-        <Link href="/consult" style={{ display: 'block', padding: '18px 20px', background: 'linear-gradient(135deg, #1a3A2C 0%, #2C4A3E 100%)', borderRadius: '16px', textDecoration: 'none', boxShadow: '0 4px 16px rgba(26,58,44,0.25)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div>
-              <div style={{ fontSize: '15px', fontWeight: 700, color: '#FFFEF9', marginBottom: '3px' }}>🌿 中醫智能問診</div>
-              <div style={{ fontSize: '11px', color: 'rgba(255,254,249,0.65)' }}>上傳舌苔照，AI 分析體質與調養建議</div>
-            </div>
-            <div style={{ fontSize: '20px', color: 'rgba(255,254,249,0.7)' }}>→</div>
-          </div>
-        </Link>
       </div>
 
       {/* Footer */}
