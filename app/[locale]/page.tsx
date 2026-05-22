@@ -31,8 +31,8 @@ export default function HomePage() {
   }, [])
 
   const T_MENU = lang === 'tw'
-    ? { langToggle: '繁體 / 簡體', langCurrent: '繁', guide: '📋 使用說明', disclaimer: '⚠️ 免責聲明', about: 'ℹ️ 關於本站', contact: '📩 聯絡我們' }
-    : { langToggle: '繁体 / 简体', langCurrent: '简', guide: '📋 使用说明', disclaimer: '⚠️ 免责声明', about: 'ℹ️ 关于本站', contact: '📩 联系我们' }
+    ? { langToggle: '繁體 / 簡體', langCurrent: '繁', guide: '使用說明', disclaimer: '免責聲明', about: '關於本站', contact: '聯絡我們' }
+    : { langToggle: '繁体 / 简体', langCurrent: '简', guide: '使用说明', disclaimer: '免责声明', about: '关于我们', contact: '联系我们' }
 
   const MENU_ITEMS = [
     { label: T_MENU.langToggle, icon: '🌐', action: 'lang' },
