@@ -209,13 +209,13 @@ export default function AcupointsPage() {
             <input type="text" placeholder={loading ? (isCN ? '载入中...' : '載入中...') : (view === 'points' ? (isCN ? '搜寻穴位名称、编码...' : '搜尋穴位名稱、編碼...') : (isCN ? '搜寻症状...' : '搜尋症狀...'))}
               value={view === 'points' ? searchQuery : treatSearch}
               onChange={e => view === 'points' ? setSearchQuery(e.target.value) : setTreatSearch(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && (view === 'points' ? setSearchQuery(searchQuery) : setTreatSearch(treatSearch))}
+              onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); setAcuView('list') } }}
               disabled={loading}
               style={{ flex: 1, border: 'none', background: 'transparent', outline: 'none', fontSize: '14px', color: '#FFFEF9' }} />
             {(view === 'points' ? searchQuery : treatSearch) ? (
               <button onClick={() => view === 'points' ? setSearchQuery('') : setTreatSearch('')} style={{ background: 'rgba(255,254,249,0.2)', border: 'none', borderRadius: 20, padding: '2px 8px', cursor: 'pointer', fontSize: 11, color: '#FFFEF9', fontWeight: 700, display: 'flex', alignItems: 'center' }}>✕</button>
             ) : <span style={{ width: 28 }} />}
-            <button onClick={() => { view === 'points' ? setSearchQuery(searchQuery) : setTreatSearch(treatSearch); setAcuView('list') }} style={{ background: 'rgba(255,254,249,0.2)', border: 'none', borderRadius: 20, padding: '2px 8px', cursor: 'pointer', fontSize: 11, color: '#FFFEF9', fontWeight: 700, display: 'flex', alignItems: 'center' }}>送出</button>
+            <button onClick={() => { setAcuView('list') }} style={{ background: 'rgba(255,254,249,0.2)', border: 'none', borderRadius: 20, padding: '2px 8px', cursor: 'pointer', fontSize: 11, color: '#FFFEF9', fontWeight: 700, display: 'flex', alignItems: 'center' }}>送出</button>
           </div>
         </div>
 
@@ -405,15 +405,15 @@ export default function AcupointsPage() {
             <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '14px' }}>
               <div style={{ width: '40px', height: '4px', borderRadius: '2px', backgroundColor: '#D4D0C8' }} />
             </div>
-            <h2 style={{ fontSize: '24px', fontWeight: 900, color: '#1a2C24', marginBottom: '4px' }}>{selectedTreatment.name}</h2>
+            <h2 style={{ fontSize: '24px', fontWeight: 900, color: '#1a2C24', marginBottom: '4px' }}>{isCN ? selectedTreatment.name : toTraditional(selectedTreatment.name)}</h2>
             <div style={{ fontSize: '12px', color: '#8A8A7A', marginBottom: '16px' }}>{isCN ? '针灸治疗处方' : '針灸治療處方'}</div>
 
             <div style={{ backgroundColor: '#F7F5F0', borderRadius: '14px', padding: '14px', marginBottom: '12px' }}>
               <div style={{ fontSize: '12px', fontWeight: 800, color: '#1a3A2C', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '10px' }}>💉 {isCN ? '主穴' : '主穴'}</div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
                 {selectedTreatment.mainPoints.map(p => (
-                  <Link key={p.name} href={`/${locale}/acu?q=${encodeURIComponent(p.name)}`} onClick={() => setSelectedTreatment(null)} style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '5px 10px', backgroundColor: '#FDF3E7', borderRadius: '20px', border: '1px solid #E8C99A', textDecoration: 'none', fontSize: '12px', color: '#8B4513', fontWeight: 700 }}>
-                    {p.name} {p.code && <span style={{ fontSize: '10px', opacity: 0.7 }}>{p.code}</span>}
+                  <Link key={p.name} href={`/${locale}/acu?q=${encodeURIComponent(isCN ? p.name : toTraditional(p.name))}`} onClick={() => setSelectedTreatment(null)} style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '5px 10px', backgroundColor: '#FDF3E7', borderRadius: '20px', border: '1px solid #E8C99A', textDecoration: 'none', fontSize: '12px', color: '#8B4513', fontWeight: 700 }}>
+                    {isCN ? p.name : toTraditional(p.name)} {p.code && <span style={{ fontSize: '10px', opacity: 0.7 }}>{p.code}</span>}
                   </Link>
                 ))}
               </div>
@@ -424,8 +424,8 @@ export default function AcupointsPage() {
                 <div style={{ fontSize: '12px', fontWeight: 800, color: '#1a3A2C', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '10px' }}>🔗 {isCN ? '配穴' : '配穴'}</div>
                 {Object.entries(selectedTreatment.paired).map(([syndrome, desc]) => (
                   <div key={syndrome} style={{ marginBottom: '8px' }}>
-                    <div style={{ fontSize: '11px', fontWeight: 800, color: '#8B4513', marginBottom: '3px' }}>▎ {syndrome}</div>
-                    <div style={{ fontSize: '13px', color: '#3A3A2A', lineHeight: 1.6 }}>{desc}</div>
+                    <div style={{ fontSize: '11px', fontWeight: 800, color: '#8B4513', marginBottom: '3px' }}>▎ {isCN ? syndrome : toTraditional(syndrome)}</div>
+                    <div style={{ fontSize: '13px', color: '#3A3A2A', lineHeight: 1.6 }}>{isCN ? desc : toTraditional(desc)}</div>
                   </div>
                 ))}
               </div>
@@ -434,14 +434,14 @@ export default function AcupointsPage() {
             {selectedTreatment.zhifa && (
               <div style={{ backgroundColor: '#F7F5F0', borderRadius: '14px', padding: '14px', marginBottom: '12px' }}>
                 <div style={{ fontSize: '12px', fontWeight: 800, color: '#1a3A2C', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '6px' }}>⚕️ {isCN ? '治法' : '治法'}</div>
-                <div style={{ fontSize: '13px', color: '#3A3A2A', lineHeight: 1.7 }}>{selectedTreatment.zhifa}</div>
+                <div style={{ fontSize: '13px', color: '#3A3A2A', lineHeight: 1.7 }}>{isCN ? selectedTreatment.zhifa : toTraditional(selectedTreatment.zhifa)}</div>
               </div>
             )}
 
             {selectedTreatment.caozuo && (
               <div style={{ backgroundColor: '#F7F5F0', borderRadius: '14px', padding: '14px', marginBottom: '16px' }}>
                 <div style={{ fontSize: '12px', fontWeight: 800, color: '#1a3A2C', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '6px' }}>🪡 {isCN ? '操作' : '操作'}</div>
-                <div style={{ fontSize: '13px', color: '#3A3A2A', lineHeight: 1.7 }}>{selectedTreatment.caozuo}</div>
+                <div style={{ fontSize: '13px', color: '#3A3A2A', lineHeight: 1.7 }}>{isCN ? selectedTreatment.caozuo : toTraditional(selectedTreatment.caozuo)}</div>
               </div>
             )}
 
@@ -458,10 +458,10 @@ export default function AcupointsPage() {
               <div style={{ width: '40px', height: '4px', borderRadius: '2px', backgroundColor: '#D4D0C8' }} />
             </div>
             <div style={{ marginBottom: '14px' }}>
-              <h2 style={{ fontSize: '22px', fontWeight: 800, color: '#1a2C24', marginBottom: '8px' }}>{selectedAcupoint.name}</h2>
+              <h2 style={{ fontSize: '22px', fontWeight: 800, color: '#1a2C24', marginBottom: '8px' }}>{isCN ? selectedAcupoint.name : toTraditional(selectedAcupoint.name)}</h2>
               <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-                <span style={{ padding: '3px 10px', backgroundColor: '#EEEBE3', borderRadius: '20px', fontSize: '12px', color: '#2C4A3E', fontWeight: 700 }}>{selectedAcupoint.code} · {getMeridianName(selectedAcupoint.code)}</span>
-                {selectedAcupoint.specialType && <span style={{ padding: '3px 10px', backgroundColor: '#FDF3E7', borderRadius: '20px', fontSize: '12px', color: '#8B4513', fontWeight: 700 }}>{selectedAcupoint.specialType}</span>}
+                <span style={{ padding: '3px 10px', backgroundColor: '#EEEBE3', borderRadius: '20px', fontSize: '12px', color: '#2C4A3E', fontWeight: 700 }}>{selectedAcupoint.code} · {isCN ? getMeridianName(selectedAcupoint.code) : toTraditional(getMeridianName(selectedAcupoint.code))}</span>
+                {selectedAcupoint.specialType && <span style={{ padding: '3px 10px', backgroundColor: '#FDF3E7', borderRadius: '20px', fontSize: '12px', color: '#8B4513', fontWeight: 700 }}>{isCN ? selectedAcupoint.specialType : toTraditional(selectedAcupoint.specialType)}</span>}
               </div>
             </div>
             {[
@@ -472,7 +472,7 @@ export default function AcupointsPage() {
             ].map(({ label, value }) => value ? (
               <div key={label} style={{ marginBottom: '14px' }}>
                 <div style={{ fontSize: '11px', fontWeight: 700, color: '#2C4A3E', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</div>
-                <div style={{ fontSize: '14px', color: '#2C3428', lineHeight: 1.75 }}>{value}</div>
+                <div style={{ fontSize: '14px', color: '#2C3428', lineHeight: 1.75 }}>{isCN ? value : toTraditional(value)}</div>
               </div>
             ) : null)}
             <button onClick={() => setSelectedAcupoint(null)} style={{ marginTop: '16px', padding: '12px', backgroundColor: '#1a3A2C', color: '#FFFEF9', border: 'none', borderRadius: '12px', cursor: 'pointer', fontSize: '14px', fontWeight: 700, width: '100%' }}>{isCN ? '关闭' : '關閉'}</button>
