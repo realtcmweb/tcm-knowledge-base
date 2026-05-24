@@ -207,10 +207,14 @@ export default function AcupointsPage() {
             <input type="text" placeholder={loading ? (isCN ? '载入中...' : '載入中...') : (view === 'points' ? (isCN ? '搜寻穴位名称、编码...' : '搜尋穴位名稱、編碼...') : (isCN ? '搜寻症状...' : '搜尋症狀...'))}
               value={view === 'points' ? searchQuery : treatSearch}
               onChange={e => view === 'points' ? setSearchQuery(e.target.value) : setTreatSearch(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && (view === 'points' ? setSearchQuery(searchQuery) : setTreatSearch(treatSearch))}
               disabled={loading}
               style={{ flex: 1, border: 'none', background: 'transparent', outline: 'none', fontSize: '14px', color: '#FFFEF9' }} />
-            {(view === 'points' ? searchQuery : treatSearch) && (
+            {(view === 'points' ? searchQuery : treatSearch) ? (
               <button onClick={() => view === 'points' ? setSearchQuery('') : setTreatSearch('')} style={{ background: 'rgba(255,254,249,0.2)', border: 'none', borderRadius: '50%', width: '20px', height: '20px', cursor: 'pointer', fontSize: '10px', color: '#FFFEF9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+            ) : (
+              <button type="submit" onClick={e => e.preventDefault()} style={{ background: 'rgba(255,254,249,0.2)', border: 'none', borderRadius: 20, padding: '2px 8px', cursor: 'pointer', fontSize: 11, color: '#FFFEF9', fontWeight: 700, display: 'flex', alignItems: 'center' }}>送出</button>
+            )}
             )}
           </div>
         </div>
