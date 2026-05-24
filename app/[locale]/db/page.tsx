@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
 import { toSimplified } from '@/lib/toSimplified'
+import { toTraditional } from '@/lib/toTraditional'
 import { useRouter, usePathname } from 'next/navigation'
 
 interface Formula {
@@ -265,11 +266,11 @@ export default function FormulasPage() {
                     onMouseEnter={e => { ;(e.currentTarget as HTMLButtonElement).style.borderColor = '#2C4A3E'; (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 4px 16px rgba(0,0,0,0.1)'; (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(-1px)' }}
                     onMouseLeave={e => { ;(e.currentTarget as HTMLButtonElement).style.borderColor = '#E8E4DC'; (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 1px 4px rgba(0,0,0,0.05)'; (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(0)' }}>
                     <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px', marginBottom: '6px' }}>
-                      <div style={{ fontSize: '16px', fontWeight: 700, color: '#1a2C24', lineHeight: 1.3 }}>{f.name}</div>
-                      <div style={{ flexShrink: 0, padding: '3px 10px', borderRadius: '20px', backgroundColor: '#EEEBE3', fontSize: '11px', color: '#2C4A3E', fontWeight: 700, whiteSpace: 'nowrap', marginTop: '2px' }}>{f.categoryLabel}</div>
+                      <div style={{ fontSize: '16px', fontWeight: 700, color: '#1a2C24', lineHeight: 1.3 }}>{isCN ? f.name : toTraditional(f.name)}</div>
+                      <div style={{ flexShrink: 0, padding: '3px 10px', borderRadius: '20px', backgroundColor: '#EEEBE3', fontSize: '11px', color: '#2C4A3E', fontWeight: 700, whiteSpace: 'nowrap', marginTop: '2px' }}>{isCN ? f.categoryLabel : toTraditional(f.categoryLabel)}</div>
                     </div>
                     <div style={{ fontSize: '12px', color: '#8A8A7A', marginBottom: '4px' }}>📚 {isCN ? '出自《' : '出自《'}{f.source}{isCN ? '》' : '》'}</div>
-                    <div style={{ fontSize: '13px', color: '#5A5A4A', lineHeight: 1.5 }}>{f.effects?.slice(0, 60)}{f.effects && f.effects.length > 60 ? '...' : ''}</div>
+                    <div style={{ fontSize: '13px', color: '#5A5A4A', lineHeight: 1.5 }}>{isCN ? f.effects?.slice(0, 60) : toTraditional(f.effects || '').slice(0, 60)}{f.effects && f.effects.length > 60 ? '...' : ''}</div>
                   </button>
                 ))}
               </div>

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { toSimplified } from '@/lib/toSimplified'
+import { toTraditional } from '@/lib/toTraditional'
 import { useRouter, usePathname } from 'next/navigation'
 import { useTranslations, useLocale } from 'next-intl'
 import treatmentsData from '../../../public/data/treatments.json'
@@ -353,11 +354,11 @@ export default function AcupointsPage() {
                   filteredAcupoints.slice(0, 200).map(a => (
                     <button key={a.code} onClick={() => setSelectedAcupoint(a)} style={{ width: '100%', padding: '12px 16px', backgroundColor: selectedAcupoint?.code === a.code ? '#F0EDE6' : '#FFFEF9', border: 'none', borderBottom: '1px solid #E8E4DC', cursor: 'pointer', textAlign: 'left' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px' }}>
-                        <span style={{ fontSize: '15px', fontWeight: 700, color: '#1a2C24' }}>{a.name}</span>
+                        <span style={{ fontSize: '15px', fontWeight: 700, color: '#1a2C24' }}>{isCN ? a.name : toTraditional(a.name)}</span>
                         <span style={{ fontSize: '11px', color: '#8A8A7A', backgroundColor: '#F0EDE5', padding: '2px 8px', borderRadius: '10px', fontWeight: 600 }}>{a.code}</span>
                         {a.specialType && <span style={{ fontSize: '10px', color: '#8B4513', backgroundColor: '#FDF3E7', padding: '2px 8px', borderRadius: '10px' }}>{a.specialType}</span>}
                       </div>
-                      <div style={{ fontSize: '12px', color: '#8A8A7A' }}>{getMeridianName(a.code)} · {(a.indications || '').slice(0, 35)}...</div>
+                      <div style={{ fontSize: '12px', color: '#8A8A7A' }}>{isCN ? getMeridianName(a.code) : toTraditional(getMeridianName(a.code))} · {(isCN ? (a.indications || '') : toTraditional(a.indications || '')).slice(0, 35)}...</div>
                     </button>
                   ))
                 )}

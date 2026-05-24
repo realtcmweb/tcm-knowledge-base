@@ -1,6 +1,7 @@
 'use client'
 import React, { useState, useEffect } from 'react'
 import { toSimplified } from '@/lib/toSimplified'
+import { toTraditional } from '@/lib/toTraditional'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useTranslations, useLocale } from 'next-intl'
@@ -258,12 +259,12 @@ export default function HerbsPage() {
                 }}>
                 <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
                   <div>
-                    <div style={{ fontSize: 17, fontWeight: 700, color: '#1a2C24', lineHeight: 1.3 }}>{h.name}</div>
+                    <div style={{ fontSize: 17, fontWeight: 700, color: '#1a2C24', lineHeight: 1.3 }}>{isCN ? h.name : toTraditional(h.name)}</div>
                     <div style={{ fontSize: 12, color: '#7A9A6A', marginTop: 2 }}>{h.pinyin}</div>
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
                     <span style={{ fontSize: 10, color: '#5A8A5A', backgroundColor: '#EEF4EE', padding: '3px 8px', borderRadius: 8, fontWeight: 600 }}>
-                      {getCategory(h.chapter)}
+                      {isCN ? getCategory(h.chapter) : toTraditional(getCategory(h.chapter))}
                     </span>
                     <span style={{ fontSize: 14, color: '#CCC' }}>›</span>
                   </div>
