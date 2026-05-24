@@ -215,7 +215,6 @@ export default function AcupointsPage() {
             ) : (
               <button type="submit" onClick={e => e.preventDefault()} style={{ background: 'rgba(255,254,249,0.2)', border: 'none', borderRadius: 20, padding: '2px 8px', cursor: 'pointer', fontSize: 11, color: '#FFFEF9', fontWeight: 700, display: 'flex', alignItems: 'center' }}>送出</button>
             )}
-            )}
           </div>
         </div>
 
