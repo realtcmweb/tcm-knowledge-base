@@ -98,7 +98,7 @@ export default function HerbsPage() {
     if (selectedCat && getCategory(h.chapter) !== selectedCat) return false
     if (search.trim()) {
       const sq = toSimplified(search).toLowerCase()
-      return h.name.includes(sq) || h.pinyin.toLowerCase().includes(sq)
+      return h.name.toLowerCase().includes(sq) || h.pinyin.toLowerCase().includes(sq)
     }
     return true
   })
@@ -240,7 +240,7 @@ export default function HerbsPage() {
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {filtered.map(h => (
-              <button key={h.name} onClick={() => router.push(`/herbs/${encodeURIComponent(h.name)}`)} style={{
+              <button key={h.name} onClick={() => router.push(`/${locale}/herbs/${encodeURIComponent(h.name)}`)} style={{
                 backgroundColor: '#FFFEF9', border: '1.5px solid #E8E4DC', borderRadius: 16, padding: '14px 16px',
                 cursor: 'pointer', textAlign: 'left', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', width: '100%',
                 transition: 'all 0.15s ease',
