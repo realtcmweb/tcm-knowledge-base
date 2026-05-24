@@ -1,3 +1,4 @@
+import React from 'react'
 import { promises as fs } from 'fs'
 import path from 'path'
 import Link from 'next/link'
@@ -15,45 +16,83 @@ interface Formula {
   formulaSong: string
 }
 
-function parseHerbsFromComposition(composition: string, herbNamesTC: Set<string>): string[] {
+function buildHerbNameSet(): Set<string> {
+  try {
+    const herbsData = JSON.parse(
+      require('fs').readFileSync(path.join(process.cwd(), 'public', 'data', 'herbs.json'), 'utf-8')
+    )
+    return new Set(herbsData.map((h: { name: string }) => h.name))
+  } catch {
+    return new Set()
+  }
+}
+
+/**
+ * Wrap herb names in a composition string with links.
+ * E.g. "麻黄去节，三两（9g） 桂枝去皮" → "麻黄去节，三两（9g） 桂枝去皮"
+ * with "麻黄" and "桂枝" replaced by Link elements.
+ */
+function renderCompositionWithLinks(
+  composition: string,
+  herbSet: Set<string>,
+  locale: string,
+  isCN: boolean,
+  toTraditional: (s: string) => string
+): React.ReactNode[] {
   if (!composition) return []
-  const s = composition.replace(/\s+/g, '')
-  const segments = s.split(/[，。、（）【】『』《》]|\d+g|\d+mL|\d+粒|\d+枚|\d+寸|\d+分/)
-  const found: string[] = []
-  const seen = new Set<string>()
 
-  for (const seg of segments) {
-    const trimmed = seg.trim()
-    if (!trimmed) continue
-    const cleaned = trimmed
-      .replace(/(去节|去皮|炙|炒香|炒|切|擘|煅|蒸|洗|浸|焙|不去白|各|先煎|后入|淘去沙土|米泔水|醋研)+$/, '')
-      .replace(/^(半|一|二|三|四|五|六|七|八|九|十|百)+/, '')
-      .trim()
+  const sortedHerbs = Array.from(herbSet).sort((a, b) => b.length - a.length)
+  const text = composition
 
-    if (!cleaned) continue
-
-    // Direct match
-    if (herbNamesTC.has(cleaned) && !seen.has(cleaned)) {
-      found.push(cleaned); seen.add(cleaned); continue
-    }
-    // Prefix match (4,3,2)
-    for (const n of [4, 3, 2]) {
-      if (cleaned.length >= n) {
-        const prefix = cleaned.slice(0, n)
-        if (herbNamesTC.has(prefix) && !seen.has(prefix)) {
-          found.push(prefix); seen.add(prefix); break
-        }
+  // Find all herb name occurrences with positions
+  const matches: Array<{ start: number; end: number; name: string }> = []
+  for (const herb of sortedHerbs) {
+    let pos = 0
+    while (true) {
+      const idx = text.indexOf(herb, pos)
+      if (idx === -1) break
+      // Check for overlap
+      const overlaps = matches.some(m => idx < m.end && idx + herb.length > m.start)
+      if (!overlaps) {
+        matches.push({ start: idx, end: idx + herb.length, name: herb })
       }
-    }
-    // Substring match
-    for (const h of herbNamesTC) {
-      if (h.length < 2) continue
-      if (seg.includes(h) && !seen.has(h)) {
-        found.push(h); seen.add(h)
-      }
+      pos = idx + 1
     }
   }
-  return found
+
+  // Sort by start position
+  matches.sort((a, b) => a.start - b.start)
+
+  const result: React.ReactNode[] = []
+  let lastEnd = 0
+
+  for (const m of matches) {
+    if (m.start > lastEnd) {
+      result.push(text.slice(lastEnd, m.start))
+    }
+    const displayName = isCN ? m.name : toTraditional(m.name)
+    result.push(
+      <Link
+        key={`${m.start}-${m.name}`}
+        href={`/${locale}/herbs?q=${encodeURIComponent(m.name)}`}
+        style={{
+          color: '#2C6B3A',
+          textDecoration: 'underline',
+          textDecorationStyle: 'dotted',
+          fontWeight: 700,
+        }}
+      >
+        {displayName}
+      </Link>
+    )
+    lastEnd = m.end
+  }
+
+  if (lastEnd < text.length) {
+    result.push(text.slice(lastEnd))
+  }
+
+  return result
 }
 
 export default async function FormulaDetailPage({ params }: { params: Promise<{ locale: string; name: string }> }) {
@@ -75,14 +114,7 @@ export default async function FormulaDetailPage({ params }: { params: Promise<{ 
     toSimplified = mod.toSimplified
   } catch { toSimplified = (s: string) => s }
 
-  // Load herb names for matching
-  let herbNamesTC = new Set<string>()
-  try {
-    const herbsData: { name: string }[] = JSON.parse(
-      await fs.readFile(path.join(process.cwd(), 'public', 'data', 'herbs.json'), 'utf-8')
-    )
-    herbNamesTC = new Set(herbsData.map(h => h.name))
-  } catch { /* ignore */ }
+  const herbSet = buildHerbNameSet()
 
   const formulaNameRaw = decodeURIComponent(resolved.name)
   const formulaNameSC = toSimplified(formulaNameRaw)
@@ -98,8 +130,6 @@ export default async function FormulaDetailPage({ params }: { params: Promise<{ 
     console.error('Failed to load formulas:', e)
   }
 
-  const parsedHerbs = formula?.composition ? parseHerbsFromComposition(formula.composition, herbNamesTC) : []
-
   const navLabel = isCN ? '方剂大全' : '方劑大全'
   const backLabel = isCN ? '← 返回列表' : '← 返回列表'
   const notFound = `找不到「${formulaNameDisplay}」`
@@ -108,7 +138,6 @@ export default async function FormulaDetailPage({ params }: { params: Promise<{ 
   const labelComposition = '🌿 組成'
   const labelUsage = '📖 用法'
   const labelSong = '🎵 方歌'
-  const labelHerbs = '🧪 中藥連結'
   const disclaimer = isCN
     ? '本资料库内容仅供学术参考，不作商业用途。有病请寻求合法的中医师，非中医师请勿擅自处方服药。'
     : '本資料庫內容僅供學術參考，不作商業用途。有病請尋求合法的中醫師，非中醫師請勿擅自處方服藥。'
@@ -154,19 +183,9 @@ export default async function FormulaDetailPage({ params }: { params: Promise<{ 
                 {formula.composition && (
                   <div style={{ marginBottom: 14 }}>
                     <div style={{ fontSize: 11, fontWeight: 700, color: '#7A9A6A', marginBottom: 3 }}>{labelComposition}</div>
-                    <div style={{ fontSize: 14, color: '#1a2C24', lineHeight: 1.8 }}>{isCN ? formula.composition : toTraditional(formula.composition)}</div>
-                    {parsedHerbs.length > 0 && (
-                      <div style={{ marginTop: 10 }}>
-                        <div style={{ fontSize: 11, fontWeight: 700, color: '#7A9A6A', marginBottom: 6 }}>{labelHerbs}</div>
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                          {parsedHerbs.map(herb => (
-                            <Link key={herb} href={`/${locale}/herbs?q=${encodeURIComponent(herb)}`} style={{ display: 'inline-flex', alignItems: 'center', padding: '4px 10px', backgroundColor: '#EEF4EE', borderRadius: 20, border: '1px solid #B8D4B8', textDecoration: 'none', fontSize: 12, color: '#2C4A3E', fontWeight: 700 }}>
-                              🌿 {isCN ? herb : toTraditional(herb)}
-                            </Link>
-                          ))}
-                        </div>
-                      </div>
-                    )}
+                    <div style={{ fontSize: 14, color: '#1a2C24', lineHeight: 2 }}>
+                      {renderCompositionWithLinks(formula.composition, herbSet, locale, isCN, toTraditional)}
+                    </div>
                   </div>
                 )}
                 {formula.usage && (
