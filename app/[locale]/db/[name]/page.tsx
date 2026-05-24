@@ -1,5 +1,6 @@
 import { promises as fs } from 'fs'
 import path from 'path'
+import Link from 'next/link'
 
 interface Formula {
   id: number
@@ -14,11 +15,41 @@ interface Formula {
   formulaSong: string
 }
 
+function parseHerbsFromComposition(composition: string): string[] {
+  if (!composition) return []
+  // Extract herb names - handle patterns like:
+  // 麻黄去节，三两（9g） 桂枝去皮，二两（6g） 杏仁去皮尖，七十个（9g） 甘草炙，一两（3g）
+  // 麻黄(去节)，桂枝(去皮)，甘草(炙)，杏仁，生姜，大枣，石膏
+  // Split by spaces, then extract the herb name (first 2-3 chars typically before '去' or '，' or '（')
+  const herbs: string[] = []
+  // Split by space or multiple spaces
+  const parts = composition.split(/\s+/)
+  for (const part of parts) {
+    if (!part.trim()) continue
+    // Extract herb name - typically at the start before '去', '，', '（', '、'
+    let herbName = part
+    const specialChars = ['，', '、', '（', '【', '『', '"', '"', '『']
+    for (const char of specialChars) {
+      const idx = herbName.indexOf(char)
+      if (idx > 0) {
+        herbName = herbName.substring(0, idx)
+        break
+      }
+    }
+    // Remove trailing stuff like '三两', '二两' etc.
+    herbName = herbName.replace(/[一二三四五六七八九十百千0123456789]+[两克斤钱毫分粒枚寸]+.*$/, '')
+    herbName = herbName.trim()
+    if (herbName.length >= 1 && herbName.length <= 6 && !/^\d/.test(herbName)) {
+      herbs.push(herbName)
+    }
+  }
+  return herbs
+}
+
 export default async function FormulaDetailPage({ params }: { params: Promise<{ locale: string; name: string }> }) {
   const resolved = await params
   const locale = resolved.locale || 'zh-TW'
   const isCN = locale === 'zh-CN'
-  const formulaNameRaw = decodeURIComponent(resolved.name)
 
   let toTraditional: (s: string) => string = (s: string) => s
   let toSimplified: (s: string) => string = (s: string) => s
@@ -33,6 +64,8 @@ export default async function FormulaDetailPage({ params }: { params: Promise<{ 
     const mod = await import('@/lib/toSimplified')
     toSimplified = mod.toSimplified
   } catch { toSimplified = (s: string) => s }
+
+  const formulaNameRaw = decodeURIComponent(resolved.name)
   const formulaNameSC = toSimplified(formulaNameRaw)
   const formulaNameDisplay = isCN ? formulaNameSC : toTraditional(formulaNameSC)
 
@@ -46,6 +79,8 @@ export default async function FormulaDetailPage({ params }: { params: Promise<{ 
     console.error('Failed to load formulas:', e)
   }
 
+  const parsedHerbs = formula?.composition ? parseHerbsFromComposition(formula.composition) : []
+
   const navLabel = isCN ? '方剂大全' : '方劑大全'
   const backLabel = isCN ? '← 返回列表' : '← 返回列表'
   const notFound = `找不到「${formulaNameDisplay}」`
@@ -54,6 +89,7 @@ export default async function FormulaDetailPage({ params }: { params: Promise<{ 
   const labelComposition = '🌿 組成'
   const labelUsage = '📖 用法'
   const labelSong = '🎵 方歌'
+  const labelHerbs = '🧪 中藥連結'
   const disclaimer = isCN
     ? '本资料库内容仅供学术参考，不作商业用途。有病请寻求合法的中医师，非中医师请勿擅自处方服药。'
     : '本資料庫內容僅供學術參考，不作商業用途。有病請尋求合法的中醫師，非中醫師請勿擅自處方服藥。'
@@ -71,53 +107,68 @@ export default async function FormulaDetailPage({ params }: { params: Promise<{ 
           {!formula ? (
             <div style={{ fontSize: 14, color: '#7A7A6A', textAlign: 'center', padding: '40px 0' }}>{notFound}</div>
           ) : (
-            <div style={{ backgroundColor: '#FFFEF9', borderRadius: 20, padding: '20px 18px', marginBottom: 14, boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
-              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, marginBottom: 14 }}>
-                <div>
-                  <h1 style={{ fontSize: 26, fontWeight: 800, color: '#1a2C24', marginBottom: 4 }}>{formulaNameDisplay}</h1>
-                  <div style={{ fontSize: 13, color: '#7A9A6A' }}>{formula.pinyin}</div>
+            <>
+              <div style={{ backgroundColor: '#FFFEF9', borderRadius: 20, padding: '20px 18px', marginBottom: 14, boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, marginBottom: 14 }}>
+                  <div>
+                    <h1 style={{ fontSize: 26, fontWeight: 800, color: '#1a2C24', marginBottom: 4 }}>{formulaNameDisplay}</h1>
+                    <div style={{ fontSize: 13, color: '#7A9A6A' }}>{formula.pinyin}</div>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
+                    <span style={{ fontSize: 12, color: '#5A8A5A', backgroundColor: '#EEF4EE', padding: '4px 10px', borderRadius: 8, fontWeight: 700 }}>{isCN ? formula.categoryLabel : toTraditional(formula.categoryLabel)}</span>
+                    <span style={{ fontSize: 12, color: '#7A7A6A' }}>📚 {isCN ? '《' : '《'}{isCN ? formula.source : toTraditional(formula.source)}{isCN ? '》' : '》'}</span>
+                  </div>
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
-                  <span style={{ fontSize: 12, color: '#5A8A5A', backgroundColor: '#EEF4EE', padding: '4px 10px', borderRadius: 8, fontWeight: 700 }}>{isCN ? formula.categoryLabel : toTraditional(formula.categoryLabel)}</span>
-                  <span style={{ fontSize: 12, color: '#7A7A6A' }}>📚 {isCN ? '《' : '《'}{isCN ? formula.source : toTraditional(formula.source)}{isCN ? '》' : '》'}</span>
-                </div>
+
+                {formula.effects && (
+                  <div style={{ marginBottom: 14 }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: '#7A9A6A', marginBottom: 3 }}>{labelEffects}</div>
+                    <div style={{ fontSize: 14, color: '#1a2C24', lineHeight: 1.8 }}>{isCN ? formula.effects : toTraditional(formula.effects)}</div>
+                  </div>
+                )}
+                {formula.indications && (
+                  <div style={{ marginBottom: 14 }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: '#7A9A6A', marginBottom: 3 }}>{labelIndications}</div>
+                    <div style={{ fontSize: 14, color: '#1a2C24', lineHeight: 1.8 }}>{isCN ? formula.indications : toTraditional(formula.indications)}</div>
+                  </div>
+                )}
+                {formula.composition && (
+                  <div style={{ marginBottom: 14 }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: '#7A9A6A', marginBottom: 3 }}>{labelComposition}</div>
+                    <div style={{ fontSize: 14, color: '#1a2C24', lineHeight: 1.8 }}>{isCN ? formula.composition : toTraditional(formula.composition)}</div>
+                    {parsedHerbs.length > 0 && (
+                      <div style={{ marginTop: 10 }}>
+                        <div style={{ fontSize: 11, fontWeight: 700, color: '#7A9A6A', marginBottom: 6 }}>{labelHerbs}</div>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                          {parsedHerbs.map(herb => (
+                            <Link key={herb} href={`/${locale}/herbs?q=${encodeURIComponent(herb)}`} style={{ display: 'inline-flex', alignItems: 'center', padding: '4px 10px', backgroundColor: '#EEF4EE', borderRadius: 20, border: '1px solid #B8D4B8', textDecoration: 'none', fontSize: 12, color: '#2C4A3E', fontWeight: 700 }}>
+                              🌿 {isCN ? herb : toTraditional(herb)}
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+                {formula.usage && (
+                  <div style={{ marginBottom: 14 }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: '#7A9A6A', marginBottom: 3 }}>{labelUsage}</div>
+                    <div style={{ fontSize: 14, color: '#1a2C24', lineHeight: 1.8 }}>{isCN ? formula.usage : toTraditional(formula.usage)}</div>
+                  </div>
+                )}
+                {formula.formulaSong && (
+                  <div style={{ marginBottom: 14 }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: '#7A9A6A', marginBottom: 3 }}>{labelSong}</div>
+                    <div style={{ fontSize: 14, color: '#1a2C24', lineHeight: 1.8 }}>{isCN ? formula.formulaSong : toTraditional(formula.formulaSong)}</div>
+                  </div>
+                )}
               </div>
-              {formula.effects && (
-                <div style={{ marginBottom: 14 }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: '#7A9A6A', marginBottom: 3 }}>{labelEffects}</div>
-                  <div style={{ fontSize: 14, color: '#1a2C24', lineHeight: 1.8 }}>{isCN ? formula.effects : toTraditional(formula.effects)}</div>
-                </div>
-              )}
-              {formula.indications && (
-                <div style={{ marginBottom: 14 }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: '#7A9A6A', marginBottom: 3 }}>{labelIndications}</div>
-                  <div style={{ fontSize: 14, color: '#1a2C24', lineHeight: 1.8 }}>{isCN ? formula.indications : toTraditional(formula.indications)}</div>
-                </div>
-              )}
-              {formula.composition && (
-                <div style={{ marginBottom: 14 }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: '#7A9A6A', marginBottom: 3 }}>{labelComposition}</div>
-                  <div style={{ fontSize: 14, color: '#1a2C24', lineHeight: 1.8 }}>{isCN ? formula.composition : toTraditional(formula.composition)}</div>
-                </div>
-              )}
-              {formula.usage && (
-                <div style={{ marginBottom: 14 }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: '#7A9A6A', marginBottom: 3 }}>{labelUsage}</div>
-                  <div style={{ fontSize: 14, color: '#1a2C24', lineHeight: 1.8 }}>{isCN ? formula.usage : toTraditional(formula.usage)}</div>
-                </div>
-              )}
-              {formula.formulaSong && (
-                <div style={{ marginBottom: 14 }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: '#7A9A6A', marginBottom: 3 }}>{labelSong}</div>
-                  <div style={{ fontSize: 14, color: '#1a2C24', lineHeight: 1.8 }}>{isCN ? formula.formulaSong : toTraditional(formula.formulaSong)}</div>
-                </div>
-              )}
-            </div>
+              <div style={{ padding: '14px 16px', backgroundColor: '#F5F2EB', borderRadius: 14, fontSize: 12, color: '#7A7A6A', lineHeight: 1.7, border: '1px solid #E8E4DC' }}>
+                ⚠️ {disclaimer}
+              </div>
+              <a href={`/${locale}/db`} style={{ marginTop: 16, width: '100%', display: 'block', padding: 14, backgroundColor: '#1a3A2C', color: '#FFFEF9', border: 'none', borderRadius: 14, cursor: 'pointer', fontSize: 15, fontWeight: 700, textAlign: 'center', textDecoration: 'none' }}>{backLabel}</a>
+            </>
           )}
-          <div style={{ padding: '14px 16px', backgroundColor: '#F5F2EB', borderRadius: 14, fontSize: 12, color: '#7A7A6A', lineHeight: 1.7, border: '1px solid #E8E4DC' }}>
-            ⚠️ {disclaimer}
-          </div>
-          <a href={`/${locale}/db`} style={{ marginTop: 16, width: '100%', display: 'block', padding: 14, backgroundColor: '#1a3A2C', color: '#FFFEF9', border: 'none', borderRadius: 14, cursor: 'pointer', fontSize: 15, fontWeight: 700, textAlign: 'center', textDecoration: 'none' }}>{backLabel}</a>
         </div>
       </div>
     </div>
