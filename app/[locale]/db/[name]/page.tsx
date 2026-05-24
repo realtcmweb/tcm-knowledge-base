@@ -15,35 +15,45 @@ interface Formula {
   formulaSong: string
 }
 
-function parseHerbsFromComposition(composition: string): string[] {
+function parseHerbsFromComposition(composition: string, herbNamesTC: Set<string>): string[] {
   if (!composition) return []
-  // Extract herb names - handle patterns like:
-  // 麻黄去节，三两（9g） 桂枝去皮，二两（6g） 杏仁去皮尖，七十个（9g） 甘草炙，一两（3g）
-  // 麻黄(去节)，桂枝(去皮)，甘草(炙)，杏仁，生姜，大枣，石膏
-  // Split by spaces, then extract the herb name (first 2-3 chars typically before '去' or '，' or '（')
-  const herbs: string[] = []
-  // Split by space or multiple spaces
-  const parts = composition.split(/\s+/)
-  for (const part of parts) {
-    if (!part.trim()) continue
-    // Extract herb name - typically at the start before '去', '，', '（', '、'
-    let herbName = part
-    const specialChars = ['，', '、', '（', '【', '『', '"', '"', '『']
-    for (const char of specialChars) {
-      const idx = herbName.indexOf(char)
-      if (idx > 0) {
-        herbName = herbName.substring(0, idx)
-        break
+  const s = composition.replace(/\s+/g, '')
+  const segments = s.split(/[，。、（）【】『』《》]|\d+g|\d+mL|\d+粒|\d+枚|\d+寸|\d+分/)
+  const found: string[] = []
+  const seen = new Set<string>()
+
+  for (const seg of segments) {
+    const trimmed = seg.trim()
+    if (!trimmed) continue
+    const cleaned = trimmed
+      .replace(/(去节|去皮|炙|炒香|炒|切|擘|煅|蒸|洗|浸|焙|不去白|各|先煎|后入|淘去沙土|米泔水|醋研)+$/, '')
+      .replace(/^(半|一|二|三|四|五|六|七|八|九|十|百)+/, '')
+      .trim()
+
+    if (!cleaned) continue
+
+    // Direct match
+    if (herbNamesTC.has(cleaned) && !seen.has(cleaned)) {
+      found.push(cleaned); seen.add(cleaned); continue
+    }
+    // Prefix match (4,3,2)
+    for (const n of [4, 3, 2]) {
+      if (cleaned.length >= n) {
+        const prefix = cleaned.slice(0, n)
+        if (herbNamesTC.has(prefix) && !seen.has(prefix)) {
+          found.push(prefix); seen.add(prefix); break
+        }
       }
     }
-    // Remove trailing stuff like '三两', '二两' etc.
-    herbName = herbName.replace(/[一二三四五六七八九十百千0123456789]+[两克斤钱毫分粒枚寸]+.*$/, '')
-    herbName = herbName.trim()
-    if (herbName.length >= 1 && herbName.length <= 6 && !/^\d/.test(herbName)) {
-      herbs.push(herbName)
+    // Substring match
+    for (const h of herbNamesTC) {
+      if (h.length < 2) continue
+      if (seg.includes(h) && !seen.has(h)) {
+        found.push(h); seen.add(h)
+      }
     }
   }
-  return herbs
+  return found
 }
 
 export default async function FormulaDetailPage({ params }: { params: Promise<{ locale: string; name: string }> }) {
@@ -65,6 +75,15 @@ export default async function FormulaDetailPage({ params }: { params: Promise<{ 
     toSimplified = mod.toSimplified
   } catch { toSimplified = (s: string) => s }
 
+  // Load herb names for matching
+  let herbNamesTC = new Set<string>()
+  try {
+    const herbsData: { name: string }[] = JSON.parse(
+      await fs.readFile(path.join(process.cwd(), 'public', 'data', 'herbs.json'), 'utf-8')
+    )
+    herbNamesTC = new Set(herbsData.map(h => h.name))
+  } catch { /* ignore */ }
+
   const formulaNameRaw = decodeURIComponent(resolved.name)
   const formulaNameSC = toSimplified(formulaNameRaw)
   const formulaNameDisplay = isCN ? formulaNameSC : toTraditional(formulaNameSC)
@@ -79,7 +98,7 @@ export default async function FormulaDetailPage({ params }: { params: Promise<{ 
     console.error('Failed to load formulas:', e)
   }
 
-  const parsedHerbs = formula?.composition ? parseHerbsFromComposition(formula.composition) : []
+  const parsedHerbs = formula?.composition ? parseHerbsFromComposition(formula.composition, herbNamesTC) : []
 
   const navLabel = isCN ? '方剂大全' : '方劑大全'
   const backLabel = isCN ? '← 返回列表' : '← 返回列表'
