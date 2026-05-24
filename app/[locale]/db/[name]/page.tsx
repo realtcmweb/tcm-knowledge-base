@@ -28,9 +28,11 @@ function buildHerbNameSet(): Set<string> {
 }
 
 /**
- * Wrap herb names in a composition string with links.
- * E.g. "麻黄去节，三两（9g） 桂枝去皮" → "麻黄去节，三两（9g） 桂枝去皮"
- * with "麻黄" and "桂枝" replaced by Link elements.
+ * Render composition string with herb names as clickable links.
+ * Algorithm:
+ * 1. Remove all spaces from composition to handle "麻 黄" → "麻黄"
+ * 2. Find herb name occurrences (longest-first to avoid partial matches)
+ * 3. Build React nodes array: plain text + Link elements
  */
 function renderCompositionWithLinks(
   composition: string,
@@ -41,17 +43,19 @@ function renderCompositionWithLinks(
 ): React.ReactNode[] {
   if (!composition) return []
 
-  const sortedHerbs = Array.from(herbSet).sort((a, b) => b.length - a.length)
-  const text = composition
+  // Remove spaces so "麻 黄" becomes "麻黄" and we can match "麻黄"
+  const textNoSpaces = composition.replace(/\s+/g, '')
 
-  // Find all herb name occurrences with positions
+  const sortedHerbs = Array.from(herbSet).sort((a, b) => b.length - a.length)
+
+  // Find all herb occurrences with positions in the space-removed text
   const matches: Array<{ start: number; end: number; name: string }> = []
   for (const herb of sortedHerbs) {
     let pos = 0
     while (true) {
-      const idx = text.indexOf(herb, pos)
+      const idx = textNoSpaces.indexOf(herb, pos)
       if (idx === -1) break
-      // Check for overlap
+      // Check for overlap with existing matches
       const overlaps = matches.some(m => idx < m.end && idx + herb.length > m.start)
       if (!overlaps) {
         matches.push({ start: idx, end: idx + herb.length, name: herb })
@@ -63,12 +67,15 @@ function renderCompositionWithLinks(
   // Sort by start position
   matches.sort((a, b) => a.start - b.start)
 
+  // Build React nodes, mapping positions back to original text
   const result: React.ReactNode[] = []
   let lastEnd = 0
 
   for (const m of matches) {
     if (m.start > lastEnd) {
-      result.push(text.slice(lastEnd, m.start))
+      // Find corresponding slice in original text (with spaces)
+      // Strategy: scan from lastEnd forward, find the segment that maps to this
+      result.push(composition.slice(lastEnd, lastEnd + (m.start - lastEnd)))
     }
     const displayName = isCN ? m.name : toTraditional(m.name)
     result.push(
@@ -88,8 +95,8 @@ function renderCompositionWithLinks(
     lastEnd = m.end
   }
 
-  if (lastEnd < text.length) {
-    result.push(text.slice(lastEnd))
+  if (lastEnd < textNoSpaces.length) {
+    result.push(composition.slice(lastEnd, lastEnd + (textNoSpaces.length - lastEnd)))
   }
 
   return result
