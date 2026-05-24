@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
 import { toSimplified } from '@/lib/toSimplified'
+import { useRouter, usePathname } from 'next/navigation'
 
 interface Formula {
   id: number

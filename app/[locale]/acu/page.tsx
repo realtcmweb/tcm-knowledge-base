@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { toSimplified } from '@/lib/toSimplified'
-import { useRouter, usePathname, useTranslations, useLocale } from 'next-intl'
+import { useRouter, usePathname } from 'next/navigation'
+import { useTranslations, useLocale } from 'next-intl'
 import treatmentsData from '../../../public/data/treatments.json'
 
 interface Acupoint {
