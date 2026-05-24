@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { useTranslations, useLocale } from 'next-intl'
 
 interface Herb {
   name: string
@@ -62,31 +63,15 @@ export default function HerbsPage() {
   const [selectedCat, setSelectedCat] = useState('解表药')
   const [showMenu, setShowMenu] = useState(false)
   const [herbView, setHerbView] = useState<'home' | 'list'>('home')
+  const t = useTranslations('herbs')
+  const locale = useLocale()
   const router = useRouter()
-  const LANG_KEY = 'tcm_lang'
-  const [lang, setLang] = useState('tw')
-
-  const toggleLang = () => {
-    const next = lang === 'tw' ? 'cn' : 'tw'
-    setLang(next)
-    localStorage.setItem(LANG_KEY, next)
-  }
-
-  useEffect(() => {
-    const saved = localStorage.getItem(LANG_KEY) as 'tw' | 'cn' | null
-    if (saved) setLang(saved)
-  }, [])
-
-  const T_MENU = lang === 'tw'
-    ? { langToggle: '繁體 / 簡體', langCurrent: '繁', guide: '📋 使用說明', disclaimer: '⚠️ 免責聲明', about: 'ℹ️ 關於本站', contact: '📩 聯絡我們' }
-    : { langToggle: '繁体 / 简体', langCurrent: '简', guide: '📋 使用说明', disclaimer: '⚠️ 免责声明', about: 'ℹ️ 关于本站', contact: '📩 联系我们' }
-
   const MENU_ITEMS = [
-    { label: T_MENU.langToggle, icon: '🌐', action: 'lang' },
-    { label: T_MENU.guide, icon: '📋', action: 'guide' },
-    { label: T_MENU.disclaimer, icon: '⚠️', action: 'disclaimer' },
-    { label: T_MENU.about, icon: 'ℹ️', action: 'about' },
-    { label: T_MENU.contact, icon: '📩', action: 'contact' },
+    { label: t('menu.langToggle'), icon: '🌐', action: 'lang' },
+    { label: t('menu.guide'), icon: '📋', action: 'guide' },
+    { label: t('menu.disclaimer'), icon: '⚠️', action: 'disclaimer' },
+    { label: t('menu.about'), icon: 'ℹ️', action: 'about' },
+    { label: t('menu.contact'), icon: '📩', action: 'contact' },
   ]
 
   // Sync herb from URL params → redirect to new route
@@ -120,20 +105,11 @@ export default function HerbsPage() {
 
   const handleMenuAction = (action: string) => {
     setShowMenu(false)
-    if (action === 'lang') { toggleLang(); return }
-    if (action === 'disclaimer') setModalContent({ title: '⚠️ 免責聲明', body: '本資料庫內容僅供學術參考，不作商業用途。有病請尋求合法的醫師，非中醫師請勿擅自處方服藥。' })
-    else if (action === 'about') setModalContent({ title: 'ℹ️ 關於本站', body: `📖 醫道中醫大全是一個開源的中醫藥知識庫。
-
-🎯 目標：讓中醫藥知識更容易被查詢和學習。
-
-📊 目前收錄：
-• 374 個針灸穴位
-• 205 首經典方劑
-• ${herbs.length} 味中藥（持續更新）
-
-❤️ 製作給所有中醫藥愛好者。` })
-    else if (action === 'contact') setModalContent({ title: '📩 聯絡我們', body: '📧 請在 GitHub 倉庫提交 Issue\n🔗 github.com/realtcmweb/tcm-knowledge-base\n\n我們會盡快回覆您。' })
-    else if (action === 'guide') setModalContent({ title: '📋 使用說明', body: '🔍 搜尋：輸入中藥名稱或拼音\n\n📂 分類：按功效22大類篩選\n\n💡 點擊任意中藥卡片查看完整資料，包括：药性、功效、应用、用量、禁忌等。\n\n⚠️ 資料僅供學術參考，非醫囑。' })
+    if (action === 'lang') { router.push(locale === 'zh-TW' ? '/zh-CN/herbs' : '/zh-TW/herbs'); return }
+    if (action === 'disclaimer') setModalContent({ title: t('modals.disclaimer.title'), body: t('modals.disclaimer.body') })
+    else if (action === 'about') setModalContent({ title: t('modals.about.title'), body: `📖 ${t('modals.about.body') || '醫道中醫大全是一個開源的中醫藥知識庫。\n\n🎯 目標：讓中醫藥知識更容易被查詢和學習。\n\n📊 目前收錄：\n• 374 個針灸穴位\n• 205 首經典方劑\n• ${herbs.length} 味中藥（持續更新）\n\n❤️ 製作給所有中醫藥愛好者。'}` })
+    else if (action === 'contact') setModalContent({ title: t('modals.contact.title'), body: t('modals.contact.body') })
+    else if (action === 'guide') setModalContent({ title: t('modals.guide.title'), body: t('modals.guide.body') })
   }
 
   return (
@@ -150,9 +126,9 @@ export default function HerbsPage() {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', padding: '0 8px 0 4px', height: 50 }}>
           <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '8px 12px', color: '#FFFEF9', textDecoration: 'none', fontSize: 13, fontWeight: 600 }}>
-            <span style={{ fontSize: 15 }}>🏠</span><span>首頁</span>
+            <span style={{ fontSize: 15 }}>🏠</span><span>{locale === 'zh-CN' ? '首页' : '首頁'}</span>
           </Link>
-          <div style={{ flex: 1, textAlign: 'center', fontSize: 15, fontWeight: 700 }}>🌿 中藥大全</div>
+          <div style={{ flex: 1, textAlign: 'center', fontSize: 15, fontWeight: 700 }}>🌿 {t('title')}</div>
           <div style={{ position: 'relative' }}>
             <button onClick={() => setShowMenu(v => !v)} style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '7px 12px', color: '#FFFEF9', backgroundColor: showMenu ? 'rgba(255,254,249,0.2)' : 'rgba(255,254,249,0.12)', border: 'none', borderRadius: 20, cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>
               ☰ <span style={{ fontSize: 11 }}>選單</span>
@@ -175,7 +151,7 @@ export default function HerbsPage() {
         <div style={{ padding: '10px 14px 0' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, backgroundColor: 'rgba(255,254,249,0.15)', borderRadius: 14, padding: '11px 14px', border: '1.5px solid rgba(255,254,249,0.25)' }}>
             <span style={{ fontSize: 16, opacity: 0.8 }}>🔍</span>
-            <input type="text" placeholder={loading ? '載入中...' : '搜尋中藥名稱、拼音...'} value={search} onChange={e => setSearch(e.target.value)}
+            <input type="text" placeholder={loading ? t('loading') : t('searchPlaceholder')} value={search} onChange={e => setSearch(e.target.value)}
               disabled={loading}
               style={{ flex: 1, border: 'none', background: 'transparent', outline: 'none', fontSize: 14, color: '#FFFEF9' }} />
             {search && (
@@ -184,15 +160,15 @@ export default function HerbsPage() {
           </div>
         </div>
 
-        {/* 3-Tab Navigation */}
+        {/* 4-Tab Navigation */}
         <div style={{ display: 'flex', padding: '12px 14px 0', gap: 7 }}>
           {[
-            { href: '/acu', label: '針灸大全', emoji: '💉' },
-            { href: '/db', label: '方劑大全', emoji: '🍵' },
-            { href: '/herbs', label: '中藥大全', emoji: '🌿' },
-            { href: '/symptoms', label: '症狀大全', emoji: '🩺' },
+            { href: `/${locale}/acu`, label: t('tabAcu'), emoji: '💉' },
+            { href: `/${locale}/db`, label: t('tabFormula'), emoji: '🍵' },
+            { href: `/${locale}/herbs`, label: t('tabHerbs'), emoji: '🌿', active: true },
+            { href: `/${locale}/symptoms`, label: t('tabSymptoms'), emoji: '🩺' },
           ].map(tab => (
-            <Link key={tab.label} href={tab.href} style={{ flex: 1, padding: '10px 4px', backgroundColor: tab.href === '/herbs' ? '#FFFEF9' : 'rgba(255,254,249,0.12)', color: tab.href === '/herbs' ? '#1a3A2C' : 'rgba(255,254,249,0.8)', border: 'none', borderRadius: 12, textDecoration: 'none', fontSize: 11, fontWeight: 700, textAlign: 'center' }}>
+            <Link key={tab.label} href={tab.href} style={{ flex: 1, padding: '10px 4px', backgroundColor: tab.active ? '#FFFEF9' : 'rgba(255,254,249,0.12)', color: tab.active ? '#1a3A2C' : 'rgba(255,254,249,0.8)', border: 'none', borderRadius: 12, textDecoration: 'none', fontSize: 11, fontWeight: 700, textAlign: 'center' }}>
               <div style={{ fontSize: 18, marginBottom: 2 }}>{tab.emoji}</div>
               <div>{tab.label}</div>
             </Link>
@@ -202,7 +178,7 @@ export default function HerbsPage() {
 
       {herbView === 'home' && (
         <div style={{ padding: '16px 14px 100px' }}>
-          <div style={{ fontSize: 13, color: '#2C4A3E', marginBottom: 12, padding: '0 2px' }}>🌿 按功效主治分類</div>
+          <div style={{ fontSize: 13, color: '#2C4A3E', marginBottom: 12, padding: '0 2px' }}>🌿 {t('byEfficacy')}</div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
             {CATEGORIES.filter(cc => cc.key !== '').map(cc => (
               <button key={cc.key} onClick={() => { setSelectedCat(cc.key); setHerbView('list') }} style={{
@@ -211,7 +187,7 @@ export default function HerbsPage() {
                 boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
               }}>
                 <div style={{ fontSize: 22, marginBottom: 6 }}>{cc.emoji}</div>
-                <div style={{ fontSize: 14, fontWeight: 800, color: '#1a2C24', marginBottom: 3 }}>{cc.label}</div>
+                <div style={{ fontSize: 14, fontWeight: 800, color: '#1a2C24', marginBottom: 3 }}>{cc.key === '' ? '' : t(`categories.${cc.key}` as any) || cc.label}</div>
               </button>
             ))}
           </div>
@@ -236,7 +212,7 @@ export default function HerbsPage() {
                 color: selectedCat === cat.key ? '#1a3A2C' : 'rgba(255,254,249,0.85)',
                 whiteSpace: 'nowrap', flexShrink: 0,
               }}>
-                {cat.emoji} {cat.label}
+                {cat.emoji} {(cat.key === '' ? '' : t(`categories.${cat.key}` as any) || cat.label)}
               </button>
             ))}
           </div>
@@ -244,18 +220,18 @@ export default function HerbsPage() {
 
         {/* Count */}
         <div style={{ padding: '8px 16px 0', fontSize: 12, color: '#2C4A3E' }}>
-          {loading ? '載入中...' : `${filtered.length} 味中藥`}
+          loading ? t('loading') : `${filtered.length} ${t('resultCount').replace('{count}', '')}`
         </div>
 
         {/* Content */}
         <div style={{ padding: '12px 14px 100px' }}>
         {loading ? (
-          <div style={{ padding: '60px 0', textAlign: 'center', color: '#7A7A6A', fontSize: 14 }}>載入中...</div>
+          <div style={{ padding: '60px 0', textAlign: 'center', color: '#7A7A6A', fontSize: 14 }}>{t('loading')}</div>
         ) : filtered.length === 0 ? (
           <div style={{ padding: '60px 0', textAlign: 'center', color: '#7A7A6A' }}>
             <div style={{ fontSize: 40, marginBottom: 12 }}>🔍</div>
-            <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 4 }}>找不到符合的中藥</div>
-            <div style={{ fontSize: 12 }}>試試其他關鍵字或分類</div>
+            <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 4 }}>{t('noResults')}</div>
+            <div style={{ fontSize: 12 }}>{t('tryOther')}</div>
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -313,7 +289,7 @@ export default function HerbsPage() {
           <div style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)', width: '90vw', maxWidth: 380, backgroundColor: '#FFFEF9', borderRadius: 20, padding: '24px 20px 28px', boxShadow: '0 12px 40px rgba(0,0,0,0.2)' }} onClick={e => e.stopPropagation()}>
             <h2 style={{ fontSize: 17, fontWeight: 700, color: '#1a2C24', marginBottom: 14, textAlign: 'center' }}>{modalContent.title}</h2>
             <div style={{ fontSize: 13, color: '#3A3A2A', lineHeight: 1.9, whiteSpace: 'pre-wrap', textAlign: 'center' }}>{modalContent.body}</div>
-            <button onClick={() => setModalContent(null)} style={{ display: 'block', width: '100%', marginTop: 20, padding: 12, backgroundColor: '#1a3A2C', color: '#FFFEF9', border: 'none', borderRadius: 12, cursor: 'pointer', fontSize: 14, fontWeight: 700 }}>關閉</button>
+            <button onClick={() => setModalContent(null)} style={{ display: 'block', width: '100%', marginTop: 20, padding: 12, backgroundColor: '#1a3A2C', color: '#FFFEF9', border: 'none', borderRadius: 12, cursor: 'pointer', fontSize: 14, fontWeight: 700 }}>{t('close') || '關閉'}</button>
           </div>
         </div>
       )}

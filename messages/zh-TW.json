@@ -89,5 +89,78 @@
     "coating": "苔色",
     "teeth": "齒痕",
     "cracks": "裂紋"
+  },
+  "herbs": {
+    "title": "中藥大全",
+    "searchPlaceholder": "搜尋中藥名稱、拼音...",
+    "loading": "載入中...",
+    "resultCount": "{count} 味中藥",
+    "noResults": "找不到符合的中藥",
+    "tryOther": "試試其他關鍵字或分類",
+    "backHome": "← 返回首頁",
+    "byEfficacy": "按功效主治分類",
+    "tabAcu": "針灸大全",
+    "tabFormula": "方劑大全",
+    "tabHerbs": "中藥大全",
+    "tabSymptoms": "症狀大全",
+    "nature": "药性",
+    "efficacy": "功效",
+    "applications": "應用",
+    "usage": "用量",
+    "contraindication": "禁忌",
+    "identification": "辨識",
+    "categories": {
+      "解表药": "解表藥",
+      "清热药": "清熱藥",
+      "泻下药": "瀉下藥",
+      "祛风湿药": "祛風濕",
+      "利水渗湿药": "利水滲濕",
+      "温里药": "溫里藥",
+      "理气药": "理氣藥",
+      "补虚药": "補虛藥",
+      "安神药": "安神藥",
+      "活血化瘀药": "活血化瘀",
+      "化痰止咳平喘药": "化痰止咳",
+      "平肝息风药": "平肝息風",
+      "化湿药": "化濕藥",
+      "驱虫药": "驅蟲藥",
+      "消食药": "消食藥",
+      "止血药": "止血藥",
+      "收涩药": "收澀藥",
+      "开窍药": "開竅藥",
+      "攻毒杀虫止痒药": "攻毒殺蟲",
+      "拔毒化腐生肌药": "拔毒生肌",
+      "涌吐药": "湧吐藥"
+    },
+    "menu": {
+      "langToggle": "繁體 / 簡體",
+      "langCurrentTW": "繁",
+      "langCurrentCN": "簡",
+      "guide": "📋 使用說明",
+      "disclaimer": "⚠️ 免責聲明",
+      "about": "ℹ️ 關於本站",
+      "contact": "📩 聯絡我們"
+    },
+    "modals": {
+      "disclaimer": {
+        "title": "⚠️ 免責聲明",
+        "body": "本資料庫內容僅供學術參考，不作商業用途。有病請尋求合法的醫師，非中醫師請勿擅自處方服藥。"
+      },
+      "about": {
+        "title": "ℹ️ 關於本站",
+        "body": "📖 醫道中醫大全是一個開源的中醫藥知識庫。\n\n🎯 目標：讓中醫藥知識更容易被查詢和學習。\n\n📊 目前收錄：\n• 374 個針灸穴位\n• 205 首經典方劑\n• {herbs_count} 味中藥（持續更新）\n\n❤️ 製作給所有中醫藥愛好者。"
+      },
+      "contact": {
+        "title": "📩 聯絡我們",
+        "body": "📧 請在 GitHub 倉庫提交 Issue\n🔗 github.com/realtcmweb/tcm-knowledge-base\n\n我們會盡快回覆您。"
+      },
+      "guide": {
+        "title": "📋 使用說明",
+        "body": "🔍 搜尋：輸入中藥名稱或拼音\n\n📂 分類：按功效22大類篩選\n\n💡 點擊任意中藥卡片查看完整資料，包括：药性、功效、应用、用量、禁忌等。\n\n⚠️ 資料僅供學術參考，非醫囑。"
+      }
+    },
+    "close": "關閉",
+    "homeLink": "首頁",
+    "resultCountSingular": "味中藥"
   }
 }
