@@ -30,9 +30,10 @@ function buildHerbNameSet(): Set<string> {
 /**
  * Render composition string with herb names as clickable links.
  * Algorithm:
- * 1. Remove all spaces from composition to handle "麻 黄" → "麻黄"
- * 2. Find herb name occurrences (longest-first to avoid partial matches)
- * 3. Build React nodes array: plain text + Link elements
+ * 1. Remove whitespace from composition → textNS
+ * 2. Find all herb match positions in textNS (longest-first, no overlaps)
+ * 3. Map positions back to original text by counting non-whitespace chars
+ * 4. Output: plain text fragments + Link elements for each herb
  */
 function renderCompositionWithLinks(
   composition: string,
@@ -43,19 +44,16 @@ function renderCompositionWithLinks(
 ): React.ReactNode[] {
   if (!composition) return []
 
-  // Remove spaces so "麻 黄" becomes "麻黄" and we can match "麻黄"
-  const textNoSpaces = composition.replace(/\s+/g, '')
-
+  const textNS = composition.replace(/\s+/g, '')
   const sortedHerbs = Array.from(herbSet).sort((a, b) => b.length - a.length)
 
-  // Find all herb occurrences with positions in the space-removed text
+  // Find all herb occurrences in the no-space text
   const matches: Array<{ start: number; end: number; name: string }> = []
   for (const herb of sortedHerbs) {
     let pos = 0
     while (true) {
-      const idx = textNoSpaces.indexOf(herb, pos)
+      const idx = textNS.indexOf(herb, pos)
       if (idx === -1) break
-      // Check for overlap with existing matches
       const overlaps = matches.some(m => idx < m.end && idx + herb.length > m.start)
       if (!overlaps) {
         matches.push({ start: idx, end: idx + herb.length, name: herb })
@@ -63,25 +61,62 @@ function renderCompositionWithLinks(
       pos = idx + 1
     }
   }
-
-  // Sort by start position
   matches.sort((a, b) => a.start - b.start)
 
-  // Build React nodes, mapping positions back to original text
+  // Build result: iterate matches, emit text between them
   const result: React.ReactNode[] = []
-  let lastEnd = 0
+  let lastNSIdx = 0  // last position in no-space text we've consumed
 
-  for (const m of matches) {
-    if (m.start > lastEnd) {
-      // Find corresponding slice in original text (with spaces)
-      // Strategy: scan from lastEnd forward, find the segment that maps to this
-      result.push(composition.slice(lastEnd, lastEnd + (m.start - lastEnd)))
+  for (let mi = 0; mi < matches.length; mi++) {
+    const m = matches[mi]
+    const herbStartNS = m.start
+    const herbEndNS = m.end
+    const herbName = m.name
+
+    // Find the position in original text corresponding to herbStartNS
+    // by counting non-whitespace characters in original
+    let nsCount = 0
+    let origStart = 0
+    for (let i = 0; i < composition.length; i++) {
+      if (/\s/.test(composition[i])) continue
+      if (nsCount === herbStartNS) { origStart = i; break }
+      nsCount++
     }
-    const displayName = isCN ? m.name : toTraditional(m.name)
+
+    // Find the position in original text corresponding to herbEndNS
+    nsCount = 0
+    let origEnd = origStart
+    for (let i = origStart; i < composition.length; i++) {
+      if (/\s/.test(composition[i])) { origEnd = i; continue }
+      if (nsCount === herbEndNS - herbStartNS) { origEnd = i + 1; break }
+      nsCount++
+    }
+
+    // Text before this herb (plain)
+    if (lastNSIdx < herbStartNS) {
+      // Need to find original slice for NS positions [lastNSIdx, herbStartNS)
+      let ns = 0
+      let textStart = lastNSIdx === 0 ? 0 : -1
+      let textEnd = -1
+      for (let i = 0; i < composition.length; i++) {
+        if (/\s/.test(composition[i])) continue
+        if (ns === lastNSIdx && textStart < 0) textStart = i
+        if (ns === herbStartNS) { textEnd = i; break }
+        ns++
+      }
+      if (textStart >= 0 && textEnd > textStart) {
+        const plainText = composition.substring(textStart, textEnd)
+        result.push(plainText)
+      }
+    }
+
+    // Emit herb as Link
+    const herbTextInOriginal = composition.substring(origStart, origEnd)
+    const displayName = isCN ? herbName : toTraditional(herbName)
     result.push(
       <Link
-        key={`${m.start}-${m.name}`}
-        href={`/${locale}/herbs?q=${encodeURIComponent(m.name)}`}
+        key={`herb-${mi}-${herbName}`}
+        href={`/${locale}/herbs?q=${encodeURIComponent(herbName)}`}
         style={{
           color: '#2C6B3A',
           textDecoration: 'underline',
@@ -92,11 +127,23 @@ function renderCompositionWithLinks(
         {displayName}
       </Link>
     )
-    lastEnd = m.end
+
+    lastNSIdx = herbEndNS
   }
 
-  if (lastEnd < textNoSpaces.length) {
-    result.push(composition.slice(lastEnd, lastEnd + (textNoSpaces.length - lastEnd)))
+  // Remaining text after last herb
+  if (lastNSIdx < textNS.length) {
+    // Find original slice for remaining NS positions
+    let ns = 0
+    let textStart = -1
+    for (let i = 0; i < composition.length; i++) {
+      if (/\s/.test(composition[i])) continue
+      if (ns === lastNSIdx) { textStart = i; break }
+      ns++
+    }
+    if (textStart >= 0) {
+      result.push(composition.substring(textStart))
+    }
   }
 
   return result
