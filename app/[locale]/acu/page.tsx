@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { useRouter, usePathname } from 'next/navigation'
-import { useTranslations, useLocale } from 'next-intl'
+import { toSimplified } from '@/lib/toSimplified'
+import { useRouter, usePathname, useTranslations, useLocale } from 'next-intl'
 import treatmentsData from '../../../public/data/treatments.json'
 
 interface Acupoint {
@@ -145,10 +145,10 @@ export default function AcupointsPage() {
     if (selectedMeridian && !a.code.startsWith(selectedMeridian)) return false
     if (selectedPointType && !a.specialType.includes(selectedPointType)) return false
     if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase()
-      return a.name.toLowerCase().includes(q) ||
-        a.code.toLowerCase().includes(q) ||
-        (a.indications && a.indications.toLowerCase().includes(q))
+      const sq = toSimplified(searchQuery).toLowerCase()
+      return a.name.toLowerCase().includes(sq) ||
+        a.code.toLowerCase().includes(sq) ||
+        (a.indications && a.indications.toLowerCase().includes(sq))
     }
     return true
   })

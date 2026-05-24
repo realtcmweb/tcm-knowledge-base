@@ -1,5 +1,6 @@
 'use client'
 import React, { useState, useEffect } from 'react'
+import { toSimplified } from '@/lib/toSimplified'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useTranslations, useLocale } from 'next-intl'
@@ -95,8 +96,8 @@ export default function HerbsPage() {
   const filtered = herbs.filter(h => {
     if (selectedCat && getCategory(h.chapter) !== selectedCat) return false
     if (search.trim()) {
-      const q = search.toLowerCase()
-      return h.name.includes(q) || h.pinyin.toLowerCase().includes(q)
+      const sq = toSimplified(search).toLowerCase()
+      return h.name.includes(sq) || h.pinyin.toLowerCase().includes(sq)
     }
     return true
   })

@@ -89,5 +89,83 @@
     "coating": "Coating Color",
     "teeth": "Teeth Marks",
     "cracks": "Cracks"
-  }
+  },
+  "herbs": {
+    "title": "",
+    "searchPlaceholder": "",
+    "loading": "",
+    "resultCount": "",
+    "noResults": "",
+    "tryOther": "",
+    "backHome": "",
+    "byEfficacy": "",
+    "tabAcu": "",
+    "tabFormula": "",
+    "tabHerbs": "",
+    "tabSymptoms": "",
+    "nature": "",
+    "efficacy": "",
+    "applications": "",
+    "usage": "",
+    "contraindication": "",
+    "identification": "",
+    "categories": {
+      "解表药": "",
+      "清热药": "",
+      "泻下药": "",
+      "祛风湿药": "",
+      "利水渗湿药": "",
+      "温里药": "",
+      "理气药": "",
+      "补虚药": "",
+      "安神药": "",
+      "活血化瘀药": "",
+      "化痰止咳平喘药": "",
+      "平肝息风药": "",
+      "化湿药": "",
+      "驱虫药": "",
+      "消食药": "",
+      "止血药": "",
+      "收涩药": "",
+      "开窍药": "",
+      "攻毒杀虫止痒药": "",
+      "拔毒化腐生肌药": "",
+      "涌吐药": ""
+    },
+    "menu": {
+      "langToggle": "",
+      "langCurrentTW": "",
+      "langCurrentCN": "",
+      "guide": "",
+      "disclaimer": "",
+      "about": "",
+      "contact": ""
+    },
+    "modals": {
+      "disclaimer": {
+        "title": "",
+        "body": ""
+      },
+      "about": {
+        "title": "",
+        "body": ""
+      },
+      "contact": {
+        "title": "",
+        "body": ""
+      },
+      "guide": {
+        "title": "",
+        "body": ""
+      }
+    },
+    "close": "",
+    "homeLink": "",
+    "resultCountSingular": ""
+  },
+  "acu": {},
+  "formulas": {},
+  "symptoms": {},
+  "consult": {},
+  "treat": {}
 }

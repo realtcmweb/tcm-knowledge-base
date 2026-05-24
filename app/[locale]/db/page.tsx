@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
-import { useRouter, usePathname } from 'next/navigation'
+import { toSimplified } from '@/lib/toSimplified'
 
 interface Formula {
   id: number
@@ -123,11 +123,11 @@ export default function FormulasPage() {
   const filteredFormulas = formulas.filter(f => {
     if (selectedCat && f.category !== selectedCat) return false
     if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase()
-      return f.name.toLowerCase().includes(q) ||
-        f.source.toLowerCase().includes(q) ||
-        f.effects.toLowerCase().includes(q) ||
-        f.categoryLabel.includes(q)
+      const sq = toSimplified(searchQuery).toLowerCase()
+      return f.name.toLowerCase().includes(sq) ||
+        f.source.toLowerCase().includes(sq) ||
+        f.effects.toLowerCase().includes(sq) ||
+        f.categoryLabel.includes(sq)
     }
     return true
   })
