@@ -51,7 +51,7 @@ export default function SharedHeader({
   const handleSearch = () => {
     const q = searchValue.trim()
     if (!q) return
-    router.push(`/db?q=${encodeURIComponent(q)}`)
+    router.push(`/search?q=${encodeURIComponent(q)}`)
   }
 
   const handleMenuItemAction = (action: string) => {
