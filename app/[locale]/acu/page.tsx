@@ -7,6 +7,7 @@ import { toTraditional } from '@/lib/toTraditional'
 import { useRouter, usePathname } from 'next/navigation'
 import { useTranslations, useLocale } from 'next-intl'
 import treatmentsData from '../../../public/data/treatments.json'
+import SharedHeader from '@/components/SharedHeader'
 
 interface Acupoint {
   code: string
@@ -110,27 +111,11 @@ export default function AcupointsPage() {
   const [treatCat, setTreatCat] = useState('all')
   const [selectedTreatment, setSelectedTreatment] = useState<Treatment | null>(null)
 
-  const [showMenu, setShowMenu] = useState(false)
   const [modalContent, setModalContent] = useState<{title: string; body: string} | null>(null)
 
   const isCN = locale === 'zh-CN'
 
-  const T_MENU = {
-    langToggle: isCN ? '繁體 / 簡體' : '繁体 / 简体',
-    langCurrent: isCN ? '简' : '繁',
-    guide: isCN ? '使用说明' : '使用說明',
-    disclaimer: isCN ? '免责声明' : '免責聲明',
-    about: isCN ? '关于本站' : '關於本站',
-    contact: isCN ? '联系我们' : '聯絡我們',
-  }
 
-  const MENU_ITEMS = [
-    { label: T_MENU.langToggle, icon: '🌐', action: 'lang' },
-    { label: T_MENU.guide, icon: '📋', action: 'guide' },
-    { label: T_MENU.disclaimer, icon: '⚠️', action: 'disclaimer' },
-    { label: T_MENU.about, icon: 'ℹ️', action: 'about' },
-    { label: T_MENU.contact, icon: '📩', action: 'contact' },
-  ]
 
   useEffect(() => {
     fetch('/data/acupoints.json').then(r => r.json()).then(d => {
@@ -161,16 +146,15 @@ export default function AcupointsPage() {
     return true
   })
 
-  const handleMenuAction = (action: string) => {
-    setShowMenu(false)
+  const handleHeaderMenuAction = (action: string) => {
     if (action === 'lang') {
       router.push(locale === 'zh-TW' ? '/zh-CN/acu' : '/zh-TW/acu')
       return
     }
-    else if (action === 'disclaimer') setModalContent({ title: T_MENU.disclaimer, body: isCN ? '本资料库内容仅供学术参考，不作商业用途。有病请寻求合法的医师，非中医师请勿擅自处方服药。' : '本資料庫內容僅供學術參考，不作商業用途。有病請尋求合法的醫師，非中醫師請勿擅自處方服藥。' })
-    else if (action === 'about') setModalContent({ title: 'ℹ️ 關於本站', body: isCN ? '📖 医道中医大全是一个开源的中医药知识库，收录了针灸穴位、经典方剂等中医药资料。\n\n🎯 目标：让中医药知识更容易被查询和学习。\n\n📊 目前收录：\n• 374 个针灸穴位（WHO 国际标准）\n• 205 首经典方剂\n• 39 个针灸治疗处方\n• 更多内容持续更新中' : '📖 醫道中醫大全是一個開源的中醫藥知識庫，收錄了針灸穴位、經典方劑等中醫藥資料。\n\n🎯 目標：讓中醫藥知識更容易被查詢和學習。\n\n📊 目前收錄：\n• 374 個針灸穴位（WHO 國際標準）\n• 205 首經典方劑\n• 39 個針灸治療處方\n• 更多內容持續更新中' })
-    else if (action === 'contact') setModalContent({ title: isCN ? '📩 联系我们' : '📩 聯絡我們', body: isCN ? '📧 请在 GitHub 仓库提交 Issue\n🔗 github.com/realtcmweb/tcm-knowledge-base' : '📧 請在 GitHub 倉庫提交 Issue\n🔗 github.com/realtcmweb/tcm-knowledge-base' })
-    else if (action === 'guide') setModalContent({ title: T_MENU.guide, body: isCN ? '📖 本资料库收录WHO国际标准针灸穴位374个。\n\n🔍 搜寻：输入穴位名称或编码\n\n🏷️ 筛选方式：\n• 按经络：点上方经络代码筛选\n• 按分类：督脉/任脉/经外奇穴\n• 按穴性：井穴/荥穴/输穴/经穴/合穴/络穴/郄穴/原穴/募穴\n\n💊 切换至「治疗」模式可按症状查询针灸处方' : '📖 本資料庫收錄WHO國際標準針灸穴位374個。\n\n🔍 搜尋：輸入穴位名稱或編碼\n\n🏷️ 篩選方式：\n• 按經絡：點上方經絡代碼篩選\n• 按分類：督脈/任脈/經外奇穴\n• 按穴性：井穴/滎穴/輸穴/經穴/合穴/絡穴/郄穴/原穴/募穴\n\n💊 切換至「治療」模式可按症狀查詢針灸處方' })
+    else if (action === 'disclaimer') setModalContent({ title: isCN ? '⚠️ 免责声名' : '⚠️ 免責聲明', body: isCN ? '本资料库内容仅供学术参考，不作商业用途。有病请寻求合法的医师，非中医师请勿擅自处方服药。' : '本資料庫內容僅供學術參考，不作商業用途。有病請尋求合法的醫師，非中醫師請勿擅自處方服藥。' })
+    else if (action === 'about') setModalContent({ title: 'ℹ️ 關於本站', body: isCN ? '📖 医道中医大全是一个开源的中医药知识库。\n\n📊 目前收录：\n• 374 个针灸穴位（WHO 国际标准）\n• 205 首经典方剂\n• 422 味中藥\n• 更多内容持续更新中' : '📖 醫道中醫大全是一個開源的中醫藥知識庫。\n\n📊 目前收錄：\n• 374 個針灸穴位（WHO 國際標準）\n• 205 首經典方劑\n• 422 味中藥\n• 更多內容持續更新中' })
+    else if (action === 'contact') setModalContent({ title: isCN ? '📩 联系我们' : '📩 聯絡我們', body: '📧 github.com/realtcmweb/tcm-knowledge-base' })
+    else if (action === 'guide') setModalContent({ title: isCN ? '📋 使用说明' : '📋 使用說明', body: isCN ? '📖 本资料库收录WHO国际标准针灸穴位374个。\n\n🔍 搜寻：输入穴位名称或编码\n\n🏷️ 筛选方式：\n• 按经络：点上方经络代码筛选\n• 按分类：督脉/任脉/经外奇穴\n• 按穴性：井穴/荥穴/输穴/经穴/合穴/络穴/郄穴/原穴/募穴\n\n💊 切换至「治疗」模式可按症状查询针灸处方' : '📖 本資料庫收錄WHO國際標準針灸穴位374個。\n\n🔍 搜尋：輸入穴位名稱或編碼\n\n🏷️ 篩選方式：\n• 按經絡：點上方經絡代碼篩選\n• 按分類：督脈/任脈/經外奇穴\n• 按穴性：井穴/滎穴/輸穴/經穴/合穴/絡穴/郄穴/原穴/募穴\n\n💊 切換至「治療」模式可按症狀查詢針灸處方' })
   }
 
   const currentCatLabel = (cat: typeof CATEGORIES[0]) => isCN ? cat.cn : cat.tw
@@ -178,82 +162,37 @@ export default function AcupointsPage() {
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#F7F5F0', fontFamily: '-apple-system, BlinkMacSystemFont, "PingFang TC", "Microsoft JhengHei", sans-serif' }}>
-      {/* Header */}
-      <div style={{ background: '#1a3A2C', color: '#FFFEF9', padding: '0 0 16px', borderRadius: '0 0 20px 20px', boxShadow: '0 2px 12px rgba(0,0,0,0.15)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', padding: '0 8px 0 4px', height: '50px' }}>
-          <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '8px 12px', color: '#FFFEF9', textDecoration: 'none', fontSize: '13px', fontWeight: 600, opacity: 0.9 }}>
-            <span style={{ fontSize: '15px' }}>🏠</span><span>{isCN ? '首页' : '首頁'}</span>
-          </Link>
-          <div style={{ flex: 1, textAlign: 'center', fontSize: '15px', fontWeight: 700 }}>{isCN ? '针灸大全' : '針灸大全'}</div>
-          <div style={{ position: 'relative' }}>
-            <button onClick={() => setShowMenu(v => !v)} style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '7px 12px', color: '#FFFEF9', backgroundColor: showMenu ? 'rgba(255,254,249,0.2)' : 'rgba(255,254,249,0.12)', border: 'none', borderRadius: '20px', cursor: 'pointer', fontSize: '13px', fontWeight: 600 }}>
-              ☰ <span style={{ fontSize: '11px' }}>{isCN ? '菜单' : '選單'}</span>
-            </button>
-            {showMenu && (
-              <div style={{ position: 'absolute', right: 0, top: 'calc(100% + 8px)', width: '220px', backgroundColor: '#FFFEF9', borderRadius: '14px', boxShadow: '0 8px 24px rgba(0,0,0,0.18)', overflow: 'hidden', zIndex: 300, border: '1px solid #E8E4DC' }}>
-                {MENU_ITEMS.map((item, i) => (
-                  <a key={i} href="#" onClick={e => { e.preventDefault(); handleMenuAction(item.action) }} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '13px 16px', color: '#1a2C24', textDecoration: 'none', fontSize: '13px', fontWeight: 600, borderBottom: i < MENU_ITEMS.length - 1 ? '1px solid #F0EDE5' : 'none' }}>
-                    <span style={{ fontSize: '15px' }}>{item.icon}</span>
-                    <span style={{ flex: 1 }}>{item.label}</span>
-                  </a>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Search */}
-        <div style={{ padding: '0 14px 0' }}>
-          <label htmlFor="acu-search-input" style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: 'rgba(255,254,249,0.15)', borderRadius: '14px', padding: '11px 14px', border: '1.5px solid rgba(255,254,249,0.25)', cursor: 'text' }}
-            onClick={() => document.getElementById('acu-search-input')?.focus()}>
-            <span style={{ fontSize: '16px', opacity: 0.7, flexShrink: 0, userSelect: 'none' }}>🔍</span>
-            <input id="acu-search-input"
-              type="text"
-              placeholder={view === 'points' ? (isCN ? '搜尋穴位名稱或編碼' : '搜尋穴位名稱或編碼') : (isCN ? '搜尋症狀' : '搜尋症狀')}
-              value={view === 'points' ? searchQuery : treatSearch}
-              onChange={e => view === 'points' ? setSearchQuery(e.target.value) : setTreatSearch(e.target.value)}
-              onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); setAcuView('list') } }}
-              disabled={loading}
-              style={{ flex: 1, border: 'none', background: 'transparent', outline: 'none', fontSize: '14px', color: '#FFFEF9', caretColor: '#FFFEF9' }} />
-            {loading ? (
-              <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', color: 'rgba(255,254,249,0.7)' }}>
-                <span style={{ display: 'inline-block', width: '12px', height: '12px', border: '2px solid rgba(255,254,249,0.4)', borderTopColor: '#FFFEF9', borderRadius: '50%' }} className="animate-spin-fast" />
-                {isCN ? '搜尋中' : '搜尋中'}
-              </span>
-            ) : (view === 'points' ? searchQuery : treatSearch) ? (
-              <button onClick={() => { view === 'points' ? setSearchQuery('') : setTreatSearch(''); document.getElementById('acu-search-input')?.focus() }} style={{ background: 'rgba(255,254,249,0.2)', border: 'none', borderRadius: 20, padding: '2px 8px', cursor: 'pointer', fontSize: 11, color: '#FFFEF9', fontWeight: 700, display: 'flex', alignItems: 'center', flexShrink: 0 }}>✕</button>
-            ) : null}
-            {!loading && !(view === 'points' ? searchQuery : treatSearch) ? null : !loading ? (
-              <button onClick={() => { setAcuView('list') }} disabled={!(view === 'points' ? searchQuery : treatSearch)} style={{ padding: '5px 14px', backgroundColor: (view === 'points' ? searchQuery : treatSearch) ? '#FFFEF9' : 'rgba(255,254,249,0.3)', color: '#1a3A2C', border: 'none', borderRadius: '20px', fontSize: '12px', fontWeight: 700, cursor: (view === 'points' ? searchQuery : treatSearch) ? 'pointer' : 'default', flexShrink: 0 }}>搜尋</button>
-            ) : null}
-          </label>
-        </div>
-
-        {/* 4-Tab */}
-        <div style={{ display: 'flex', padding: '12px 14px 0', gap: '7px' }}>
-          {[
-            { href: `/${locale}/acu`, label: isCN ? '针灸大全' : '針灸大全', emoji: '💉' },
-            { href: `/${locale}/db`, label: isCN ? '方剂大全' : '方劑大全', emoji: '🍵' },
-            { href: `/${locale}/herbs`, label: isCN ? '中药大全' : '中藥大全', emoji: '🌿' },
-            { href: `/${locale}/symptoms`, label: isCN ? '症状大全' : '症狀大全', emoji: '🩺' },
-          ].map(tab => (
-            <Link key={tab.href} href={tab.href} style={{ flex: 1, padding: '10px 4px', backgroundColor: tab.href === `/${locale}/acu` ? '#FFFEF9' : 'rgba(255,254,249,0.12)', color: tab.href === `/${locale}/acu` ? '#1a3A2C' : 'rgba(255,254,249,0.8)', borderRadius: '12px', textDecoration: 'none', fontSize: '11px', fontWeight: 700, textAlign: 'center' }}>
-              <div style={{ fontSize: '18px', marginBottom: '2px' }}>{tab.emoji}</div>
-              <div>{tab.label}</div>
-            </Link>
-          ))}
-        </div>
-
-        {/* View Mode Toggle */}
-        <div style={{ padding: '10px 14px 0', display: 'flex', gap: '6px' }}>
-          <button onClick={() => { setView('points'); setAcuView('home') }} style={{ flex: 1, padding: '9px 4px', borderRadius: '12px', border: 'none', cursor: 'pointer', fontSize: '12px', fontWeight: 700, textAlign: 'center', backgroundColor: view === 'points' ? '#FFFEF9' : 'rgba(255,254,249,0.12)', color: view === 'points' ? '#1a3A2C' : 'rgba(255,254,249,0.8)' }}>
-            💉 {isCN ? '穴位' : '穴位'}
-          </button>
-          <button onClick={() => { setView('treatment'); setAcuView('home') }} style={{ flex: 1, padding: '9px 4px', borderRadius: '12px', border: 'none', cursor: 'pointer', fontSize: '12px', fontWeight: 700, textAlign: 'center', backgroundColor: view === 'treatment' ? '#FFFEF9' : 'rgba(255,254,249,0.12)', color: view === 'treatment' ? '#1a3A2C' : 'rgba(255,254,249,0.8)' }}>
-            💊 {isCN ? '治疗' : '治療'}
-          </button>
-        </div>
-      </div>
+      <SharedHeader
+        title={isCN ? '针灸大全' : '針灸大全'}
+        onMenuAction={handleHeaderMenuAction}
+        extraContent={
+          <>
+            {/* 4-Tab */}
+            <div style={{ display: 'flex', padding: '12px 14px 0', gap: '7px' }}>
+              {[
+                { href: `/${locale}/acu`, label: isCN ? '针灸大全' : '針灸大全', emoji: '💉' },
+                { href: `/${locale}/db`, label: isCN ? '方剂大全' : '方劑大全', emoji: '🍵' },
+                { href: `/${locale}/herbs`, label: isCN ? '中药大全' : '中藥大全', emoji: '🌿' },
+                { href: `/${locale}/symptoms`, label: isCN ? '症状大全' : '症狀大全', emoji: '🩺' },
+              ].map(tab => (
+                <Link key={tab.href} href={tab.href} style={{ flex: 1, padding: '10px 4px', backgroundColor: tab.href === `/${locale}/acu` ? '#FFFEF9' : 'rgba(255,254,249,0.12)', color: tab.href === `/${locale}/acu` ? '#1a3A2C' : 'rgba(255,254,249,0.8)', borderRadius: '12px', textDecoration: 'none', fontSize: '11px', fontWeight: 700, textAlign: 'center' }}>
+                  <div style={{ fontSize: '18px', marginBottom: '2px' }}>{tab.emoji}</div>
+                  <div>{tab.label}</div>
+                </Link>
+              ))}
+            </div>
+            {/* View Mode Toggle */}
+            <div style={{ padding: '10px 14px 0', display: 'flex', gap: '6px' }}>
+              <button onClick={() => { setView('points'); setAcuView('home') }} style={{ flex: 1, padding: '9px 4px', borderRadius: '12px', border: 'none', cursor: 'pointer', fontSize: '12px', fontWeight: 700, textAlign: 'center', backgroundColor: view === 'points' ? '#FFFEF9' : 'rgba(255,254,249,0.12)', color: view === 'points' ? '#1a3A2C' : 'rgba(255,254,249,0.8)' }}>
+                💉 {isCN ? '穴位' : '穴位'}
+              </button>
+              <button onClick={() => { setView('treatment'); setAcuView('home') }} style={{ flex: 1, padding: '9px 4px', borderRadius: '12px', border: 'none', cursor: 'pointer', fontSize: '12px', fontWeight: 700, textAlign: 'center', backgroundColor: view === 'treatment' ? '#FFFEF9' : 'rgba(255,254,249,0.12)', color: view === 'treatment' ? '#1a3A2C' : 'rgba(255,254,249,0.8)' }}>
+                💊 {isCN ? '治疗' : '治療'}
+              </button>
+            </div>
+          </>
+        }
+      />
 
       {/* ===== POINTS VIEW ===== */}
       {view === 'points' && (
@@ -501,7 +440,7 @@ export default function AcupointsPage() {
         </div>
       )}
 
-      {showMenu && <div style={{ position: 'fixed', inset: 0, zIndex: 99 }} onClick={() => setShowMenu(false)} />}
+
     </div>
   )
 }

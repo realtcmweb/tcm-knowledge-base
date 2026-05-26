@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useMemo, Suspense } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
+import SharedHeader from '@/components/SharedHeader'
 import { toSimplified } from '@/lib/toSimplified'
 import { toTraditional } from '@/lib/toTraditional'
 import { useRouter, usePathname } from 'next/navigation'
@@ -95,7 +96,6 @@ function FormulasPage() {
   const [formulas, setFormulas] = useState<Formula[]>([])
   const [loading, setLoading] = useState(true)
   const [showCatSidebar, setShowCatSidebar] = useState(false)
-  const [showMenu, setShowMenu] = useState(false)
   const [modalContent, setModalContent] = useState<{title: string; body: string} | null>(null)
   const [dbView, setDbView] = useState<'home' | 'list'>('home')
   const router = useRouter()
@@ -112,22 +112,7 @@ function FormulasPage() {
     }
   }, [searchParams])
 
-  const T_MENU = {
-    langToggle: isCN ? '繁體 / 簡體' : '繁体 / 简体',
-    langCurrent: isCN ? '简' : '繁',
-    guide: isCN ? '使用说明' : '使用說明',
-    disclaimer: isCN ? '免责声明' : '免责声名',
-    about: isCN ? '关于本站' : '關於本站',
-    contact: isCN ? '联系我们' : '聯絡我們',
-  }
 
-  const MENU_ITEMS = [
-    { label: T_MENU.langToggle, icon: '🌐', action: 'lang' },
-    { label: T_MENU.guide, icon: '📋', action: 'guide' },
-    { label: T_MENU.disclaimer, icon: '⚠️', action: 'disclaimer' },
-    { label: T_MENU.about, icon: 'ℹ️', action: 'about' },
-    { label: T_MENU.contact, icon: '📩', action: 'contact' },
-  ]
 
   const [herbNames, setHerbNames] = useState<string[]>([])
   const herbNamesSorted = useMemo(() => [...herbNames].sort((a, b) => b.length - a.length), [herbNames])
@@ -157,96 +142,42 @@ function FormulasPage() {
 
   const activeCat = FORMULA_CATEGORIES.find(c => c.key === selectedCat) || FORMULA_CATEGORIES[0]
 
-  const handleMenuAction = (action: string) => {
-    setShowMenu(false)
+  const handleHeaderMenuAction = (action: string) => {
     if (action === 'lang') {
       router.push(locale === 'zh-TW' ? '/zh-CN/db' : '/zh-TW/db')
       return
     }
-    if (action === 'disclaimer') {
-      setModalContent({ title: T_MENU.disclaimer, body: isCN ? '本资料库内容仅供学术参考，不作商业用途。有病请寻求合法的医师，非中医师请勿擅自处方服药。\n\n本站所收录的中医药知识来源于公开文献整理，编者已尽可能核实内容准确性，但不保证所有信息完全正确、及时或完整。读者依此行事需自行承担风险。' : '本資料庫內容僅供學術參考，不作商業用途。有病請尋求合法的醫師，非中醫師請勿擅自處方服藥。\n\n本站所收錄的中醫藥知識來源於公開文獻整理，編者在編輯過程中已盡可能核實內容準確性，但不保證所有資訊完全正確、及時或完整。讀者依此行事需自行承擔風險。' })
-    } else if (action === 'about') {
-      setModalContent({ title: 'ℹ️ 關於本站', body: isCN ? '📖 医道中医大全是一个开源的中医药知识库，收录了针灸穴位、经典方剂等中医药资料。\n\n🎯 目标：让中医药知识更容易被查询和学习。\n\n📊 目前收录：\n• 374 个针灸穴位（WHO 国际标准）\n• 205 首经典方剂\n• 更多内容持续更新中\n\n❤️ 制作给所有中医药爱好者。' : '📖 醫道中醫大全是一個開源的中醫藥知識庫，收錄了針灸穴位、經典方劑等中醫藥資料。\n\n🎯 目標：讓中醫藥知識更容易被查詢和學習。\n\n📊 目前收錄：\n• 374 個針灸穴位（WHO 國際標準）\n• 205 首經典方劑\n• 更多內容持續更新中\n\n❤️ 製作給所有中醫藥愛好者。' })
-    } else if (action === 'contact') {
-      setModalContent({ title: isCN ? '📩 联系我们' : '📩 聯絡我們', body: isCN ? '📧 请在 GitHub 仓库提交 Issue\n🔗 github.com/realtcmweb/tcm-knowledge-base\n\n我们会尽快回复您。' : '📧 請在 GitHub 倉庫提交 Issue\n🔗 github.com/realtcmweb/tcm-knowledge-base\n\n我們會盡快回覆您。' })
-    } else if (action === 'guide') {
-      setModalContent({ title: T_MENU.guide, body: isCN ? '📖 本资料库收录中医经典方剂205首。\n\n🔍 搜寻：输入方剂名称或功效\n\n🏷️ 分类方式：\n• 按主治功效：解表剂/清热剂/补益剂...\n• 按方剂来源：伤寒论/金匮要略...\n\n💡 方剂详情页显示：组成、功效、主治、方义' : '📖 本資料庫收錄中醫經典方劑205首。\n\n🔍 搜尋：輸入方劑名稱或功效\n\n🏷️ 分類方式：\n• 按主治功效：解表劑/清熱劑/補益劑...\n• 按方劑來源：傷寒論/金匱要略...\n\n💡 方劑詳情頁顯示：組成、功效、主治、方義' })
-    }
+    else if (action === 'disclaimer') setModalContent({ title: isCN ? '⚠️ 免责声名' : '⚠️ 免责声名', body: isCN ? '本资料库内容仅供学术参考，不作商业用途。有病请寻求合法的医师，非中医师请勿擅自处方服药。' : '本資料庫內容僅供學術參考，不作商業用途。有病請尋求合法的醫師，非中醫師請勿擅自處方服藥。' })
+    else if (action === 'about') setModalContent({ title: 'ℹ️ 關於本站', body: isCN ? '📖 医道中医大全是一个开源的中医药知识库。\n\n📊 目前收录：\n• 374 个针灸穴位（WHO 国际标准）\n• 205 首经典方剂\n• 422 味中药\n• 更多内容持续更新中' : '📖 醫道中醫大全是一個開源的中醫藥知識庫。\n\n📊 目前收錄：\n• 374 個針灸穴位（WHO 國際標準）\n• 205 首經典方劑\n• 422 味中藥\n• 更多內容持續更新中' })
+    else if (action === 'contact') setModalContent({ title: isCN ? '📩 联系我们' : '📩 聯絡我們', body: '📧 github.com/realtcmweb/tcm-knowledge-base' })
+    else if (action === 'guide') setModalContent({ title: isCN ? '📋 使用说明' : '📋 使用說明', body: isCN ? '📖 本资料库收录中医经典方剂205首。\n\n🔍 搜寻：输入方剂名称或功效\n\n🏷️ 分类方式：\n• 按主治功效：解表剂/清热剂/补益剂...\n• 按方剂来源：伤寒论/金匮要略...\n\n💡 方剂详情页显示：组成、功效、主治、方义' : '📖 本資料庫收錄中醫經典方劑205首。\n\n🔍 搜尋：輸入方劑名稱或功效\n\n🏷️ 分類方式：\n• 按主治功效：解表劑/清熱劑/補益劑...\n• 按方劑來源：傷寒論/金匱要略...\n\n💡 方劑詳情頁顯示：組成、功效、主治、方義' })
   }
 
   const catLabel = (cat: typeof FORMULA_CATEGORIES[0]) => isCN ? cat.cn : cat.tw
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#F7F5F0', fontFamily: '-apple-system, BlinkMacSystemFont, "PingFang TC", "Microsoft JhengHei", sans-serif' }}>
-      {/* Header */}
-      <div style={{ background: '#1a3A2C', color: '#FFFEF9', padding: '0 0 18px', borderRadius: '0 0 20px 20px', boxShadow: '0 2px 12px rgba(0,0,0,0.15)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', padding: '0 8px 0 4px', height: '50px' }}>
-          <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '8px 12px', color: '#FFFEF9', textDecoration: 'none', fontSize: '13px', fontWeight: 600, opacity: 0.9 }}>
-            <span style={{ fontSize: '15px' }}>🏠</span>
-            <span>{isCN ? '首页' : '首頁'}</span>
-          </Link>
-          <div style={{ flex: 1, textAlign: 'center', fontSize: '15px', fontWeight: 700, letterSpacing: '0.03em' }}>
-            {isCN ? '方剂大全' : '方劑大全'}
+            <SharedHeader
+        title={isCN ? '方剂大全' : '方劑大全'}
+        onMenuAction={handleHeaderMenuAction}
+        extraContent={
+          <div style={{ display: 'flex', padding: '12px 14px 0', gap: '7px' }}>
+            {[
+              { href: `/${locale}/acu`, label: isCN ? '针灸大全' : '針灸大全', emoji: '💉' },
+              { href: `/${locale}/db`, label: isCN ? '方剂大全' : '方劑大全', emoji: '🍵' },
+              { href: `/${locale}/herbs`, label: isCN ? '中药大全' : '中藥大全', emoji: '🌿' },
+              { href: `/${locale}/symptoms`, label: isCN ? '症状大全' : '症狀大全', emoji: '🩺' },
+            ].map(tab => (
+              <Link key={tab.href} href={tab.href} style={{ flex: 1, padding: '10px 4px', backgroundColor: tab.href === `/${locale}/db` ? '#FFFEF9' : 'rgba(255,254,249,0.12)', color: tab.href === `/${locale}/db` ? '#1a3A2C' : 'rgba(255,254,249,0.8)', borderRadius: '12px', textDecoration: 'none', fontSize: '11px', fontWeight: 700, textAlign: 'center' }}>
+                <div style={{ fontSize: '18px', marginBottom: '2px' }}>{tab.emoji}</div>
+                <div>{tab.label}</div>
+              </Link>
+            ))}
           </div>
+        }
+      />
 
-          <div style={{ position: 'relative' }}>
-            <button onClick={() => setShowMenu(v => !v)} style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '7px 12px', color: '#FFFEF9', backgroundColor: showMenu ? 'rgba(255,254,249,0.2)' : 'rgba(255,254,249,0.12)', border: 'none', borderRadius: '20px', cursor: 'pointer', fontSize: '13px', fontWeight: 600 }}>
-              ☰ <span style={{ fontSize: '11px' }}>{isCN ? '菜单' : '選單'}</span>
-            </button>
 
-            {showMenu && (
-              <div style={{ position: 'absolute', right: 0, top: 'calc(100% + 8px)', width: '220px', backgroundColor: '#FFFEF9', borderRadius: '14px', boxShadow: '0 8px 24px rgba(0,0,0,0.18)', overflow: 'hidden', zIndex: 300, border: '1px solid #E8E4DC' }}>
-                {MENU_ITEMS.map((item, i) => (
-                  <a key={i} href="#" onClick={e => { e.preventDefault(); handleMenuAction(item.action) }} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '13px 16px', color: '#1a2C24', textDecoration: 'none', fontSize: '13px', fontWeight: 600, borderBottom: i < MENU_ITEMS.length - 1 ? '1px solid #F0EDE5' : 'none' }}>
-                    <span style={{ fontSize: '15px' }}>{item.icon}</span>
-                    <span style={{ flex: 1 }}>{item.label}</span>
-                  </a>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Search */}
-        <div style={{ padding: '10px 14px 0' }}>
-          <label htmlFor="db-search-input" style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: 'rgba(255,254,249,0.15)', borderRadius: '14px', padding: '11px 14px', border: '1.5px solid rgba(255,254,249,0.25)', cursor: 'text' }}
-            onClick={() => document.getElementById('db-search-input')?.focus()}>
-            <span style={{ fontSize: '16px', opacity: 0.7, flexShrink: 0, userSelect: 'none' }}>🔍</span>
-            <input id="db-search-input"
-              type="text"
-              placeholder={loading ? (isCN ? '载入中...' : '載入中...') : (isCN ? '搜尋方劑名稱或功效' : '搜尋方劑名稱或功效')}
-              value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-              onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); setDbView('list') } }}
-              disabled={loading}
-              style={{ flex: 1, border: 'none', backgroundColor: 'transparent', outline: 'none', fontSize: '14px', color: '#FFFEF9', caretColor: '#FFFEF9' }} />
-            {loading ? (
-              <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', color: 'rgba(255,254,249,0.7)', flexShrink: 0 }}>
-                <span style={{ display: 'inline-block', width: '12px', height: '12px', border: '2px solid rgba(255,254,249,0.4)', borderTopColor: '#FFFEF9', borderRadius: '50%' }} className="animate-spin-fast" />
-              </span>
-            ) : searchQuery ? (
-              <button onClick={() => { setSearchQuery(''); document.getElementById('db-search-input')?.focus() }} style={{ background: 'rgba(255,254,249,0.2)', border: 'none', borderRadius: 20, padding: '2px 8px', cursor: 'pointer', fontSize: 11, color: '#FFFEF9', fontWeight: 700, display: 'flex', alignItems: 'center', flexShrink: 0 }}>✕</button>
-            ) : null}
-            {!loading && (
-              <button onClick={() => setDbView('list')} disabled={!searchQuery.trim()} style={{ padding: '5px 14px', backgroundColor: searchQuery.trim() ? '#FFFEF9' : 'rgba(255,254,249,0.3)', color: '#1a3A2C', border: 'none', borderRadius: '20px', fontSize: '12px', fontWeight: 700, cursor: searchQuery.trim() ? 'pointer' : 'default', flexShrink: 0 }}>搜尋</button>
-            )}
-          </label>
-        </div>
-
-        {/* 4-Tab Navigation */}
-        <div style={{ display: 'flex', padding: '12px 14px 0', gap: '7px' }}>
-          {[
-            { href: `/${locale}/acu`, label: isCN ? '针灸大全' : '針灸大全', emoji: '💉' },
-            { href: `/${locale}/db`, label: isCN ? '方剂大全' : '方劑大全', emoji: '🍵' },
-            { href: `/${locale}/herbs`, label: isCN ? '中药大全' : '中藥大全', emoji: '🌿' },
-            { href: `/${locale}/symptoms`, label: isCN ? '症状大全' : '症狀大全', emoji: '🩺' },
-          ].map(tab => (
-            <Link key={tab.label} href={tab.href} style={{ flex: 1, padding: '10px 4px', backgroundColor: tab.href === `/${locale}/db` ? '#FFFEF9' : 'rgba(255,254,249,0.12)', color: tab.href === `/${locale}/db` ? '#1a3A2C' : 'rgba(255,254,249,0.8)', borderRadius: '12px', textDecoration: 'none', fontSize: '11px', fontWeight: 700, textAlign: 'center' }}>
-              <div style={{ fontSize: '18px', marginBottom: '2px' }}>{tab.emoji}</div>
-              <div>{tab.label}</div>
-            </Link>
-          ))}
-        </div>
-      </div>
 
       {dbView === 'home' && (
         <div style={{ padding: '16px 14px 100px' }}>
@@ -344,7 +275,6 @@ function FormulasPage() {
         </div>
       )}
 
-      {showMenu && <div style={{ position: 'fixed', inset: 0, zIndex: 99 }} onClick={() => setShowMenu(false)} />}
     </div>
   )
 }

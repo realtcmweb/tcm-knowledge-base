@@ -4,6 +4,7 @@ import React, { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
 import { useRouter, usePathname } from 'next/navigation'
 import diseasesData from '@/public/data/diseases.json'
+import SharedHeader from '@/components/SharedHeader'
 
 type SpecialtyKey = '內科' | '外科' | '婦科' | '兒科'
 type SubKey = string
@@ -55,7 +56,6 @@ export default function SymptomsPage() {
   const locale = pathname.split('/')[1] || 'zh-TW'
   const isCN = locale === 'zh-CN'
 
-  const [showMenu, setShowMenu] = useState(false)
   const [fontSize, setFontSize] = useState(14)
   const [modalContent, setModalContent] = useState<{title: string; body: string} | null>(null)
   const [symptomView, setSymptomView] = useState<'home' | 'list'>('home')
@@ -115,8 +115,7 @@ export default function SymptomsPage() {
     }
   }, [])
 
-  const handleMenuAction = (action: string) => {
-    setShowMenu(false)
+  const handleHeaderMenuAction = (action: string) => {
     if (action === 'lang') {
       router.push(locale === 'zh-TW' ? '/zh-CN/symptoms' : '/zh-TW/symptoms')
       return
@@ -197,88 +196,28 @@ export default function SymptomsPage() {
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#F7F5F0', fontFamily: '-apple-system, BlinkMacSystemFont, "PingFang TC", "Microsoft JhengHei", sans-serif', fontSize: `${fontSize}px` }}>
-      {/* Header */}
-      <div style={{ background: '#1a3A2C', color: '#FFFEF9', padding: '0 0 18px', borderRadius: '0 0 20px 20px', boxShadow: '0 2px 12px rgba(0,0,0,0.15)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', padding: '0 8px 0 4px', height: '50px' }}>
-          <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '8px 12px', color: '#FFFEF9', textDecoration: 'none', fontSize: '13px', fontWeight: 600, opacity: 0.9 }}>
-            <span style={{ fontSize: '15px' }}>🏠</span>
-            <span>{T.navHome}</span>
-          </Link>
-          <div style={{ flex: 1, textAlign: 'center', fontSize: '15px', fontWeight: 700, letterSpacing: '0.03em' }}>{T.title}</div>
-
-          {/* Menu */}
-          <div style={{ position: 'relative' }}>
-            <button onClick={() => setShowMenu(v => !v)} style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '7px 12px', color: '#FFFEF9', backgroundColor: showMenu ? 'rgba(255,254,249,0.2)' : 'rgba(255,254,249,0.12)', border: 'none', borderRadius: '20px', cursor: 'pointer', fontSize: '13px', fontWeight: 600 }}>
-              ☰ <span style={{ fontSize: '11px' }}>{T.menuBtn}</span>
-            </button>
-
-            {showMenu && (
-              <div style={{ position: 'absolute', right: 0, top: 'calc(100% + 8px)', width: '220px', backgroundColor: '#FFFEF9', borderRadius: '14px', boxShadow: '0 8px 24px rgba(0,0,0,0.18)', overflow: 'hidden', zIndex: 300, border: '1px solid #E8E4DC' }}>
-                <button onClick={() => { router.push(locale === 'zh-TW' ? '/zh-CN/symptoms' : '/zh-TW/symptoms'); setShowMenu(false) }} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '13px 16px', color: '#1a2C24', background: 'none', border: 'none', cursor: 'pointer', fontSize: '13px', fontWeight: 700, width: '100%', borderBottom: '1px solid #F0EDE5' }}
-                  onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#F5F2EB')}
-                  onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}>
-                  <span style={{ fontSize: '15px' }}>🌐</span>
-                  <span style={{ flex: 1 }}>{T.langToggle}</span>
-                  <span style={{ fontSize: '10px', backgroundColor: '#1a3A2C', color: '#FFFEF9', padding: '2px 6px', borderRadius: '8px' }}>{T.langCurrent}</span>
-                </button>
-                <button onClick={() => { setFontSize(fontSize >= 20 ? 12 : fontSize + 2); setShowMenu(false) }} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '13px 16px', color: '#1a2C24', background: 'none', border: 'none', cursor: 'pointer', fontSize: '13px', fontWeight: 700, width: '100%', borderBottom: '1px solid #F0EDE5' }}
-                  onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#F5F2EB')}
-                  onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}>
-                  <span style={{ fontSize: '15px' }}>🔤</span>
-                  <span style={{ flex: 1 }}>{T.menu.font}</span>
-                </button>
-                {[
-                  { emoji: '⚠️', label: T.menu.disclaimer, action: 'disclaimer' },
-                  { emoji: 'ℹ️', label: T.menu.about, action: 'about' },
-                  { emoji: '📩', label: T.menu.contact, action: 'contact' },
-                ].map((item, i) => (
-                  <button key={i} onClick={() => handleMenuAction(item.action)} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '13px 16px', color: '#1a2C24', background: 'none', border: 'none', cursor: 'pointer', fontSize: '13px', fontWeight: 700, width: '100%', borderBottom: i < 2 ? '1px solid #F0EDE5' : 'none' }}
-                    onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#F5F2EB')}
-                    onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}>
-                    <span style={{ fontSize: '15px' }}>{item.emoji}</span>
-                    <span style={{ flex: 1 }}>{item.label}</span>
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Search */}
-        <div style={{ padding: '10px 14px 0' }}>
-          <label htmlFor="symptom-search-input" style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: 'rgba(255,254,249,0.15)', borderRadius: '14px', padding: '11px 14px', border: '1.5px solid rgba(255,254,249,0.25)', cursor: 'text' }}
-            onClick={() => document.getElementById('symptom-search-input')?.focus()}>
-            <span style={{ fontSize: '16px', opacity: 0.7, flexShrink: 0, userSelect: 'none' }}>🔍</span>
-            <input id="symptom-search-input"
-              type="text"
-              placeholder={isCN ? '搜尋症狀或疾病...' : '搜尋症狀或疾病...'}
-              value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-              onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); setSymptomView('list') } }}
-              style={{ flex: 1, border: 'none', backgroundColor: 'transparent', outline: 'none', fontSize: '14px', color: '#FFFEF9', caretColor: '#FFFEF9' }} />
-            {searchQuery ? (
-              <button onClick={() => { setSearchQuery(''); document.getElementById('symptom-search-input')?.focus() }} style={{ background: 'rgba(255,254,249,0.2)', border: 'none', borderRadius: 20, padding: '2px 8px', cursor: 'pointer', fontSize: 11, color: '#FFFEF9', fontWeight: 700, display: 'flex', alignItems: 'center', flexShrink: 0 }}>✕</button>
-            ) : null}
-            {!searchQuery ? null : (
-              <button onClick={() => { setSymptomView('list') }} style={{ padding: '5px 14px', backgroundColor: '#FFFEF9', color: '#1a3A2C', border: 'none', borderRadius: '20px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>搜尋</button>
-            )}
-          </label>
-        </div>
-
-        {/* 4-Tab Nav */}
-        <div style={{ display: 'flex', padding: '12px 14px 0', gap: '7px' }}>
-          {[
-            { href: `/${locale}/acu`, label: T.navAcupuncture, emoji: '💉' },
-            { href: `/${locale}/db`, label: T.navFormula, emoji: '🍵' },
-            { href: `/${locale}/herbs`, label: isCN ? '中药大全' : '中藥大全', emoji: '🌿' },
-            { href: `/${locale}/symptoms`, label: T.navSymptoms, emoji: '🩺', active: true },
-          ].map(tab => (
-            <Link key={tab.label} href={tab.href} style={{ flex: 1, padding: '10px 4px', backgroundColor: tab.active ? '#FFFEF9' : 'rgba(255,254,249,0.12)', color: tab.active ? '#1a3A2C' : 'rgba(255,254,249,0.8)', border: 'none', borderRadius: '12px', textDecoration: 'none', fontSize: '11px', fontWeight: 700, textAlign: 'center' }}>
-              <div style={{ fontSize: '18px', marginBottom: '2px' }}>{tab.emoji}</div>
-              <div>{tab.label}</div>
-            </Link>
-          ))}
-        </div>
-      </div>
+      <SharedHeader
+        title={T.title}
+        onMenuAction={handleHeaderMenuAction}
+        extraContent={
+          <>
+            {/* 4-Tab Nav */}
+            <div style={{ display: 'flex', padding: '12px 14px 0', gap: '7px' }}>
+              {[
+                { href: `/${locale}/acu`, label: T.navAcupuncture, emoji: '💉' },
+                { href: `/${locale}/db`, label: T.navFormula, emoji: '🍵' },
+                { href: `/${locale}/herbs`, label: isCN ? '中药大全' : '中藥大全', emoji: '🌿' },
+                { href: `/${locale}/symptoms`, label: T.navSymptoms, emoji: '🩺', active: true },
+              ].map(tab => (
+                <Link key={tab.label} href={tab.href} style={{ flex: 1, padding: '10px 4px', backgroundColor: tab.active ? '#FFFEF9' : 'rgba(255,254,249,0.12)', color: tab.active ? '#1a3A2C' : 'rgba(255,254,249,0.8)', border: 'none', borderRadius: '12px', textDecoration: 'none', fontSize: '11px', fontWeight: 700, textAlign: 'center' }}>
+                  <div style={{ fontSize: '18px', marginBottom: '2px' }}>{tab.emoji}</div>
+                  <div>{tab.label}</div>
+                </Link>
+              ))}
+            </div>
+          </>
+        }
+      />
 
       {symptomView === 'home' && (
         <div style={{ padding: '16px 14px 100px' }}>
@@ -509,7 +448,6 @@ export default function SymptomsPage() {
         </div>
       )}
 
-      {showMenu && <div style={{ position: 'fixed', inset: 0, zIndex: 99 }} onClick={() => setShowMenu(false)} />}
     </div>
   )
 }

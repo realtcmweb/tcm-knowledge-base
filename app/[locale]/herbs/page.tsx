@@ -5,6 +5,7 @@ import { toTraditional } from '@/lib/toTraditional'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useTranslations, useLocale } from 'next-intl'
+import SharedHeader from '@/components/SharedHeader'
 
 interface Herb {
   name: string
@@ -63,19 +64,11 @@ export default function HerbsPage() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [selectedCat, setSelectedCat] = useState('解表药')
-  const [showMenu, setShowMenu] = useState(false)
   const [herbView, setHerbView] = useState<'home' | 'list'>('home')
   const t = useTranslations('herbs')
   const locale = useLocale()
   const isCN = locale === 'zh-CN'
   const router = useRouter()
-  const MENU_ITEMS = [
-    { label: t('menu.langToggle'), icon: '🌐', action: 'lang' },
-    { label: t('menu.guide'), icon: '📋', action: 'guide' },
-    { label: t('menu.disclaimer'), icon: '⚠️', action: 'disclaimer' },
-    { label: t('menu.about'), icon: 'ℹ️', action: 'about' },
-    { label: t('menu.contact'), icon: '📩', action: 'contact' },
-  ]
 
   // Sync herb from URL params → redirect to new route
   useEffect(() => {
@@ -106,8 +99,7 @@ export default function HerbsPage() {
 
   const activeCat = CATEGORIES.find(c => c.key === selectedCat) || CATEGORIES[0]
 
-  const handleMenuAction = (action: string) => {
-    setShowMenu(false)
+  const handleHeaderMenuAction = (action: string) => {
     if (action === 'lang') { router.push(locale === 'zh-TW' ? '/zh-CN/herbs' : '/zh-TW/herbs'); return }
     if (action === 'disclaimer') setModalContent({ title: t('modals.disclaimer.title'), body: t('modals.disclaimer.body') })
     else if (action === 'about') setModalContent({ title: t('modals.about.title'), body: `📖 ${t('modals.about.body') || '醫道中醫大全是一個開源的中醫藥知識庫。\n\n🎯 目標：讓中醫藥知識更容易被查詢和學習。\n\n📊 目前收錄：\n• 374 個針灸穴位\n• 205 首經典方劑\n• ${herbs.length} 味中藥（持續更新）\n\n❤️ 製作給所有中醫藥愛好者。'}` })
@@ -120,77 +112,28 @@ export default function HerbsPage() {
       minHeight: '100vh', backgroundColor: '#F7F5F0',
       fontFamily: '-apple-system, BlinkMacSystemFont, "PingFang TC", "Microsoft JhengHei", sans-serif'
     }}>
-      {/* Header */}
-      <div style={{
-        background: '#1a3A2C', color: '#FFFEF9',
-        padding: '0 0 18px', borderRadius: '0 0 20px 20px',
-        boxShadow: '0 2px 12px rgba(0,0,0,0.15)',
-        position: 'sticky', top: 0, zIndex: 100,
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', padding: '0 8px 0 4px', height: 50 }}>
-          <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '8px 12px', color: '#FFFEF9', textDecoration: 'none', fontSize: 13, fontWeight: 600 }}>
-            <span style={{ fontSize: 15 }}>🏠</span><span>{locale === 'zh-CN' ? '首页' : '首頁'}</span>
-          </Link>
-          <div style={{ flex: 1, textAlign: 'center', fontSize: 15, fontWeight: 700 }}>🌿 {t('title')}</div>
-          <div style={{ position: 'relative' }}>
-            <button onClick={() => setShowMenu(v => !v)} style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '7px 12px', color: '#FFFEF9', backgroundColor: showMenu ? 'rgba(255,254,249,0.2)' : 'rgba(255,254,249,0.12)', border: 'none', borderRadius: 20, cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>
-              ☰ <span style={{ fontSize: 11 }}>選單</span>
-            </button>
-            {showMenu && (
-              <div style={{ position: 'absolute', right: 0, top: 'calc(100% + 8px)', width: 220, backgroundColor: '#FFFEF9', borderRadius: 14, boxShadow: '0 8px 24px rgba(0,0,0,0.18)', overflow: 'hidden', zIndex: 300, border: '1px solid #E8E4DC' }}>
-                {MENU_ITEMS.map((item, i) => (
-                  <a key={i} href="#" onClick={e => { e.preventDefault(); handleMenuAction(item.action) }}
-                    style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '13px 16px', color: '#1a2C24', textDecoration: 'none', fontSize: 13, fontWeight: 600, borderBottom: i < MENU_ITEMS.length - 1 ? '1px solid #F0EDE5' : 'none' }}>
-                    <span style={{ fontSize: 15 }}>{item.icon}</span>
-                    <span style={{ flex: 1 }}>{item.label}</span>
-                  </a>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Search */}
-        <div style={{ padding: '10px 14px 0' }}>
-          <label htmlFor="herb-search-input" style={{ display: 'flex', alignItems: 'center', gap: 8, backgroundColor: 'rgba(255,254,249,0.15)', borderRadius: 14, padding: '11px 14px', border: '1.5px solid rgba(255,254,249,0.25)', cursor: 'text' }}
-            onClick={() => document.getElementById('herb-search-input')?.focus()}>
-            <span style={{ fontSize: 16, opacity: 0.7, flexShrink: 0, userSelect: 'none' }}>🔍</span>
-            <input id="herb-search-input"
-              type="text"
-              placeholder={loading ? t('loading') : t('searchPlaceholder')}
-              value={search} onChange={e => setSearch(e.target.value)}
-              onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); setHerbView('list') } }}
-              disabled={loading}
-              style={{ flex: 1, border: 'none', background: 'transparent', outline: 'none', fontSize: 14, color: '#FFFEF9', caretColor: '#FFFEF9' }} />
-            {loading ? (
-              <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', color: 'rgba(255,254,249,0.7)', flexShrink: 0 }}>
-                <span style={{ display: 'inline-block', width: '12px', height: '12px', border: '2px solid rgba(255,254,249,0.4)', borderTopColor: '#FFFEF9', borderRadius: '50%' }} className="animate-spin-fast" />
-              </span>
-            ) : search ? (
-              <button onClick={() => { setSearch(''); document.getElementById('herb-search-input')?.focus() }} style={{ background: 'rgba(255,254,249,0.2)', border: 'none', borderRadius: 20, padding: '2px 8px', cursor: 'pointer', fontSize: 11, color: '#FFFEF9', fontWeight: 700, display: 'flex', alignItems: 'center', flexShrink: 0 }}>✕</button>
-            ) : null}
-            {!loading && !search ? null : !loading ? (
-              <button onClick={() => { setHerbView('list') }} disabled={!search} style={{ padding: '5px 14px', backgroundColor: search ? '#FFFEF9' : 'rgba(255,254,249,0.3)', color: '#1a3A2C', border: 'none', borderRadius: '20px', fontSize: '12px', fontWeight: 700, cursor: search ? 'pointer' : 'default', flexShrink: 0 }}>搜尋</button>
-            ) : null}
-          </label>
-        </div>
-
-        {/* 4-Tab Navigation */}
-        <div style={{ display: 'flex', padding: '12px 14px 0', gap: 7 }}>
-          {[
-            { href: `/${locale}/acu`, label: t('tabAcu'), emoji: '💉' },
-            { href: `/${locale}/db`, label: t('tabFormula'), emoji: '🍵' },
-            { href: `/${locale}/herbs`, label: t('tabHerbs'), emoji: '🌿', active: true },
-            { href: `/${locale}/symptoms`, label: t('tabSymptoms'), emoji: '🩺' },
-          ].map(tab => (
-            <Link key={tab.label} href={tab.href} style={{ flex: 1, padding: '10px 4px', backgroundColor: tab.active ? '#FFFEF9' : 'rgba(255,254,249,0.12)', color: tab.active ? '#1a3A2C' : 'rgba(255,254,249,0.8)', border: 'none', borderRadius: 12, textDecoration: 'none', fontSize: 11, fontWeight: 700, textAlign: 'center' }}>
-              <div style={{ fontSize: 18, marginBottom: 2 }}>{tab.emoji}</div>
-              <div>{tab.label}</div>
-            </Link>
-          ))}
-        </div>
-      </div>
-
+      <SharedHeader
+        title={t('title')}
+        onMenuAction={handleHeaderMenuAction}
+        extraContent={
+          <>
+            {/* 4-Tab Navigation */}
+            <div style={{ display: 'flex', padding: '12px 14px 0', gap: 7 }}>
+              {[
+                { href: `/${locale}/acu`, label: t('tabAcu'), emoji: '💉' },
+                { href: `/${locale}/db`, label: t('tabFormula'), emoji: '🍵' },
+                { href: `/${locale}/herbs`, label: t('tabHerbs'), emoji: '🌿', active: true },
+                { href: `/${locale}/symptoms`, label: t('tabSymptoms'), emoji: '🩺' },
+              ].map(tab => (
+                <Link key={tab.label} href={tab.href} style={{ flex: 1, padding: '10px 4px', backgroundColor: tab.active ? '#FFFEF9' : 'rgba(255,254,249,0.12)', color: tab.active ? '#1a3A2C' : 'rgba(255,254,249,0.8)', border: 'none', borderRadius: 12, textDecoration: 'none', fontSize: 11, fontWeight: 700, textAlign: 'center' }}>
+                  <div style={{ fontSize: 18, marginBottom: 2 }}>{tab.emoji}</div>
+                  <div>{tab.label}</div>
+                </Link>
+              ))}
+            </div>
+          </>
+        }
+      />
       {herbView === 'home' && (
         <div style={{ padding: '16px 14px 100px' }}>
           <div style={{ fontSize: 13, color: '#2C4A3E', marginBottom: 12, padding: '0 2px' }}>🌿 {t('byEfficacy')}</div>
@@ -309,7 +252,6 @@ export default function HerbsPage() {
         </div>
       )}
 
-      {showMenu && <div style={{ position: 'fixed', inset: 0, zIndex: 99 }} onClick={() => setShowMenu(false)} />}
     </div>
   )
 }
