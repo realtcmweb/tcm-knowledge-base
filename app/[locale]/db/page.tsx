@@ -1,7 +1,8 @@
 'use client'
 
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo, Suspense } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { toSimplified } from '@/lib/toSimplified'
 import { toTraditional } from '@/lib/toTraditional'
 import { useRouter, usePathname } from 'next/navigation'
@@ -78,7 +79,17 @@ function getLinkedComposition(composition: string, herbNamesSorted: string[]): R
   return parts
 }
 
-export default function FormulasPage() {
+export { FormulasPage }
+
+export default function FormulasPageWrapper() {
+  return (
+    <Suspense fallback={<div style={{ padding: '60px 20px', textAlign: 'center', color: '#8B6E5A' }}>載入中...</div>}>
+      <FormulasPage />
+    </Suspense>
+  )
+}
+
+function FormulasPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCat, setSelectedCat] = useState('解表劑')
   const [formulas, setFormulas] = useState<Formula[]>([])
@@ -90,6 +101,16 @@ export default function FormulasPage() {
   const router = useRouter()
   const locale = usePathname().split('/')[1] || 'zh-TW'
   const isCN = locale === 'zh-CN'
+  const searchParams = useSearchParams()
+
+  // Pre-fill search from URL ?q= param
+  useEffect(() => {
+    const urlQ = searchParams.get('q')
+    if (urlQ) {
+      setSearchQuery(urlQ)
+      setDbView('list')
+    }
+  }, [searchParams])
 
   const T_MENU = {
     langToggle: isCN ? '繁體 / 簡體' : '繁体 / 简体',
@@ -199,12 +220,15 @@ export default function FormulasPage() {
               disabled={loading}
               style={{ flex: 1, border: 'none', backgroundColor: 'transparent', outline: 'none', fontSize: '14px', color: '#FFFEF9', caretColor: '#FFFEF9' }} />
             {loading ? (
-              <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', color: 'rgba(255,254,249,0.7)' }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', color: 'rgba(255,254,249,0.7)', flexShrink: 0 }}>
                 <span style={{ display: 'inline-block', width: '12px', height: '12px', border: '2px solid rgba(255,254,249,0.4)', borderTopColor: '#FFFEF9', borderRadius: '50%' }} className="animate-spin-fast" />
               </span>
             ) : searchQuery ? (
               <button onClick={() => { setSearchQuery(''); document.getElementById('db-search-input')?.focus() }} style={{ background: 'rgba(255,254,249,0.2)', border: 'none', borderRadius: 20, padding: '2px 8px', cursor: 'pointer', fontSize: 11, color: '#FFFEF9', fontWeight: 700, display: 'flex', alignItems: 'center', flexShrink: 0 }}>✕</button>
             ) : null}
+            {!loading && (
+              <button onClick={() => setDbView('list')} disabled={!searchQuery.trim()} style={{ padding: '5px 14px', backgroundColor: searchQuery.trim() ? '#FFFEF9' : 'rgba(255,254,249,0.3)', color: '#1a3A2C', border: 'none', borderRadius: '20px', fontSize: '12px', fontWeight: 700, cursor: searchQuery.trim() ? 'pointer' : 'default', flexShrink: 0 }}>搜尋</button>
+            )}
           </label>
         </div>
 

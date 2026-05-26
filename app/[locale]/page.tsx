@@ -58,7 +58,7 @@ export default function HomePage() {
 
   const handleSearch = () => {
     if (!search.trim()) return
-    router.push(`/db?q=${encodeURIComponent(search.trim())}`)
+    router.push(`/search?q=${encodeURIComponent(search.trim())}`)
   }
 
   const handleMenuAction = (action: string) => {

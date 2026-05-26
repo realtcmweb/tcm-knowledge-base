@@ -223,6 +223,9 @@ export default function AcupointsPage() {
             ) : (view === 'points' ? searchQuery : treatSearch) ? (
               <button onClick={() => { view === 'points' ? setSearchQuery('') : setTreatSearch(''); document.getElementById('acu-search-input')?.focus() }} style={{ background: 'rgba(255,254,249,0.2)', border: 'none', borderRadius: 20, padding: '2px 8px', cursor: 'pointer', fontSize: 11, color: '#FFFEF9', fontWeight: 700, display: 'flex', alignItems: 'center', flexShrink: 0 }}>✕</button>
             ) : null}
+            {!loading && !(view === 'points' ? searchQuery : treatSearch) ? (
+              <button onClick={() => { setAcuView('list') }} style={{ padding: '5px 14px', backgroundColor: '#FFFEF9', color: '#1a3A2C', border: 'none', borderRadius: '20px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>搜尋</button>
+            ) : null}
           </label>
         </div>
 
