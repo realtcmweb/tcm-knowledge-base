@@ -160,7 +160,10 @@ function FormulasPage() {
             <SharedHeader
         title={isCN ? '方剂大全' : '方劑大全'}
         onMenuAction={handleHeaderMenuAction}
-        extraContent={
+searchValue={searchQuery}
+        onSearchChange={setSearchQuery}
+        placeholder={isCN ? '搜尋方劑名稱或功效' : '搜尋方劑名稱或功效'}
+                extraContent={
           <div style={{ display: 'flex', padding: '12px 14px 0', gap: '7px' }}>
             {[
               { href: `/${locale}/acu`, label: isCN ? '针灸大全' : '針灸大全', emoji: '💉' },

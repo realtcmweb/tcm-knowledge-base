@@ -165,7 +165,10 @@ export default function AcupointsPage() {
       <SharedHeader
         title={isCN ? '针灸大全' : '針灸大全'}
         onMenuAction={handleHeaderMenuAction}
-        extraContent={
+searchValue={searchQuery}
+        onSearchChange={setSearchQuery}
+        placeholder={isCN ? '搜尋穴位名稱或編碼' : '搜尋穴位名稱或編碼'}
+                extraContent={
           <>
             {/* 4-Tab */}
             <div style={{ display: 'flex', padding: '12px 14px 0', gap: '7px' }}>

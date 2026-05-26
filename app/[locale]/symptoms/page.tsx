@@ -199,7 +199,10 @@ export default function SymptomsPage() {
       <SharedHeader
         title={T.title}
         onMenuAction={handleHeaderMenuAction}
-        extraContent={
+searchValue={searchQuery}
+        onSearchChange={setSearchQuery}
+        placeholder={isCN ? '搜尋症狀或疾病' : '搜尋症狀或疾病'}
+                extraContent={
           <>
             {/* 4-Tab Nav */}
             <div style={{ display: 'flex', padding: '12px 14px 0', gap: '7px' }}>
