@@ -97,9 +97,9 @@ export default function SymptomsPage() {
     主穴: isCN ? '主穴' : '主穴',
     治法: isCN ? '治法' : '治法',
     menu: {
-      disclaimer: isCN ? '⚠️ 免责声明' : '⚠️ 免責聲明',
-      about: isCN ? 'ℹ️ 关于本站' : 'ℹ️ 關於本站',
-      contact: isCN ? '📩 联系我们' : '📩 聯絡我們',
+      disclaimer: isCN ? '免责声明' : '免責聲明',
+      about: isCN ? '关于本站' : '關於本站',
+      contact: isCN ? '联系我们' : '聯絡我們',
       font: isCN ? '🔤 字体 ±' : '🔤 字體 ±',
     },
   }
@@ -246,16 +246,19 @@ export default function SymptomsPage() {
 
         {/* Search */}
         <div style={{ padding: '10px 14px 0' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: 'rgba(255,254,249,0.15)', borderRadius: '14px', padding: '11px 14px', border: '1.5px solid rgba(255,254,249,0.25)' }}>
-            <span style={{ fontSize: '16px', opacity: 0.8 }}>🔍</span>
-            <input type="text" placeholder={isCN ? '搜寻症状、疾病...' : '搜尋症狀、疾病...'} value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && setSearchQuery(searchQuery)}
-              style={{ flex: 1, border: 'none', backgroundColor: 'transparent', outline: 'none', fontSize: '14px', color: '#FFFEF9' }} />
+          <label htmlFor="symptom-search-input" style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: 'rgba(255,254,249,0.15)', borderRadius: '14px', padding: '11px 14px', border: '1.5px solid rgba(255,254,249,0.25)', cursor: 'text' }}
+            onClick={() => document.getElementById('symptom-search-input')?.focus()}>
+            <span style={{ fontSize: '16px', opacity: 0.7, flexShrink: 0, userSelect: 'none' }}>🔍</span>
+            <input id="symptom-search-input"
+              type="text"
+              placeholder={isCN ? '搜尋症狀或疾病...' : '搜尋症狀或疾病...'}
+              value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); setSymptomView('list') } }}
+              style={{ flex: 1, border: 'none', backgroundColor: 'transparent', outline: 'none', fontSize: '14px', color: '#FFFEF9', caretColor: '#FFFEF9' }} />
             {searchQuery ? (
-              <button onClick={() => setSearchQuery('')} style={{ background: 'rgba(255,254,249,0.2)', border: 'none', borderRadius: 20, padding: '2px 8px', cursor: 'pointer', fontSize: 11, color: '#FFFEF9', fontWeight: 700, display: 'flex', alignItems: 'center' }}>✕</button>
-            ) : <span style={{ width: 28 }} />}
-            <button onClick={() => { setSearchQuery(searchQuery); setSymptomView('list') }} style={{ background: 'rgba(255,254,249,0.2)', border: 'none', borderRadius: 20, padding: '2px 8px', cursor: 'pointer', fontSize: 11, color: '#FFFEF9', fontWeight: 700, display: 'flex', alignItems: 'center' }}>送出</button>
-          </div>
+              <button onClick={() => { setSearchQuery(''); document.getElementById('symptom-search-input')?.focus() }} style={{ background: 'rgba(255,254,249,0.2)', border: 'none', borderRadius: 20, padding: '2px 8px', cursor: 'pointer', fontSize: 11, color: '#FFFEF9', fontWeight: 700, display: 'flex', alignItems: 'center', flexShrink: 0 }}>✕</button>
+            ) : null}
+          </label>
         </div>
 
         {/* 4-Tab Nav */}

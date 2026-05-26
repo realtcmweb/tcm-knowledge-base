@@ -94,10 +94,10 @@ export default function FormulasPage() {
   const T_MENU = {
     langToggle: isCN ? '繁體 / 簡體' : '繁体 / 简体',
     langCurrent: isCN ? '简' : '繁',
-    guide: isCN ? '📋 使用说明' : '📋 使用說明',
-    disclaimer: isCN ? '⚠️ 免责声明' : '⚠️ 免责声名',
-    about: isCN ? 'ℹ️ 关于本站' : 'ℹ️ 關於本站',
-    contact: isCN ? '📩 联系我们' : '📩 聯絡我們',
+    guide: isCN ? '使用说明' : '使用說明',
+    disclaimer: isCN ? '免责声明' : '免责声名',
+    about: isCN ? '关于本站' : '關於本站',
+    contact: isCN ? '联系我们' : '聯絡我們',
   }
 
   const MENU_ITEMS = [
@@ -188,18 +188,24 @@ export default function FormulasPage() {
 
         {/* Search */}
         <div style={{ padding: '10px 14px 0' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: 'rgba(255,254,249,0.15)', borderRadius: '14px', padding: '11px 14px', border: '1.5px solid rgba(255,254,249,0.25)' }}>
-            <span style={{ fontSize: '16px', opacity: 0.8 }}>🔍</span>
-            <input type="text" placeholder={loading ? (isCN ? '载入中...' : '載入中...') : (isCN ? '搜寻方剂名称、功效、分类...' : '搜尋方劑名稱、功效、分類...')}
+          <label htmlFor="db-search-input" style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: 'rgba(255,254,249,0.15)', borderRadius: '14px', padding: '11px 14px', border: '1.5px solid rgba(255,254,249,0.25)', cursor: 'text' }}
+            onClick={() => document.getElementById('db-search-input')?.focus()}>
+            <span style={{ fontSize: '16px', opacity: 0.7, flexShrink: 0, userSelect: 'none' }}>🔍</span>
+            <input id="db-search-input"
+              type="text"
+              placeholder={loading ? (isCN ? '载入中...' : '載入中...') : (isCN ? '搜尋方劑名稱或功效' : '搜尋方劑名稱或功效')}
               value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); setDbView('list') } }}
               disabled={loading}
-              style={{ flex: 1, border: 'none', backgroundColor: 'transparent', outline: 'none', fontSize: '14px', color: '#FFFEF9' }} />
-            {searchQuery ? (
-              <button onClick={() => setSearchQuery('')} style={{ background: 'rgba(255,254,249,0.2)', border: 'none', borderRadius: 20, padding: '2px 8px', cursor: 'pointer', fontSize: 11, color: '#FFFEF9', fontWeight: 700, display: 'flex', alignItems: 'center' }}>✕</button>
-            ) : <span style={{ width: 28 }} />}
-            <button onClick={() => { setDbView('list') }} style={{ background: 'rgba(255,254,249,0.2)', border: 'none', borderRadius: 20, padding: '2px 8px', cursor: 'pointer', fontSize: 11, color: '#FFFEF9', fontWeight: 700, display: 'flex', alignItems: 'center' }}>送出</button>
-          </div>
+              style={{ flex: 1, border: 'none', backgroundColor: 'transparent', outline: 'none', fontSize: '14px', color: '#FFFEF9', caretColor: '#FFFEF9' }} />
+            {loading ? (
+              <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', color: 'rgba(255,254,249,0.7)' }}>
+                <span style={{ display: 'inline-block', width: '12px', height: '12px', border: '2px solid rgba(255,254,249,0.4)', borderTopColor: '#FFFEF9', borderRadius: '50%' }} className="animate-spin-fast" />
+              </span>
+            ) : searchQuery ? (
+              <button onClick={() => { setSearchQuery(''); document.getElementById('db-search-input')?.focus() }} style={{ background: 'rgba(255,254,249,0.2)', border: 'none', borderRadius: 20, padding: '2px 8px', cursor: 'pointer', fontSize: 11, color: '#FFFEF9', fontWeight: 700, display: 'flex', alignItems: 'center', flexShrink: 0 }}>✕</button>
+            ) : null}
+          </label>
         </div>
 
         {/* 4-Tab Navigation */}
@@ -270,6 +276,9 @@ export default function FormulasPage() {
                       <div style={{ flexShrink: 0, padding: '3px 10px', borderRadius: '20px', backgroundColor: '#EEEBE3', fontSize: '11px', color: '#2C4A3E', fontWeight: 700, whiteSpace: 'nowrap', marginTop: '2px' }}>{isCN ? f.categoryLabel : toTraditional(f.categoryLabel)}</div>
                     </div>
                     <div style={{ fontSize: '12px', color: '#8A8A7A', marginBottom: '4px' }}>📚 {isCN ? '出自《' : '出自《'}{f.source}{isCN ? '》' : '》'}</div>
+                    {f.composition && (
+                      <div style={{ fontSize: '12px', color: '#5A8A5A', marginBottom: '3px' }}>🌿 {f.composition.replace(/\s+/g,'').slice(0, 40)}{f.composition.replace(/\s+/g,'').length > 40 ? '...' : ''}</div>
+                    )}
                     <div style={{ fontSize: '13px', color: '#5A5A4A', lineHeight: 1.5 }}>{isCN ? f.effects?.slice(0, 60) : toTraditional(f.effects || '').slice(0, 60)}{f.effects && f.effects.length > 60 ? '...' : ''}</div>
                   </button>
                 ))}

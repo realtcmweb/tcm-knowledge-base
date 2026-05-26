@@ -30,10 +30,10 @@ function buildHerbNameSet(): Set<string> {
 /**
  * Render composition string with herb names as clickable links.
  * Algorithm:
- * 1. Remove whitespace from composition → textNS
+ * 1. Remove whitespace from composition → textNS (used only for matching)
  * 2. Find all herb match positions in textNS (longest-first, no overlaps)
- * 3. Map positions back to original text by counting non-whitespace chars
- * 4. Output: plain text fragments + Link elements for each herb
+ * 3. Display text = textNS (whitespace removed) so layout is clean
+ * 4. Map positions back for links
  */
 function renderCompositionWithLinks(
   composition: string,
@@ -63,9 +63,9 @@ function renderCompositionWithLinks(
   }
   matches.sort((a, b) => a.start - b.start)
 
-  // Build result: iterate matches, emit text between them
+  // Build result: iterate over displayText (textNS with whitespace removed)
   const result: React.ReactNode[] = []
-  let lastNSIdx = 0  // last position in no-space text we've consumed
+  let lastNSIdx = 0
 
   for (let mi = 0; mi < matches.length; mi++) {
     const m = matches[mi]
@@ -73,49 +73,20 @@ function renderCompositionWithLinks(
     const herbEndNS = m.end
     const herbName = m.name
 
-    // Find the position in original text corresponding to herbStartNS
-    // by counting non-whitespace characters in original
-    let nsCount = 0
-    let origStart = 0
-    for (let i = 0; i < composition.length; i++) {
-      if (/\s/.test(composition[i])) continue
-      if (nsCount === herbStartNS) { origStart = i; break }
-      nsCount++
-    }
+    // Map NS index back to original character position
+    const origStart = mapNSIndexToOrig(composition, herbStartNS)
+    const origEnd = mapNSIndexToOrig(composition, herbEndNS)
 
-    // Find the position in original text corresponding to herbEndNS
-    nsCount = 0
-    let origEnd = origStart
-    for (let i = origStart; i < composition.length; i++) {
-      if (/\s/.test(composition[i])) { origEnd = i; continue }
-      if (nsCount === herbEndNS - herbStartNS) { origEnd = i + 1; break }
-      nsCount++
-    }
-
-    // Text before this herb (plain)
+    // Text before this herb in display text (using textNS, no spaces)
     if (lastNSIdx < herbStartNS) {
-      // Need to find original slice for NS positions [lastNSIdx, herbStartNS)
-      let ns = 0
-      let textStart = lastNSIdx === 0 ? 0 : -1
-      let textEnd = -1
-      for (let i = 0; i < composition.length; i++) {
-        if (/\s/.test(composition[i])) continue
-        if (ns === lastNSIdx && textStart < 0) textStart = i
-        if (ns === herbStartNS) { textEnd = i; break }
-        ns++
-      }
-      if (textStart >= 0 && textEnd > textStart) {
-        const plainText = composition.substring(textStart, textEnd)
-        result.push(plainText)
-      }
+      result.push(textNS.substring(lastNSIdx, herbStartNS))
     }
 
     // Emit herb as Link
-    const herbTextInOriginal = composition.substring(origStart, origEnd)
     const displayName = isCN ? herbName : toTraditional(herbName)
     result.push(
       <Link
-        key={`herb-${mi}-${herbName}`}
+        key={`herb-${mi}-${herbName}-${herbStartNS}`}
         href={`/${locale}/herbs?q=${encodeURIComponent(herbName)}`}
         style={{
           color: '#2C6B3A',
@@ -131,22 +102,23 @@ function renderCompositionWithLinks(
     lastNSIdx = herbEndNS
   }
 
-  // Remaining text after last herb
+  // Remaining display text after last herb
   if (lastNSIdx < textNS.length) {
-    // Find original slice for remaining NS positions
-    let ns = 0
-    let textStart = -1
-    for (let i = 0; i < composition.length; i++) {
-      if (/\s/.test(composition[i])) continue
-      if (ns === lastNSIdx) { textStart = i; break }
-      ns++
-    }
-    if (textStart >= 0) {
-      result.push(composition.substring(textStart))
-    }
+    result.push(textNS.substring(lastNSIdx))
   }
 
   return result
+}
+
+/** Map a no-space index to the corresponding position in original text */
+function mapNSIndexToOrig(orig: string, nsIdx: number): number {
+  let nsCount = 0
+  for (let i = 0; i < orig.length; i++) {
+    if (/\s/.test(orig[i])) continue
+    if (nsCount === nsIdx) return i
+    nsCount++
+  }
+  return orig.length
 }
 
 export default async function FormulaDetailPage({ params }: { params: Promise<{ locale: string; name: string }> }) {
@@ -199,7 +171,7 @@ export default async function FormulaDetailPage({ params }: { params: Promise<{ 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#F5F0E8', display: 'flex', flexDirection: 'column' }}>
       <div style={{ backgroundColor: '#1a3A2C', padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 12, position: 'sticky', top: 0, zIndex: 100 }}>
-        <a href={`/${locale}/db`} style={{ background: 'rgba(255,254,249,0.15)', border: 'none', borderRadius: 10, width: 36, height: 36, cursor: 'pointer', fontSize: 18, color: '#FFFEF9', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, textDecoration: 'none' }}>←</a>
+        <Link href={`/${locale}/db`} style={{ background: 'rgba(255,254,249,0.15)', border: 'none', borderRadius: 10, width: 36, height: 36, cursor: 'pointer', fontSize: 18, color: '#FFFEF9', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, textDecoration: 'none' }}>←</Link>
         <div style={{ fontSize: 17, fontWeight: 700, color: '#FFFEF9', flex: 1 }}>{formulaNameDisplay}</div>
         <a href={`/${locale}/db`} style={{ color: 'rgba(255,254,249,0.8)', textDecoration: 'none', fontSize: 13 }}>{navLabel}</a>
       </div>

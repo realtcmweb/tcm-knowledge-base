@@ -99,12 +99,27 @@ export default function HomePage() {
 
         {/* Search */}
         <div style={{ padding: '0 16px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: 'rgba(255,254,249,0.15)', borderRadius: '14px', padding: '12px 14px', border: '1.5px solid rgba(255,254,249,0.25)' }}>
-            <span style={{ fontSize: '17px', opacity: 0.8 }}>🔍</span>
-            <input type="text" placeholder={loading ? '載入中...' : '搜尋穴位、方劑...'} value={search} onChange={e => setSearch(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSearch()} disabled={loading} style={{ flex: 1, border: 'none', background: 'transparent', outline: 'none', fontSize: '14px', color: '#FFFEF9' }} />
-            {search && <button onClick={() => setSearch('')} style={{ background: 'rgba(255,254,249,0.2)', border: 'none', borderRadius: '50%', width: '20px', height: '20px', cursor: 'pointer', fontSize: '10px', color: '#FFFEF9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>}
-            <button onClick={handleSearch} disabled={loading || !search.trim()} style={{ padding: '7px 16px', backgroundColor: search.trim() ? '#FFFEF9' : 'rgba(255,254,249,0.3)', color: '#1a3A2C', border: 'none', borderRadius: '20px', fontSize: '13px', fontWeight: 700, cursor: search.trim() ? 'pointer' : 'default' }}>搜尋</button>
-          </div>
+          <label htmlFor="home-search-input" style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: 'rgba(255,254,249,0.15)', borderRadius: '14px', padding: '12px 14px', border: '1.5px solid rgba(255,254,249,0.25)', cursor: 'text' }}
+            onClick={() => document.getElementById('home-search-input')?.focus()}>
+            <span style={{ fontSize: '17px', opacity: 0.7, flexShrink: 0, userSelect: 'none' }}>🔍</span>
+            <input id="home-search-input"
+              type="text"
+              placeholder={loading ? '載入中...' : '搜尋穴位、方劑...'}
+              value={search} onChange={e => setSearch(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && handleSearch()}
+              disabled={loading}
+              style={{ flex: 1, border: 'none', background: 'transparent', outline: 'none', fontSize: '14px', color: '#FFFEF9', caretColor: '#FFFEF9' }} />
+            {loading ? (
+              <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', color: 'rgba(255,254,249,0.7)', flexShrink: 0 }}>
+                <span style={{ display: 'inline-block', width: '12px', height: '12px', border: '2px solid rgba(255,254,249,0.4)', borderTopColor: '#FFFEF9', borderRadius: '50%' }} className="animate-spin-fast" />
+              </span>
+            ) : search ? (
+              <button onClick={() => { setSearch(''); document.getElementById('home-search-input')?.focus() }} style={{ background: 'rgba(255,254,249,0.2)', border: 'none', borderRadius: 20, padding: '2px 8px', cursor: 'pointer', fontSize: 11, color: '#FFFEF9', fontWeight: 700, display: 'flex', alignItems: 'center', flexShrink: 0 }}>✕</button>
+            ) : null}
+            {!loading && (
+              <button onClick={handleSearch} disabled={!search.trim()} style={{ padding: '7px 16px', backgroundColor: search.trim() ? '#FFFEF9' : 'rgba(255,254,249,0.3)', color: '#1a3A2C', border: 'none', borderRadius: '20px', fontSize: '13px', fontWeight: 700, cursor: search.trim() ? 'pointer' : 'default', flexShrink: 0 }}>搜尋</button>
+            )}
+          </label>
         </div>
 
         {/* Stats */}

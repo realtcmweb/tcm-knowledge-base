@@ -136,10 +136,10 @@
       "langToggle": "繁体 / 简体",
       "langCurrentTW": "繁",
       "langCurrentCN": "簡",
-      "guide": "📋 使用说明",
-      "disclaimer": "⚠️ 免责声明",
-      "about": "ℹ️ 关于本站",
-      "contact": "📩 联系我们"
+      "guide": "使用说明",
+      "disclaimer": "免责声明",
+      "about": "关于本站",
+      "contact": "联系我们"
     },
     "modals": {
       "disclaimer": {

@@ -118,10 +118,10 @@ export default function AcupointsPage() {
   const T_MENU = {
     langToggle: isCN ? '繁體 / 簡體' : '繁体 / 简体',
     langCurrent: isCN ? '简' : '繁',
-    guide: isCN ? '📋 使用说明' : '📋 使用說明',
-    disclaimer: isCN ? '⚠️ 免责声明' : '⚠️ 免責聲明',
-    about: isCN ? 'ℹ️ 关于本站' : 'ℹ️ 關於本站',
-    contact: isCN ? '📩 联系我们' : '📩 聯絡我們',
+    guide: isCN ? '使用说明' : '使用說明',
+    disclaimer: isCN ? '免责声明' : '免責聲明',
+    about: isCN ? '关于本站' : '關於本站',
+    contact: isCN ? '联系我们' : '聯絡我們',
   }
 
   const MENU_ITEMS = [
@@ -204,19 +204,26 @@ export default function AcupointsPage() {
 
         {/* Search */}
         <div style={{ padding: '0 14px 0' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: 'rgba(255,254,249,0.15)', borderRadius: '14px', padding: '11px 14px', border: '1.5px solid rgba(255,254,249,0.25)' }}>
-            <span style={{ fontSize: '16px', opacity: 0.8 }}>🔍</span>
-            <input type="text" placeholder={loading ? (isCN ? '载入中...' : '載入中...') : (view === 'points' ? (isCN ? '搜寻穴位名称、编码...' : '搜尋穴位名稱、編碼...') : (isCN ? '搜寻症状...' : '搜尋症狀...'))}
+          <label htmlFor="acu-search-input" style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: 'rgba(255,254,249,0.15)', borderRadius: '14px', padding: '11px 14px', border: '1.5px solid rgba(255,254,249,0.25)', cursor: 'text' }}
+            onClick={() => document.getElementById('acu-search-input')?.focus()}>
+            <span style={{ fontSize: '16px', opacity: 0.7, flexShrink: 0, userSelect: 'none' }}>🔍</span>
+            <input id="acu-search-input"
+              type="text"
+              placeholder={view === 'points' ? (isCN ? '搜尋穴位名稱或編碼' : '搜尋穴位名稱或編碼') : (isCN ? '搜尋症狀' : '搜尋症狀')}
               value={view === 'points' ? searchQuery : treatSearch}
               onChange={e => view === 'points' ? setSearchQuery(e.target.value) : setTreatSearch(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); setAcuView('list') } }}
               disabled={loading}
-              style={{ flex: 1, border: 'none', background: 'transparent', outline: 'none', fontSize: '14px', color: '#FFFEF9' }} />
-            {(view === 'points' ? searchQuery : treatSearch) ? (
-              <button onClick={() => view === 'points' ? setSearchQuery('') : setTreatSearch('')} style={{ background: 'rgba(255,254,249,0.2)', border: 'none', borderRadius: 20, padding: '2px 8px', cursor: 'pointer', fontSize: 11, color: '#FFFEF9', fontWeight: 700, display: 'flex', alignItems: 'center' }}>✕</button>
-            ) : <span style={{ width: 28 }} />}
-            <button onClick={() => { setAcuView('list') }} style={{ background: 'rgba(255,254,249,0.2)', border: 'none', borderRadius: 20, padding: '2px 8px', cursor: 'pointer', fontSize: 11, color: '#FFFEF9', fontWeight: 700, display: 'flex', alignItems: 'center' }}>送出</button>
-          </div>
+              style={{ flex: 1, border: 'none', background: 'transparent', outline: 'none', fontSize: '14px', color: '#FFFEF9', caretColor: '#FFFEF9' }} />
+            {loading ? (
+              <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', color: 'rgba(255,254,249,0.7)' }}>
+                <span style={{ display: 'inline-block', width: '12px', height: '12px', border: '2px solid rgba(255,254,249,0.4)', borderTopColor: '#FFFEF9', borderRadius: '50%' }} className="animate-spin-fast" />
+                {isCN ? '搜尋中' : '搜尋中'}
+              </span>
+            ) : (view === 'points' ? searchQuery : treatSearch) ? (
+              <button onClick={() => { view === 'points' ? setSearchQuery('') : setTreatSearch(''); document.getElementById('acu-search-input')?.focus() }} style={{ background: 'rgba(255,254,249,0.2)', border: 'none', borderRadius: 20, padding: '2px 8px', cursor: 'pointer', fontSize: 11, color: '#FFFEF9', fontWeight: 700, display: 'flex', alignItems: 'center', flexShrink: 0 }}>✕</button>
+            ) : null}
+          </label>
         </div>
 
         {/* 4-Tab */}

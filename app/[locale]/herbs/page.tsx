@@ -67,6 +67,7 @@ export default function HerbsPage() {
   const [herbView, setHerbView] = useState<'home' | 'list'>('home')
   const t = useTranslations('herbs')
   const locale = useLocale()
+  const isCN = locale === 'zh-CN'
   const router = useRouter()
   const MENU_ITEMS = [
     { label: t('menu.langToggle'), icon: '🌐', action: 'lang' },
@@ -151,17 +152,24 @@ export default function HerbsPage() {
 
         {/* Search */}
         <div style={{ padding: '10px 14px 0' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, backgroundColor: 'rgba(255,254,249,0.15)', borderRadius: 14, padding: '11px 14px', border: '1.5px solid rgba(255,254,249,0.25)' }}>
-            <span style={{ fontSize: 16, opacity: 0.8 }}>🔍</span>
-            <input type="text" placeholder={loading ? t('loading') : t('searchPlaceholder')} value={search} onChange={e => setSearch(e.target.value)}
+          <label htmlFor="herb-search-input" style={{ display: 'flex', alignItems: 'center', gap: 8, backgroundColor: 'rgba(255,254,249,0.15)', borderRadius: 14, padding: '11px 14px', border: '1.5px solid rgba(255,254,249,0.25)', cursor: 'text' }}
+            onClick={() => document.getElementById('herb-search-input')?.focus()}>
+            <span style={{ fontSize: 16, opacity: 0.7, flexShrink: 0, userSelect: 'none' }}>🔍</span>
+            <input id="herb-search-input"
+              type="text"
+              placeholder={loading ? t('loading') : t('searchPlaceholder')}
+              value={search} onChange={e => setSearch(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); setHerbView('list') } }}
               disabled={loading}
-              style={{ flex: 1, border: 'none', background: 'transparent', outline: 'none', fontSize: 14, color: '#FFFEF9' }} />
-            {search ? (
-              <button onClick={() => setSearch('')} style={{ background: 'rgba(255,254,249,0.2)', border: 'none', borderRadius: 20, padding: '2px 8px', cursor: 'pointer', fontSize: 11, color: '#FFFEF9', fontWeight: 700, display: 'flex', alignItems: 'center' }}>✕</button>
-            ) : <span style={{ width: 28 }} />}
-            <button onClick={() => { setHerbView('list') }} style={{ background: 'rgba(255,254,249,0.2)', border: 'none', borderRadius: 20, padding: '2px 8px', cursor: 'pointer', fontSize: 11, color: '#FFFEF9', fontWeight: 700, display: 'flex', alignItems: 'center' }}>送出</button>
-          </div>
+              style={{ flex: 1, border: 'none', background: 'transparent', outline: 'none', fontSize: 14, color: '#FFFEF9', caretColor: '#FFFEF9' }} />
+            {loading ? (
+              <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', color: 'rgba(255,254,249,0.7)', flexShrink: 0 }}>
+                <span style={{ display: 'inline-block', width: '12px', height: '12px', border: '2px solid rgba(255,254,249,0.4)', borderTopColor: '#FFFEF9', borderRadius: '50%' }} className="animate-spin-fast" />
+              </span>
+            ) : search ? (
+              <button onClick={() => { setSearch(''); document.getElementById('herb-search-input')?.focus() }} style={{ background: 'rgba(255,254,249,0.2)', border: 'none', borderRadius: 20, padding: '2px 8px', cursor: 'pointer', fontSize: 11, color: '#FFFEF9', fontWeight: 700, display: 'flex', alignItems: 'center', flexShrink: 0 }}>✕</button>
+            ) : null}
+          </label>
         </div>
 
         {/* 4-Tab Navigation */}
@@ -224,7 +232,7 @@ export default function HerbsPage() {
 
         {/* Count */}
         <div style={{ padding: '8px 16px 0', fontSize: 12, color: '#2C4A3E' }}>
-          loading ? t('loading') : `${filtered.length} ${t('resultCount').replace('{count}', '')}`
+          {loading ? t('loading') : `${filtered.length} ${t('resultCount').replace('{count}', '')}`}
         </div>
 
         {/* Content */}

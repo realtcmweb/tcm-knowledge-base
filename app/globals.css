@@ -60,3 +60,9 @@ input, select, textarea {
   to { transform: rotate(360deg); }
 }
 .animate-spin-slow { animation: spin-slow 30s linear infinite; }
+
+/* Search loading spinner */
+@keyframes spin-fast {
+  to { transform: rotate(360deg); }
+}
+.animate-spin-fast { animation: spin-fast 0.7s linear infinite; }
