@@ -62,8 +62,8 @@ function formatSection(title: string, content: string): JSX.Element | null {
 export default function HerbsPage() {
   const [herbs, setHerbs] = useState<Herb[]>([])
   const [loading, setLoading] = useState(true)
-  const [search, setSearch] = useState('')
   const [selectedCat, setSelectedCat] = useState('解表药')
+  const [searchQuery, setSearchQuery] = useState('')
   const [herbView, setHerbView] = useState<'home' | 'list'>('home')
   const t = useTranslations('herbs')
   const locale = useLocale()
@@ -88,10 +88,15 @@ export default function HerbsPage() {
       .then(d => { setHerbs(d); setLoading(false) })
   }, [])
 
+  const handleSearch = () => {
+    if (!searchQuery.trim()) return
+    router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`)
+  }
+
   const filtered = herbs.filter(h => {
     if (selectedCat && getCategory(h.chapter) !== selectedCat) return false
-    if (search.trim()) {
-      const sq = toSimplified(search).toLowerCase()
+    if (searchQuery.trim()) {
+      const sq = toSimplified(searchQuery).toLowerCase()
       return h.name.toLowerCase().includes(sq) || h.pinyin.toLowerCase().includes(sq)
     }
     return true
@@ -115,6 +120,9 @@ export default function HerbsPage() {
       <SharedHeader
         title={t('title')}
         onMenuAction={handleHeaderMenuAction}
+        searchValue={searchQuery}
+        onSearchChange={setSearchQuery}
+        onSearchKeyDown={e => { if (e.key === 'Enter') handleSearch() }}
         extraContent={
           <>
             {/* 4-Tab Navigation */}

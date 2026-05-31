@@ -18,7 +18,20 @@ interface Acupoint {
   indications: string
   method: string
   anatomy: string
+  area?: string  // 董氏奇穴部位
 }
+
+// 董氏奇穴12部位
+const DW_AREAS = [
+  { key: 'all', tw: '全部', cn: '全部', emoji: '🌟', count: 81 },
+  { key: 'E1', tw: '一部位', cn: '一部位', emoji: '🖐️', count: 31, desc: '手指' },
+  { key: 'E2', tw: '二二部', cn: '二二部', emoji: '✋', count: 13, desc: '手掌' },
+  { key: 'E6', tw: '六六部', cn: '六六部', emoji: '🦶', count: 10, desc: '足背' },
+  { key: 'E7', tw: '七七部', cn: '七七部', emoji: '🦵', count: 7, desc: '小腿' },
+  { key: 'E8', tw: '八八部', cn: '八八部', emoji: '🦿', count: 18, desc: '大腿' },
+  { key: 'E9', tw: '九九部', cn: '九九部', emoji: '👂', count: 2, desc: '耳朵' },
+  { key: 'E10', tw: '十十部', cn: '十十部', emoji: '🧠', count: 0, desc: '頭面' },
+]
 
 interface Treatment {
   name: string
@@ -44,6 +57,7 @@ const CATEGORIES = [
   { key: 'GV', tw: '督脈', cn: '督脉', emoji: '⚡' },
   { key: 'CV', tw: '任脈', cn: '任脉', emoji: '🌊' },
   { key: 'EX', tw: '經外奇穴', cn: '经外奇穴', emoji: '⭐' },
+  { key: 'DW', tw: '董氏奇穴', cn: '董氏奇穴', emoji: '🌟' },
 ]
 
 const POINT_TYPES = [
@@ -97,6 +111,7 @@ export default function AcupointsPage() {
   const pathname = usePathname()
 
   const [acupoints, setAcupoints] = useState<Acupoint[]>([])
+  const [dongshiPoints, setDongshiPoints] = useState<Acupoint[]>([])
   const [loading, setLoading] = useState(true)
   const [view, setView] = useState<'points' | 'treatment'>('points')
   const [acuView, setAcuView] = useState<'home' | 'category' | 'list'>('home')
@@ -106,6 +121,7 @@ export default function AcupointsPage() {
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [selectedPointType, setSelectedPointType] = useState('')
   const [selectedAcupoint, setSelectedAcupoint] = useState<Acupoint | null>(null)
+  const [selectedDWArea, setSelectedDWArea] = useState('all')  // 董氏奇穴部位篩選
 
   const [treatSearch, setTreatSearch] = useState('')
   const [treatCat, setTreatCat] = useState('all')
@@ -118,19 +134,27 @@ export default function AcupointsPage() {
 
 
   useEffect(() => {
-    fetch('/data/acupoints.json').then(r => r.json()).then(d => {
-      setAcupoints(d)
+    Promise.all([
+      fetch('/data/acupoints.json').then(r => r.json()),
+      fetch('/data/dongshi.json').then(r => r.json()),
+    ]).then(([a, d]) => {
+      setAcupoints(a)
+      setDongshiPoints(d)
       setLoading(false)
     })
   }, [])
 
-  const filteredAcupoints = acupoints.filter(a => {
+  const filteredAcupoints = (selectedCategory === 'DW' ? dongshiPoints : acupoints).filter(a => {
     if (selectedCategory === 'regular' && !MERIDIANS.some(m => a.code.startsWith(m.code))) return false
     if (selectedCategory === 'GV' && !a.code.startsWith('GV')) return false
     if (selectedCategory === 'CV' && !a.code.startsWith('CV')) return false
     if (selectedCategory === 'EX' && !a.code.startsWith('EX')) return false
+    if (selectedCategory === 'DW' && !a.code.startsWith('E')) return false
+    if (selectedCategory === 'all' && a.code.startsWith('E')) return false
     if (selectedMeridian && !a.code.startsWith(selectedMeridian)) return false
     if (selectedPointType && !a.specialType.includes(selectedPointType)) return false
+    // 董氏奇穴部位篩選
+    if (selectedCategory === 'DW' && selectedDWArea !== 'all' && !a.code.startsWith(selectedDWArea)) return false
     if (searchQuery.trim()) {
       const sq = toSimplified(searchQuery).toLowerCase()
       return a.name.toLowerCase().includes(sq) ||
@@ -225,10 +249,17 @@ searchValue={searchQuery}
                 </button>
               </div>
               <div style={{ padding: '8px 14px 0', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                <button onClick={() => { setSelectedCategory('EX'); setSelectedMeridian(''); setSelectedPointType(''); setAcuView('list') }} style={{ backgroundColor: '#FFFEF9', borderRadius: '16px', padding: '14px', border: '1.5px solid #E8E4DC', cursor: 'pointer', textAlign: 'left', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
-                  <div style={{ fontSize: '22px', marginBottom: '6px' }}>⭐</div>
-                  <div style={{ fontSize: '13px', fontWeight: 800, color: '#1a2C24', marginBottom: '3px' }}>{isCN ? '经外奇穴' : '經外奇穴'}</div>
-                  <div style={{ fontSize: '10px', color: '#8A8A7A' }}>{isCN ? '不归经 · 新穴' : '不歸經 · 新穴'}</div>
+                <button onClick={() => { setSelectedCategory('DW'); setSelectedMeridian(''); setSelectedPointType(''); setSelectedDWArea('all'); setAcuView('list') }} style={{ backgroundColor: '#FFFEF9', borderRadius: '16px', padding: '14px', border: '1.5px solid #E8E4DC', cursor: 'pointer', textAlign: 'left', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                    <div style={{ fontSize: '22px' }}>🌟</div>
+                    <div style={{ fontSize: '13px', fontWeight: 800, color: '#1a2C24' }}>{isCN ? '董氏奇穴' : '董氏奇穴'}</div>
+                  </div>
+                  <div style={{ fontSize: '11px', color: '#8A8A7A', marginBottom: '6px' }}>{isCN ? '740穴 · 十二部位系統' : '740穴 · 十二部位系統'}</div>
+                  <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                    {[{ t: '🖐️ 一部位(31)', c: 'E1' }, { t: '✋ 二二部(13)', c: 'E2' }, { t: '🦶 六六部(10)', c: 'E6' }, { t: '🦿 八八部(18)', c: 'E8' }].map(b => (
+                      <span key={b.c} style={{ fontSize: '9px', backgroundColor: '#FDF3E7', color: '#8B4513', padding: '2px 6px', borderRadius: '8px', fontWeight: 700 }}>{b.t}</span>
+                    ))}
+                  </div>
                 </button>
               </div>
             </>
@@ -240,7 +271,7 @@ searchValue={searchQuery}
                 <button onClick={() => setAcuView('home')} style={{ background: 'rgba(255,254,249,0.15)', border: 'none', borderRadius: '12px', padding: '6px 10px', cursor: 'pointer', fontSize: '11px', color: '#FFFEF9', fontWeight: 700 }}>← {isCN ? '返回' : '返回'}</button>
               </div>
               <div style={{ padding: '12px 14px 8px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                {[{ key: 'regular', tw: '十二經脈', cn: '十二经脉', emoji: '🫁', desc: isCN ? '肺经 · 大肠经 · 胃经 · 脾经...' : '肺經 · 大腸經 · 胃經 · 脾經...' }, { key: 'GV', tw: '督脈', cn: '督脉', emoji: '⚡', desc: isCN ? '阳脉之海' : '陽脈之海' }, { key: 'CV', tw: '任脈', cn: '任脉', emoji: '🌊', desc: isCN ? '阴脉之海' : '陰脈之海' }, { key: 'EX', tw: '經外奇穴', cn: '经外奇穴', emoji: '⭐', desc: isCN ? '新穴' : '新穴' }].map(cat => (
+                {[{ key: 'regular', tw: '十二經脈', cn: '十二经脉', emoji: '🫁', desc: isCN ? '肺经 · 大肠经 · 胃经 · 脾经...' : '肺經 · 大腸經 · 胃經 · 脾經...' }, { key: 'GV', tw: '督脈', cn: '督脉', emoji: '⚡', desc: isCN ? '阳脉之海' : '陽脈之海' }, { key: 'CV', tw: '任脈', cn: '任脉', emoji: '🌊', desc: isCN ? '阴脉之海' : '陰脈之海' }, { key: 'EX', tw: '經外奇穴', cn: '经外奇穴', emoji: '⭐', desc: isCN ? '新穴' : '新穴' }, { key: 'DW', tw: '董氏奇穴', cn: '董氏奇穴', emoji: '🌟', desc: isCN ? '740穴 · 十二部位' : '740穴 · 十二部位' }].map(cat => (
                   <button key={cat.key} onClick={() => { setSelectedCategory(cat.key); setSelectedMeridian(''); setSelectedPointType(''); setAcuView('list') }} style={{ backgroundColor: '#FFFEF9', borderRadius: '16px', padding: '16px 14px', border: '1.5px solid #E8E4DC', cursor: 'pointer', textAlign: 'left', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
                     <div style={{ fontSize: '24px', marginBottom: '8px' }}>{cat.emoji}</div>
                     <div style={{ fontSize: '14px', fontWeight: 800, color: '#1a2C24' }}>{isCN ? cat.cn : cat.tw}</div>
@@ -276,6 +307,42 @@ searchValue={searchQuery}
                 </div>
               )}
 
+              {/* 董氏奇穴 12部位 橫向滾動 */}
+              {selectedCategory === 'DW' && (
+                <div style={{ padding: '10px 14px 6px' }}>
+                  <div style={{ backgroundColor: '#FDF8F0', borderRadius: '14px', padding: '10px 12px', border: '1px solid #F0E4C8' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
+                      <span style={{ fontSize: '14px' }}>🗺️</span>
+                      <span style={{ fontSize: '11px', fontWeight: 700, color: '#5A3A1A' }}>{isCN ? '董氏奇穴 · 12部位分區' : '董氏奇穴 · 12部位分區'}</span>
+                    </div>
+                    <div style={{ display: 'flex', gap: '5px', overflowX: 'auto', paddingBottom: '2px' }}>
+                      {DW_AREAS.filter(a => a.count > 0).map(area => (
+                        <button
+                          key={area.key}
+                          onClick={() => { setSelectedDWArea(area.key); setSelectedMeridian(''); setSelectedPointType('') }}
+                          style={{
+                            padding: '6px 10px',
+                            borderRadius: '12px',
+                            border: 'none',
+                            fontSize: '11px',
+                            cursor: 'pointer',
+                            whiteSpace: 'nowrap',
+                            flexShrink: 0,
+                            fontWeight: 700,
+                            backgroundColor: selectedDWArea === area.key ? '#8B4513' : '#FFF9F0',
+                            color: selectedDWArea === area.key ? '#FFFEF9' : '#8B4513',
+                            boxShadow: selectedDWArea === area.key ? '0 1px 4px rgba(139,69,19,0.3)' : 'none',
+                          }}
+                        >
+                          {area.emoji} {isCN ? area.tw : area.cn}
+                          <span style={{ marginLeft: '3px', opacity: 0.75, fontSize: '10px' }}>({area.count})</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Point Type Pills */}
               <div style={{ padding: '8px 14px 0', display: 'flex', gap: '5px', overflowX: 'auto' }}>
                 <button onClick={() => setSelectedPointType('')} style={{ padding: '4px 10px', borderRadius: '14px', border: 'none', fontSize: '10px', cursor: 'pointer', whiteSpace: 'nowrap', backgroundColor: !selectedPointType ? '#8B4513' : '#E8E4DC', color: !selectedPointType ? '#FFFEF9' : '#5A3A2A', fontWeight: 600 }}>{isCN ? '全部穴性' : '全部穴性'}</button>
@@ -308,9 +375,12 @@ searchValue={searchQuery}
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px' }}>
                         <span style={{ fontSize: '15px', fontWeight: 700, color: '#1a2C24' }}>{isCN ? a.name : toTraditional(a.name)}</span>
                         <span style={{ fontSize: '11px', color: '#8A8A7A', backgroundColor: '#F0EDE5', padding: '2px 8px', borderRadius: '10px', fontWeight: 600 }}>{a.code}</span>
-                        {a.specialType && <span style={{ fontSize: '10px', color: '#8B4513', backgroundColor: '#FDF3E7', padding: '2px 8px', borderRadius: '10px' }}>{a.specialType}</span>}
+                        {a.specialType === '董氏奇穴' && a.area && <span style={{ fontSize: '10px', color: '#8B4513', backgroundColor: '#FDF3E7', padding: '2px 8px', borderRadius: '10px' }}>{isCN ? a.area : toTraditional(a.area)}</span>}
+                        {a.specialType && a.specialType !== '董氏奇穴' && <span style={{ fontSize: '10px', color: '#8A8A7A', backgroundColor: '#F0EDE5', padding: '2px 8px', borderRadius: '10px' }}>{a.specialType}</span>}
                       </div>
-                      <div style={{ fontSize: '12px', color: '#8A8A7A' }}>{isCN ? getMeridianName(a.code) : toTraditional(getMeridianName(a.code))} · {(isCN ? (a.indications || '') : toTraditional(a.indications || '')).slice(0, 35)}...</div>
+                      <div style={{ fontSize: '12px', color: '#8A8A7A' }}>
+                        {a.specialType === '董氏奇穴' ? (isCN ? a.area : toTraditional(a.area || '')) : (isCN ? getMeridianName(a.code) : toTraditional(getMeridianName(a.code)))} · {(isCN ? (a.indications || '') : toTraditional(a.indications || '')).slice(0, 30)}...
+                      </div>
                     </button>
                   ))
                 )}
@@ -412,7 +482,8 @@ searchValue={searchQuery}
             <div style={{ marginBottom: '14px' }}>
               <h2 style={{ fontSize: '22px', fontWeight: 800, color: '#1a2C24', marginBottom: '8px' }}>{isCN ? selectedAcupoint.name : toTraditional(selectedAcupoint.name)}</h2>
               <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-                <span style={{ padding: '3px 10px', backgroundColor: '#EEEBE3', borderRadius: '20px', fontSize: '12px', color: '#2C4A3E', fontWeight: 700 }}>{selectedAcupoint.code} · {isCN ? getMeridianName(selectedAcupoint.code) : toTraditional(getMeridianName(selectedAcupoint.code))}</span>
+                <span style={{ padding: '3px 10px', backgroundColor: '#EEEBE3', borderRadius: '20px', fontSize: '12px', color: '#2C4A3E', fontWeight: 700 }}>{selectedAcupoint.code}</span>
+                {selectedAcupoint.area && <span style={{ padding: '3px 10px', backgroundColor: '#F0EDE5', borderRadius: '20px', fontSize: '12px', color: '#5A3A1A', fontWeight: 700 }}>{isCN ? selectedAcupoint.area : toTraditional(selectedAcupoint.area)}</span>}
                 {selectedAcupoint.specialType && <span style={{ padding: '3px 10px', backgroundColor: '#FDF3E7', borderRadius: '20px', fontSize: '12px', color: '#8B4513', fontWeight: 700 }}>{isCN ? selectedAcupoint.specialType : toTraditional(selectedAcupoint.specialType)}</span>}
               </div>
             </div>
