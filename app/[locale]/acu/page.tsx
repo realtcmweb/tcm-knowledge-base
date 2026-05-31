@@ -7,6 +7,7 @@ import { toTraditional } from '@/lib/toTraditional'
 import { useRouter, usePathname } from 'next/navigation'
 import { useTranslations, useLocale } from 'next-intl'
 import treatmentsData from '../../../public/data/treatments.json'
+import dongshiTreatmentsData from '../../../public/data/dongshi_treatments.json'
 import SharedHeader from '@/components/SharedHeader'
 
 interface Acupoint {
@@ -126,6 +127,7 @@ export default function AcupointsPage() {
   const [treatSearch, setTreatSearch] = useState('')
   const [treatCat, setTreatCat] = useState('all')
   const [selectedTreatment, setSelectedTreatment] = useState<Treatment | null>(null)
+  const [dwTreatMode, setDwTreatMode] = useState<'regular' | 'dongshi'>('regular')
 
   const [modalContent, setModalContent] = useState<{title: string; body: string} | null>(null)
 
@@ -164,7 +166,10 @@ export default function AcupointsPage() {
     return true
   })
 
-  const filteredTreatments = (treatmentsData as Treatment[]).filter(t => {
+  const filteredTreatments = (dwTreatMode === 'dongshi'
+    ? (dongshiTreatmentsData as unknown as Treatment[])
+    : (treatmentsData as Treatment[])
+  ).filter(t => {
     if (treatCat !== 'all' && getTreatCat(t.name) !== treatCat) return false
     if (treatSearch.trim()) return t.name.includes(treatSearch.trim())
     return true
@@ -213,7 +218,7 @@ searchValue={searchQuery}
               <button onClick={() => { setView('points'); setAcuView('home') }} style={{ flex: 1, padding: '9px 4px', borderRadius: '12px', border: 'none', cursor: 'pointer', fontSize: '12px', fontWeight: 700, textAlign: 'center', backgroundColor: view === 'points' ? '#FFFEF9' : 'rgba(255,254,249,0.12)', color: view === 'points' ? '#1a3A2C' : 'rgba(255,254,249,0.8)' }}>
                 💉 {isCN ? '穴位' : '穴位'}
               </button>
-              <button onClick={() => { setView('treatment'); setAcuView('home') }} style={{ flex: 1, padding: '9px 4px', borderRadius: '12px', border: 'none', cursor: 'pointer', fontSize: '12px', fontWeight: 700, textAlign: 'center', backgroundColor: view === 'treatment' ? '#FFFEF9' : 'rgba(255,254,249,0.12)', color: view === 'treatment' ? '#1a3A2C' : 'rgba(255,254,249,0.8)' }}>
+              <button onClick={() => { setView('treatment'); setDwTreatMode('regular'); setAcuView('home') }} style={{ flex: 1, padding: '9px 4px', borderRadius: '12px', border: 'none', cursor: 'pointer', fontSize: '12px', fontWeight: 700, textAlign: 'center', backgroundColor: view === 'treatment' ? '#FFFEF9' : 'rgba(255,254,249,0.12)', color: view === 'treatment' ? '#1a3A2C' : 'rgba(255,254,249,0.8)' }}>
                 💊 {isCN ? '治疗' : '治療'}
               </button>
             </div>
@@ -396,6 +401,17 @@ searchValue={searchQuery}
       {/* ===== TREATMENT VIEW ===== */}
       {view === 'treatment' && (
         <>
+          {/* 治療類型切換：董氏 vs 正經 */}
+          <div style={{ padding: '12px 14px 0', display: 'flex', gap: '6px' }}>
+            <button onClick={() => { setDwTreatMode('regular'); setTreatCat('all'); setTreatSearch('') }} style={{ flex: 1, padding: '9px', borderRadius: '14px', border: 'none', cursor: 'pointer', fontSize: '12px', fontWeight: 700, backgroundColor: dwTreatMode === 'regular' ? '#2C4A3E' : '#E8E4DC', color: dwTreatMode === 'regular' ? '#FFFEF9' : '#1a2C24' }}>
+              🧘 {isCN ? '正經針灸處方' : '正經針灸處方'}
+            </button>
+            <button onClick={() => { setDwTreatMode('dongshi'); setTreatCat('all'); setTreatSearch('') }} style={{ flex: 1, padding: '9px', borderRadius: '14px', border: 'none', cursor: 'pointer', fontSize: '12px', fontWeight: 700, backgroundColor: dwTreatMode === 'dongshi' ? '#8B4513' : '#E8E4DC', color: dwTreatMode === 'dongshi' ? '#FFFEF9' : '#1a2C24' }}>
+              🌟 {isCN ? '董氏奇穴處方' : '董氏奇穴處方'}
+            </button>
+          </div>
+
+          {/* 治療分類橫向滾動 */}
           <div style={{ padding: '12px 14px 0', display: 'flex', gap: '6px', overflowX: 'auto' }}>
             {TREAT_CATEGORIES.map(c => (
               <button key={c.key} onClick={() => setTreatCat(c.key)} style={{ padding: '6px 14px', borderRadius: '20px', border: 'none', fontSize: '12px', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0, fontWeight: 700, backgroundColor: treatCat === c.key ? '#1a3A2C' : '#E8E4DC', color: treatCat === c.key ? '#FFFEF9' : '#4A3A2C' }}>
@@ -405,17 +421,25 @@ searchValue={searchQuery}
           </div>
 
           <div style={{ padding: '8px 16px 4px', fontSize: '11px', color: '#8A8A7A' }}>
-            {filteredTreatments.length} {isCN ? '个治疗处方' : '個治療處方'}
+            {dwTreatMode === 'dongshi' ? `🌟 董氏奇穴 · ` : `🧘 正經針灸 · `}{filteredTreatments.length} {isCN ? '个治疗处方' : '個治療處方'}
           </div>
 
           <div style={{ padding: '0 14px 100px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-            {filteredTreatments.map(t => (
-              <button key={t.name} onClick={() => setSelectedTreatment(t as Treatment)} style={{ backgroundColor: selectedTreatment?.name === t.name ? '#F0EDE6' : '#FFFEF9', borderRadius: '16px', padding: '14px', border: '1.5px solid #E8E4DC', cursor: 'pointer', textAlign: 'left', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
-                <div style={{ fontSize: '16px', fontWeight: 800, color: '#1a2C24', marginBottom: '6px' }}>{t.name}</div>
-                <div style={{ fontSize: '11px', color: '#8B4513', marginBottom: '3px' }}>{isCN ? '主穴：' : '主穴：'}{t.mainPoints.slice(0, 3).map(p => p.name).join('、')}{t.mainPoints.length > 3 ? '...' : ''}</div>
-                <div style={{ fontSize: '10px', color: '#8A8A7A' }}>{Object.keys(t.paired).length > 0 ? Object.keys(t.paired)[0] : (isCN ? '综合处方' : '綜合處方')}</div>
-              </button>
-            ))}
+            {filteredTreatments.map(t => {
+              const isDW = dwTreatMode === 'dongshi'
+              const dwData = isDW ? (t as unknown as {name: string; indications: string; mainPoints: string[]; zhifa: string; area: string; dwKey: string}) : null
+              const displayPoints = isDW
+                ? (dwData.mainPoints.map((p: string) => p.split('|').pop()!.split('-')[0]).slice(0, 3).join('、') + (dwData.mainPoints.length > 3 ? '...' : ''))
+                : (t.mainPoints as {name: string}[]).slice(0, 3).map(p => p.name).join('、') + (t.mainPoints.length > 3 ? '...' : '')
+              return (
+                <button key={t.name} onClick={() => setSelectedTreatment(t as Treatment)} style={{ backgroundColor: selectedTreatment?.name === t.name ? '#F0EDE6' : '#FFFEF9', borderRadius: '16px', padding: '14px', border: '1.5px solid #E8E4DC', cursor: 'pointer', textAlign: 'left', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+                  <div style={{ fontSize: '16px', fontWeight: 800, color: '#1a2C24', marginBottom: '6px' }}>{t.name}</div>
+                  <div style={{ fontSize: '11px', color: '#8B4513', marginBottom: '3px' }}>{isCN ? '主穴：' : '主穴：'}{displayPoints}</div>
+                  {isDW && dwData.area && <div style={{ fontSize: '10px', color: '#8A8A7A' }}>📍 {isCN ? dwData.area : toTraditional(dwData.area)}</div>}
+                  {!isDW && Object.keys(t.paired || {}).length > 0 && <div style={{ fontSize: '10px', color: '#8A8A7A' }}>{Object.keys(t.paired || {})[0]}</div>}
+                </button>
+              )
+            })}
           </div>
         </>
       )}
@@ -432,14 +456,38 @@ searchValue={searchQuery}
 
             <div style={{ backgroundColor: '#F7F5F0', borderRadius: '14px', padding: '14px', marginBottom: '12px' }}>
               <div style={{ fontSize: '12px', fontWeight: 800, color: '#1a3A2C', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '10px' }}>💉 {isCN ? '主穴' : '主穴'}</div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                {selectedTreatment.mainPoints.map(p => (
-                  <Link key={p.name} href={`/${locale}/acu?q=${encodeURIComponent(isCN ? p.name : toTraditional(p.name))}`} onClick={() => setSelectedTreatment(null)} style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '5px 10px', backgroundColor: '#FDF3E7', borderRadius: '20px', border: '1px solid #E8C99A', textDecoration: 'none', fontSize: '12px', color: '#8B4513', fontWeight: 700 }}>
-                    {isCN ? p.name : toTraditional(p.name)} {p.code && <span style={{ fontSize: '10px', opacity: 0.7 }}>{p.code}</span>}
-                  </Link>
-                ))}
-              </div>
+              {dwTreatMode === 'dongshi' ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  {(selectedTreatment as unknown as {mainPoints: string[]}).mainPoints.map((p: string, i: number) => {
+                    const parts = p.split('|')
+                    const code = parts[0]
+                    const name = parts[2] || code
+                    const shortName = name.split('-')[0]
+                    return (
+                      <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 10px', backgroundColor: '#FDF3E7', borderRadius: '10px', border: '1px solid #E8C99A' }}>
+                        <span style={{ fontSize: '14px', color: '#8B4513', fontWeight: 700 }}>{shortName}</span>
+                        <span style={{ fontSize: '11px', color: '#8B4513', opacity: 0.7 }}>{code}</span>
+                      </div>
+                    )
+                  })}
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                  {selectedTreatment.mainPoints.map(p => (
+                    <Link key={p.name} href={`/${locale}/acu?q=${encodeURIComponent(isCN ? p.name : toTraditional(p.name))}`} onClick={() => setSelectedTreatment(null)} style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '5px 10px', backgroundColor: '#FDF3E7', borderRadius: '20px', border: '1px solid #E8C99A', textDecoration: 'none', fontSize: '12px', color: '#8B4513', fontWeight: 700 }}>
+                      {isCN ? p.name : toTraditional(p.name)} {p.code && <span style={{ fontSize: '10px', opacity: 0.7 }}>{p.code}</span>}
+                    </Link>
+                  ))}
+                </div>
+              )}
             </div>
+
+            {dwTreatMode === 'dongshi' && (selectedTreatment as unknown as {zhifa: string}).zhifa && (
+              <div style={{ backgroundColor: '#FDF8F0', borderRadius: '14px', padding: '14px', marginBottom: '12px', border: '1px solid #F0E4C8' }}>
+                <div style={{ fontSize: '11px', fontWeight: 800, color: '#8B4513', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '6px' }}>🪡 {isCN ? '針法特色' : '針法特色'}</div>
+                <div style={{ fontSize: '13px', color: '#5A3A1A', lineHeight: 1.7 }}>{isCN ? (selectedTreatment as unknown as {zhifa: string}).zhifa : toTraditional((selectedTreatment as unknown as {zhifa: string}).zhifa)}</div>
+              </div>
+            )}
 
             {Object.keys(selectedTreatment.paired).length > 0 && (
               <div style={{ backgroundColor: '#F7F5F0', borderRadius: '14px', padding: '14px', marginBottom: '12px' }}>
