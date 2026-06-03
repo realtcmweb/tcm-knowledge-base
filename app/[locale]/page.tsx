@@ -134,12 +134,12 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* 4 Sections 2x2 Grid */}
+      {/* 5 Sections 3+2 Grid */}
       <div style={{ padding: '12px 14px' }}>
         <h2 style={{ fontSize: '12px', fontWeight: 700, color: '#8A8A7A', marginBottom: '8px', paddingLeft: '4px', letterSpacing: '0.06em', textTransform: 'uppercase' }}>中醫資料庫</h2>
 
-        {/* Row 1 */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '8px' }}>
+        {/* Row 1 — 3 cards */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px', marginBottom: '8px' }}>
           {/* 針灸大全 */}
           <Link href="/acu" style={{ display: 'flex', flexDirection: 'column', padding: '14px 14px 12px', backgroundColor: '#EEF4F0', borderRadius: '16px', border: '1.5px solid #D8E4DC', textDecoration: 'none' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
@@ -179,8 +179,8 @@ export default function HomePage() {
           </Link>
         </div>
 
-        {/* Row 2 */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+        {/* Row 2 — 2 cards (左對齊) */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
           {/* 症狀 */}
           <Link href="/symptoms" style={{ display: 'flex', flexDirection: 'column', padding: '14px 14px 12px', backgroundColor: '#F3EEF7', borderRadius: '16px', border: '1.5px solid #E0D8EC', textDecoration: 'none', opacity: 0.8 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
@@ -218,6 +218,28 @@ export default function HomePage() {
               ))}
             </div>
           </Link>
+
+          {/* 學習大全 */}
+          <Link href="/learn" style={{ display: 'flex', flexDirection: 'column', padding: '14px 14px 12px', backgroundColor: '#F5E8F0', borderRadius: '16px', border: '1.5px solid #E0C8D8', textDecoration: 'none' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+              <div style={{ fontSize: '28px', lineHeight: 1 }}>📚</div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: '20px', fontWeight: 900, color: '#1a2C24', marginBottom: '2px' }}>學習大全</div>
+                <div style={{ fontSize: '10px', color: '#8A4A6A', fontWeight: 600 }}>互動學習</div>
+              </div>
+            </div>
+            <div style={{ fontSize: '11px', color: '#5A5A4A', lineHeight: 1.5, marginBottom: '8px', flex: 1 }}>
+              系統學針灸，含穴位故事、配穴、配伍
+            </div>
+            <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+              {['故事', '配穴', '互動'].map(tag => (
+                <span key={tag} style={{ fontSize: '9px', color: '#8A4A6A', backgroundColor: 'rgba(138,74,106,0.1)', padding: '2px 7px', borderRadius: '8px', fontWeight: 600 }}>{tag}</span>
+              ))}
+            </div>
+          </Link>
+
+          {/* 第三格留白（保持 3-column 對齊） */}
+          <div style={{ backgroundColor: 'transparent' }} />
         </div>
       </div>
 
