@@ -933,10 +933,16 @@ export default function ConsultPage() {
             </p>
           </div>
 
-          <button onClick={reset}
-            className="w-full py-3 border-2 border-stone-200 rounded-xl text-sm text-stone-500 hover:border-emerald-400 hover:text-emerald-600 transition">
-            重新問診
-          </button>
+          <div className="flex gap-3">
+            <button onClick={reset}
+              className="flex-1 py-3 border-2 border-stone-200 rounded-xl text-sm text-stone-500 hover:border-emerald-400 hover:text-emerald-600 transition">
+              重新問診
+            </button>
+            <Link href="/db"
+              className="flex-1 py-3 bg-emerald-600 text-white rounded-xl text-sm font-medium hover:bg-emerald-700 transition text-center">
+              📖 知識庫
+            </Link>
+          </div>
         </main>
       )}
 
