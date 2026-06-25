@@ -11,9 +11,7 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  turbopack: {
-    root: '/home/justin/.openclaw/workspace/tcm_ai/vercel_tcm_frontend',
-  },
+  // turbopack: { root: process.cwd() },
 }
 
 export default withNextIntl(nextConfig)

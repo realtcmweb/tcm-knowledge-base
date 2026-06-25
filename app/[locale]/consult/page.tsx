@@ -333,6 +333,27 @@ function analyzeCondition(answers: Record<string, string>): {
   if ((vals.includes('稀軟') || vals.includes('腹瀉') || vals.includes('不振') || vals.includes('胃脹') || vals.includes('吃一點'))) {
     return { type: '脾虛', sub: '脾胃虛弱', pattern: '虛', description: '您屬於脾虛體質，運化失常，大便異常，食慾不振。調理以健脾和胃、補中益氣為主。', suggestions: ['定時定量用餐', '多吃山藥、茯苓、蓮子', '飯後散步30分鐘', '少吃生冷油膩'], avoid: ['冰品', '空腹吃水果', '暴飲暴食', '甜食'], herbs: ['參苓白朮散', '四君子湯', '附子理中丸'], acupoints: ['足三里（膝蓋下3寸）', '中脘穴（肚臍上4寸）', '脾俞穴（背部）'], diet: ['山藥蓮子粥：山藥50g + 蓮子30g + 粳米100g', '茯苓餅：茯苓粉30g + 麵粉100g 煎', '四神豬肚湯：山藥/茯苓/蓮子/芡實 各15g + 猪肚'] }
   }
+  // ========== 平和質 ==========
+  if ((vals.includes('正常') || vals.includes('沒有') || vals.includes('無')) &&
+      !vals.includes('怕冷') && !vals.includes('怕熱') && !vals.includes('疲倦') &&
+      !vals.includes('失眠') && !vals.includes('便祕') && !vals.includes('腹瀉')) {
+    return { type: '平和質', sub: '陰陽平衡', pattern: '平和', description: '您屬於平和體質，陰陽氣血調和，身體健康。請继续保持規律作息、均衡飲食、適度運動。', suggestions: ['保持規律作息（23點前入睡）', '均衡飲食', '每週運動3次', '保持心情愉快'], avoid: ['過度勞累', '情緒大波動', '熬夜'], herbs: [], acupoints: [], diet: [] }
+  }
+  // ========== 血瘀質 ==========
+  if ((vals.includes('刺痛') || vals.includes('針刺') || vals.includes('固定')) &&
+      (vals.includes('痛') || vals.includes('經痛') || vals.includes('偏頭痛') || vals.includes('經常') && vals.includes('頭痛'))) {
+    return { type: '血瘀質', sub: '血行不暢', pattern: '血瘀', description: '您屬於血瘀體質，血行不暢，痛有定處。調理以活血化瘀、通絡止痛為主。', suggestions: ['多吃黑木耳、山楂、紅曲', '適度運動促進血液循環', '按摩患處', '避免久坐久站'], avoid: ['寒涼食物', '油膩食物', '熬夜'], herbs: ['血府逐瘀湯', '桃紅四物湯', '桂枝茯苓丸'], acupoints: ['血海穴（膝蓋內側）', '膈俞穴（背部）', '三陰交（內踝上）'], diet: ['山楂紅糖水：山楂10g + 紅糖', '黑木耳炒芹菜：黑木耳50g + 芹菜', '紅曲酒釀：紅曲酒釀50g'] }
+  }
+  // ========== 濕熱質 ==========
+  if ((vals.includes('黃') || vals.includes('油') || vals.includes('黏膩') || vals.includes('痘') || vals.includes('長痘')) &&
+      (vals.includes('口苦') || vals.includes('臭') || vals.includes('小便') || vals.includes('癢'))) {
+    return { type: '濕熱質', sub: '濕熱內蘊', pattern: '濕熱', description: '您屬於濕熱體質，濕熱內蘊，面垢油光，易長痘。調理以清熱利濕、瀉火解毒為主。', suggestions: ['少吃燒烤炸辣', '多吃冬瓜、綠豆、苦瓜', '保持環境乾燥', '規律運動（微汗為佳）'], avoid: ['辛辣', '油炸', '酒精', '甜食', '芒果'], herbs: ['茵陳蒿湯', '龍膽瀉肝湯', '甘露消毒丹'], acupoints: ['曲池穴（手肘）', '陰陵泉（小腿內側）', '大椎穴（後頸）'], diet: ['綠豆薏仁湯：綠豆30g + 薏仁30g', '冬瓜排骨湯：冬瓜500g + 排骨', '苦瓜茶：苦瓜乾5g 熱水泡'] }
+  }
+  // ========== 特稟質（過敏體質）==========
+  if ((vals.includes('過敏') || vals.includes('癢') || vals.includes('疹') || vals.includes('紅')) &&
+      (vals.includes('季節') || vals.includes('換季') || vals.includes('花粉') || vals.includes('食物') || vals.includes('時間'))) {
+    return { type: '特稟質', sub: '過敏體質', pattern: '特稟', description: '您屬於特稟質（過敏體質），對季節變化或特定物質過敏。調理以益氣固表、脫敏扶正為主。', suggestions: ['遠離過敏原', '補充維生素C', '保持環境清潔', '適度運動增強免疫'], avoid: ['已知過敏原', '辛辣食物', '冰冷食物', '熬夜'], herbs: ['玉屏風散', '過敏煎', '消風散'], acupoints: ['風池穴（後頸）', '曲池穴（手肘）', '血海穴（膝蓋內側）'], diet: ['維生素C茶：檸檬片 + 蜂蜜', '紅棗枸杞茶：紅棗5顆 + 枸杞10g', '百合綠豆湯：百合30g + 綠豆30g'] }
+  }
   return { type: '需調理', sub: '陰陽偏頗', pattern: 'mixed', description: '根據您的描述，您有陰陽氣血輕度偏頗。建議規律作息、均衡飲食、適度運動以維持健康平衡。', suggestions: ['保持規律作息', '均衡飲食', '每週運動3次', '保持心情愉快'], avoid: ['過度疲勞', '情緒大波動', '熬夜'], herbs: [], acupoints: [], diet: [] }
 }
 
