@@ -1,15 +1,27 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
 // MENU_ITEMS is defined below after T_MENU (uses lang-aware text)
 
+interface RetrieverResult {
+  id: string
+  name: string
+  type: string
+  description?: string
+}
+
 export default function HomePage() {
   const router = useRouter()
   const [search, setSearch] = useState('')
   const [loading, setLoading] = useState(true)
+  const [suggestions, setSuggestions] = useState<RetrieverResult[]>([])
+  const [showSuggestions, setShowSuggestions] = useState(false)
+  const [isListening, setIsListening] = useState(false)
+  const searchRef = useRef<HTMLInputElement>(null)
+  const suggestionRef = useRef<HTMLDivElement>(null)
   const [acupointsCount, setAcupointsCount] = useState(0)
   const [formulasCount, setFormulasCount] = useState(0)
   const [herbsCount, setHerbsCount] = useState(0)
@@ -56,9 +68,81 @@ export default function HomePage() {
     })
   }, [])
 
+  // 智慧建議：调用 retriever API
+  useEffect(() => {
+    if (!search.trim() || search.trim().length < 2) {
+      setSuggestions([])
+      setShowSuggestions(false)
+      return
+    }
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetch('http://127.0.0.1:8765/retrieve', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query: search.trim(), topK: 6 })
+        })
+        const data = await res.json()
+        if (data.results && data.results.length > 0) {
+          setSuggestions(data.results.slice(0, 6))
+          setShowSuggestions(true)
+        } else {
+          setSuggestions([])
+          setShowSuggestions(false)
+        }
+      } catch (e) {
+        console.error('retriever error:', e)
+        setSuggestions([])
+        setShowSuggestions(false)
+      }
+    }, 400)
+    return () => clearTimeout(timer)
+  }, [search])
+
+  // 點擊外部關閉建議
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (suggestionRef.current && !suggestionRef.current.contains(e.target as Node) && !searchRef.current?.contains(e.target as Node)) {
+        setShowSuggestions(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
   const handleSearch = () => {
     if (!search.trim()) return
+    setShowSuggestions(false)
     router.push(`/search?q=${encodeURIComponent(search.trim())}`)
+  }
+
+  // 語音輸入
+  const handleVoiceInput = () => {
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+      alert('瀏覽器不支持語音輸入')
+      return
+    }
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
+    const recognition = new SpeechRecognition()
+    recognition.lang = lang === 'tw' ? 'zh-TW' : 'zh-CN'
+    recognition.interimResults = false
+    recognition.maxAlternatives = 1
+    setIsListening(true)
+    recognition.start()
+    recognition.onresult = (event: any) => {
+      const transcript = event.results[0][0].transcript
+      setSearch(transcript)
+      setIsListening(false)
+    }
+    recognition.onerror = () => setIsListening(false)
+    recognition.onend = () => setIsListening(false)
+  }
+
+  const goToSuggestion = (item: RetrieverResult) => {
+    setShowSuggestions(false)
+    const typeMap: Record<string, string> = { Herb: '/herbs', Formula: '/db', Acupoint: '/acu', Pattern: '/symptoms', Symptom: '/symptoms', Disease: '/symptoms' }
+    const path = typeMap[item.type] || '/search'
+    router.push(`${path}?q=${encodeURIComponent(item.name)}`)
   }
 
   const handleMenuAction = (action: string) => {
@@ -98,28 +182,49 @@ export default function HomePage() {
         </div>
 
         {/* Search */}
-        <div style={{ padding: '0 16px' }}>
-          <label htmlFor="home-search-input" style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: 'rgba(255,254,249,0.15)', borderRadius: '14px', padding: '12px 14px', border: '1.5px solid rgba(255,254,249,0.25)', cursor: 'text' }}
+        <div style={{ padding: '0 16px', position: 'relative' }}>
+          <label htmlFor="home-search-input" ref={searchRef} style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: 'rgba(255,254,249,0.15)', borderRadius: '14px', padding: '12px 14px', border: '1.5px solid rgba(255,254,249,0.25)', cursor: 'text' }}
             onClick={() => document.getElementById('home-search-input')?.focus()}>
             <span style={{ fontSize: '17px', opacity: 0.7, flexShrink: 0, userSelect: 'none' }}>🔍</span>
             <input id="home-search-input"
               type="text"
-              placeholder={loading ? '載入中...' : '搜尋穴位、方劑...'}
+              placeholder={loading ? '載入中...' : '搜尋穴位、方劑、藥材...'}
               value={search} onChange={e => setSearch(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleSearch()}
+              onFocus={() => search.trim().length >= 2 && suggestions.length > 0 && setShowSuggestions(true)}
               disabled={loading}
               style={{ flex: 1, border: 'none', background: 'transparent', outline: 'none', fontSize: '14px', color: '#FFFEF9', caretColor: '#FFFEF9' }} />
+            {/* 語音按鈕 */}
+            <button type="button" onClick={handleVoiceInput} disabled={loading || isListening} style={{ background: isListening ? '#ff6b6b' : 'rgba(255,254,249,0.2)', border: 'none', borderRadius: 20, padding: '6px 10px', cursor: loading || isListening ? 'default' : 'pointer', fontSize: '14px', flexShrink: 0, display: 'flex', alignItems: 'center', transition: 'all 0.2s' }}>
+              {isListening ? '🔴' : '🎤'}
+            </button>
             {loading ? (
               <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', color: 'rgba(255,254,249,0.7)', flexShrink: 0 }}>
                 <span style={{ display: 'inline-block', width: '12px', height: '12px', border: '2px solid rgba(255,254,249,0.4)', borderTopColor: '#FFFEF9', borderRadius: '50%' }} className="animate-spin-fast" />
               </span>
             ) : search ? (
-              <button onClick={() => { setSearch(''); document.getElementById('home-search-input')?.focus() }} style={{ background: 'rgba(255,254,249,0.2)', border: 'none', borderRadius: 20, padding: '2px 8px', cursor: 'pointer', fontSize: 11, color: '#FFFEF9', fontWeight: 700, display: 'flex', alignItems: 'center', flexShrink: 0 }}>✕</button>
+              <button onClick={() => { setSearch(''); setSuggestions([]); setShowSuggestions(false); document.getElementById('home-search-input')?.focus() }} style={{ background: 'rgba(255,254,249,0.2)', border: 'none', borderRadius: 20, padding: '2px 8px', cursor: 'pointer', fontSize: 11, color: '#FFFEF9', fontWeight: 700, display: 'flex', alignItems: 'center', flexShrink: 0 }}>✕</button>
             ) : null}
             {!loading && (
               <button onClick={handleSearch} disabled={!search.trim()} style={{ padding: '7px 16px', backgroundColor: search.trim() ? '#FFFEF9' : 'rgba(255,254,249,0.3)', color: '#1a3A2C', border: 'none', borderRadius: '20px', fontSize: '13px', fontWeight: 700, cursor: search.trim() ? 'pointer' : 'default', flexShrink: 0 }}>搜尋</button>
             )}
           </label>
+          {/* 智能建議卡片 */}
+          {showSuggestions && suggestions.length > 0 && (
+            <div ref={suggestionRef} style={{ position: 'absolute', left: 16, right: 16, top: '100%', marginTop: 8, backgroundColor: '#FFFEF9', borderRadius: 14, boxShadow: '0 8px 24px rgba(0,0,0,0.18)', zIndex: 200, overflow: 'hidden', border: '1px solid #E8E4DC' }}>
+              <div style={{ padding: '10px 14px', fontSize: 11, color: '#8A8A7A', fontWeight: 600, borderBottom: '1px solid #F0EDE5', backgroundColor: '#FAF9F6' }}>💡 智能建議</div>
+              {suggestions.map((item, i) => (
+                <div key={i} onClick={() => goToSuggestion(item)} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', cursor: 'pointer', borderBottom: i < suggestions.length - 1 ? '1px solid #F0EDE5' : 'none', transition: 'background 0.15s' }}>
+                  <span style={{ fontSize: 18 }}>{item.type === 'Herb' ? '🌿' : item.type === 'Formula' ? '🍵' : item.type === 'Acupoint' ? '💉' : item.type === 'Pattern' ? '🔯' : '📋'}</span>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: '#1a2C24' }}>{item.name}</div>
+                    {item.description && <div style={{ fontSize: 11, color: '#6A6A5A', marginTop: 2 }}>{item.description.slice(0, 50)}{item.description.length > 50 ? '...' : ''}</div>}
+                  </div>
+                  <span style={{ fontSize: 10, color: '#8A8A7A', backgroundColor: '#F0EDE5', padding: '2px 8px', borderRadius: 10, fontWeight: 600 }}>{item.type}</span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Stats */}
