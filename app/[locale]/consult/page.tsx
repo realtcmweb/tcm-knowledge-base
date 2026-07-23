@@ -592,7 +592,6 @@ export default function ConsultPage() {
           </div>
           <div className="bg-stone-100 rounded-xl p-4 text-center">
             <p className="text-xs text-stone-500 leading-relaxed">
-              基於中醫十問歌：中醫師千年傳承診斷智慧<br />
               您的資料僅用於本次分析，不會保存
             </p>
           </div>
